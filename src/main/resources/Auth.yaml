@@ -1,0 +1,133 @@
+authorization:
+  - endpoint: /login
+    method: POST
+    roles:
+      Client: ["access"]
+      Employee: ["access"]
+      Manager: ["access"]
+      SuperAdmin: ["access"]
+
+  - endpoint: /logout
+    method: POST
+    roles:
+      Client: ["access"]
+      Employee: ["access"]
+      Manager: ["access"]
+      SuperAdmin: ["access"]
+
+  - endpoint: /user
+    method: POST
+    roles:
+      Client: ["create:self"]
+      Employee: ["create:Client"]
+      Manager: ["create:Client", "create:Employee", "create:Manager"]
+      SuperAdmin: ["create:Manager"]
+
+  - endpoint: /profile/{user_id}
+    method: GET
+    roles:
+      Client: ["view:self"]
+      Employee: ["view:self", "view:Client:branch"]
+      Manager: ["view:self", "view:Client:branch", "view:Employee:branch"]
+
+  - endpoint: /profile/{user_id}
+    method: PUT
+    tag: editProfile
+    roles:
+      Client: ["edit:self"]
+      Employee: ["edit:self", "edit:Client:branch"]
+      Manager: ["edit:self", "edit:Client:branch", "edit:Employee:branch"]
+
+  - endpoint: /profile/{user_id}
+    method: PUT
+    tag: changePassword
+    roles:
+      Client: ["changePassword:self"]
+      Employee: ["changePassword:self"]
+      Manager: ["changePassword:self"]
+
+  - endpoint: /profile/{user_id}/deactivate_request
+    method: POST
+    roles:
+      Client: ["requestDeactivate:self"]
+      Employee: ["requestDeactivate:self", "requestDeactivate:Client:branch"]
+
+  - endpoint: /review/profile_deactivate/{request_id}
+    method: PUT
+    roles:
+      Manager: ["approveDeactivateRequest:Client", "approveDeactivateRequest:Employee"]
+
+  - endpoint: /profile/{user_id}/deactivate
+    method: PUT
+    roles:
+      Manager: ["deactivateDirect:Client", "deactivateDirect:Employee"]
+
+  - endpoint: /accounts/{user_id}
+    method: GET
+    roles:
+      Client: ["viewAccounts:self"]
+      Employee: ["viewAccounts:Client:branch"]
+      Manager: ["viewAccounts:Client:branch"]
+
+  - endpoint: /accounts/{account_no}/details
+    method: GET
+    roles:
+      Client: ["viewAccountDetails:self"]
+      Employee: ["viewAccountDetails:Client:branch"]
+      Manager: ["viewAccountDetails:Client:branch"]
+
+  - endpoint: /users/{user_id}/accounts/add
+    method: POST
+    roles:
+      Manager: ["createAccount:Client"]
+
+  - endpoint: /user/{user_id}/account_request
+    method: POST
+    roles:
+      Client: ["requestAccount:self"]
+      Employee: ["requestAccount:Client:branch"]
+
+  - endpoint: /review/new_account/{request_id}
+    method: PUT
+    roles:
+      Manager: ["approveAccountRequest"]
+
+  - endpoint: /accounts/{account_no}/deactivate
+    method: PUT
+    roles:
+      Manager: ["deactivateAccountDirect"]
+
+  - endpoint: /accounts/{account_no}/deactivate_request
+    method: PUT
+    roles:
+      Client: ["requestDeactivateAccount:self"]
+      Employee: ["requestDeactivateAccount:Client:branch"]
+
+  - endpoint: /review/account_deactivate/{request_id}
+    method: PUT
+    roles:
+      Manager: ["approveAccountDeactivateRequest"]
+
+  - endpoint: /transactions/transfer
+    method: POST
+    roles:
+      Client: ["transfer:self"]
+      Employee: ["transfer:Client:branch"]
+      Manager: ["transfer:Client:branch"]
+
+  - endpoint: /transactions/deposit
+    method: PUT
+    roles:
+      Employee: ["deposit:Client:branch"]
+      Manager: ["deposit:Client:branch"]
+
+  - endpoint: /transactions/withdraw
+    method: POST
+    roles:
+      Employee: ["withdraw:Client:branch"]
+      Manager: ["withdraw:Client:branch"]
+
+  - endpoint: /branch
+    method: POST
+    roles:
+      Manager: ["addBranch"]

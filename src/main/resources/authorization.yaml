@@ -1,0 +1,36 @@
+authorization:
+  - endpoint: /login
+    method: POST
+    roles:
+      Client: ["access"]
+      Employee: ["access"]
+      Manager: ["access"]
+      SuperAdmin: ["access"]
+
+  - endpoint: /profile
+    method: POST
+    roles:
+      Client: ["create:self"]
+      Employee: ["create:Client"]
+      Manager: ["create:Client", "create:Employee", "create:Manager"]
+
+  - endpoint: /branch
+    method: POST
+    roles:
+      Manager: ["create:Branch"]
+
+  - endpoint: /user/\\d+
+    method: PUT
+    tag: editProfile
+    roles:
+      Client: ["edit:self"]
+      Employee: ["edit:self", "edit:Client:branch"]
+      Manager: ["edit:self", "edit:Client:branch", "edit:Employee:branch"]
+
+  - endpoint: /user/\\d+
+    method: PUT
+    tag: changePassword
+    roles:
+      Client: ["changePassword:self"]
+      Employee: ["changePassword:self"]
+      Manager: ["changePassword:self"]
