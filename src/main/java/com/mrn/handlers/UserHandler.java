@@ -16,32 +16,48 @@ import com.mrn.pojos.UserWrapper;
 import com.mrn.utilshub.ConnectionManager;
 import com.mrn.utilshub.Validator;
 
-public class UserHandler extends Handler {
+public class UserHandler extends Handler {	
 
     @Override
-    protected Map<String, Object> handlePost(Object pojoInstance) throws InvalidException 
+    protected Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributeMap) throws InvalidException 
     {
         try 
         {
             UserWrapper wrapper = (UserWrapper) pojoInstance;
             User user = wrapper.getUser();
             Map<String, Object> responseMap = new HashMap<>();
-            StringBuilder validationErrors = Validator.checkUserWrapper(wrapper);
             
-            // Check for validation errors
+// Check for validation errors
+            StringBuilder validationErrors = Validator.checkUserWrapper(wrapper);
             if (validationErrors.length() > 0) 
             {
-                responseMap.put("success", false);
-                responseMap.put("error", validationErrors.toString());
-                return responseMap;
+            	throw new InvalidException(validationErrors.toString());
             }
+            
+ // Extract modifier (performer) details
+            long modifierId = (long) attributeMap.get("userId");
+            int modifierCategoryValue = (int) attributeMap.get("userCategory");
+            UserCategory performerCategory = UserCategory.fromValue(modifierCategoryValue);
+
+            // Get target user category from the incoming user object
+            int targetCategory = user.getUserCategory().toUpperCase());
+
+            // Permission check: performer must be of higher category
+            if (performerCategory.getValue() <= targetCategory.getValue()) {
+                throw new InvalidException("You don't have permission to create this user category.");
+            }
+            String modifierCategory = (String) attributeMap.get("userCategory");
+            String category = user.getUserCategory();
+            
             
             user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(12)));
             user.setStatus("Active");
+            long modifierId = (long) attributeMap.get("userId");
+            user.setModifiedBy(modifierId);
 
             UserDAO userDAO = new UserDAO();
             long userId = userDAO.addUser(user);
-            String category = user.getUserCategory();
+            
             boolean success;
 
             switch (category) 
@@ -54,6 +70,7 @@ public class UserHandler extends Handler {
                     break;
 
                 case "Employee":
+                case "Manager":
                     Employee employee = wrapper.getEmployee();
                     employee.setEmployeeId(userId);
                     EmployeeDAO employeeDAO = new EmployeeDAO();

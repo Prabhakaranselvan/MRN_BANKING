@@ -27,6 +27,7 @@
   <filter-mapping>
       <filter-name>AuthenticationFilter</filter-name>
       <url-pattern>/MRNBank/*</url-pattern>
+      <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 
 <!-- Authorization Filter -->
@@ -37,6 +38,7 @@
   <filter-mapping>
       <filter-name>AuthorizationFilter</filter-name>
       <url-pattern>/MRNBank/*</url-pattern>
+      <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 
   <!-- Servlet -->

@@ -18,9 +18,12 @@ public class AuthenticationFilter implements Filter
 	{
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
+		res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
 
 		String path = req.getPathInfo();
-		if (path != null && path.endsWith("/login")) 
+		String exclude = ".*/(login|signup|logout)$";
+		if (path != null && path.matches(exclude)) 
 		{
 			chain.doFilter(request, response); // Allow login requests
 			return;

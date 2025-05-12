@@ -4,7 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -24,9 +28,8 @@ public class BankingServlet extends HttpServlet {
 
 	
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");		
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException 
+	{	
 		try 
 		{
 			String path = request.getPathInfo();
@@ -39,8 +42,12 @@ public class BankingServlet extends HttpServlet {
 			}
 
 			String module = parts[1];	
-			System.out.println("Module: " + module);
 
+			if ("logout".equalsIgnoreCase(module)) 
+			{
+				handleLogout(request, response);
+				return;
+			}
 			
 			String jsonString;
 			try (BufferedReader reader = request.getReader()) 
@@ -51,20 +58,19 @@ public class BankingServlet extends HttpServlet {
 			Gson gson = new Gson();
 			Class<?> pojoClass = ModuleResolver.getPojoClass(module);
 			Object pojoInstance = gson.fromJson(jsonString, pojoClass);
-			System.out.println("pojo " + pojoClass);
-
 
 			Class<?> handlerClass =  ModuleResolver.getHandlerClass(module);
 			Object handlerInstance = handlerClass.getDeclaredConstructor().newInstance();
 			
-			HttpMethod httpMethod = HttpMethod.valueOf(request.getMethod());
-			Method handleMethod = handlerClass.getMethod("handle", HttpMethod.class, Object.class);
+			String method = ModuleResolver.getMethodName(request.getMethod());
+			Map<String, Object> attributeMap = getSessionAttributes(request);
+			Method handleMethod = handlerClass.getMethod(method, Object.class , Map.class);
 			@SuppressWarnings("unchecked")
-			Map<String, Object> resultMap = (Map<String, Object>) handleMethod.invoke(handlerInstance, httpMethod, pojoInstance);
+			Map<String, Object> resultMap = (Map<String, Object>) handleMethod.invoke(handlerInstance, pojoInstance, attributeMap);
 
 			if ("login".equalsIgnoreCase(module)) 
 			{
-			    createSessionAndCookie(request, response, resultMap);
+			    createSession(request, response, resultMap);
 			}
 
 			sendResponse(response, resultMap);
@@ -92,7 +98,7 @@ public class BankingServlet extends HttpServlet {
 		}
 	}
 	
-	public static void sendResponse(HttpServletResponse response, Map<String, Object> resultMap) throws IOException 
+	private void sendResponse(HttpServletResponse response, Map<String, Object> resultMap) throws IOException 
 	{
 	    Gson gson = new Gson();
 	    
@@ -103,33 +109,69 @@ public class BankingServlet extends HttpServlet {
 	    response.getWriter().write(json);
 	}
 	
-	public static void writeJsonError(HttpServletResponse response, String errorMessage) throws IOException {
+	private void writeJsonError(HttpServletResponse response, String errorMessage) throws IOException 
+	{
         response.getWriter().write("{\"error\": \"" + errorMessage + "\"}");
     }
 	
-	private void createSessionAndCookie(HttpServletRequest request, HttpServletResponse response, Map<String, Object> resultMap) 
+	private void createSession(HttpServletRequest request, HttpServletResponse response, Map<String, Object> resultMap) 
 	{
-	    boolean success = (boolean) resultMap.getOrDefault("success", false);
+        HttpSession session = request.getSession(true); // creates session if not exists
+        
+        // Define keys you want to set as session attributes
+        List<String> sessionKeys = new ArrayList<>(Arrays.asList("userId", "userCategory", "branchId"));
 
-	    if (success) 
-	    {
-	        HttpSession session = request.getSession(true); // creates session if not exists
-	        session.setAttribute("userId", resultMap.get("userId"));
-	        session.setAttribute("userCategory", resultMap.get("userCategory"));
-	        session.setMaxInactiveInterval(30 * 60); // 30 minutes timeout
-
-//	        // Create a JSESSIONID cookie with appropriate properties
-//	        Cookie sessionCookie = new Cookie("JSESSIONID", session.getId());
-//	        sessionCookie.setMaxAge(30 * 60);           // 30 minutes
-//	        sessionCookie.setHttpOnly(true);            // prevent access via JS
-//	        //sessionCookie.setPath("/");                 // available across the app
-//	        sessionCookie.setSecure(true);              // send only over HTTPS
-//	        sessionCookie.setComment("Session tracking cookie");
-//
-//	        response.addCookie(sessionCookie);          // attach to response
-	    }
+        // Loop through and set attributes
+        for (String key : sessionKeys) 
+        {
+            Object value = resultMap.get(key);
+            if (value != null) 
+            {
+                session.setAttribute(key, value);
+            }
+        }
+        
+        session.setMaxInactiveInterval(30 * 60); // 30 minutes timeout
 	}
+	
+	private void handleLogout(HttpServletRequest request, HttpServletResponse response) throws IOException 
+	{
+		HttpSession session = request.getSession(false);
+		if (session != null) 
+		{
+			session.invalidate();
+		}
 
+		// Invalidate the JSESSIONID cookie
+		Cookie cookie = new Cookie("JSESSIONID", "");
+		cookie.setMaxAge(0); // Expire immediately
+		cookie.setPath(request.getContextPath()); // Must match the cookie path
+		cookie.setHttpOnly(true);
+		cookie.setSecure(true);
+		response.addCookie(cookie);
 
+		// Send JSON response
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.getWriter().write("{\"message\": \"Logged out successfully\"}");
+	}
+	
+	 public static Map<String, Object> getSessionAttributes(HttpServletRequest request) 
+	 {
+	        HttpSession session = request.getSession(false); // don't create if it doesn't exist
+	        Map<String, Object> attributeMap = new HashMap<>();
+
+	        if (session != null) 
+	        {
+	            Enumeration<String> attributeNames = session.getAttributeNames();
+	            while (attributeNames.hasMoreElements()) 
+	            {
+	                String name = attributeNames.nextElement();
+	                Object value = session.getAttribute(name);
+	                attributeMap.put(name, value);
+	            }
+	        }
+
+	        return attributeMap;
+	    }
 
 }

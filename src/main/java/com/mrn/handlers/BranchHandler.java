@@ -17,7 +17,7 @@ public class BranchHandler extends Handler{
 	}
 
 	@Override
-	protected Map<String, Object> handlePost(Object pojoInstance) throws InvalidException 
+	protected Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributeMap) throws InvalidException 
 	{
 		try 
 		{

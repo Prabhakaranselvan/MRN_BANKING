@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.mrn.utilshub.YamlLoader;
 
-public class AuthorizationFilter implements Filter {
+public class AuthorizationFilter implements Filter 
+{
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException 
@@ -21,11 +22,13 @@ public class AuthorizationFilter implements Filter {
 		HttpServletResponse res = (HttpServletResponse) response;
 
 		String path = req.getPathInfo();
-		if (path != null && path.endsWith("/login")) 
+		String exclude = ".*/(login|signup|logout)$";
+		if (path != null && path.matches(exclude)) 
 		{
 			chain.doFilter(request, response); // Allow login requests
 			return;
 		}
+		
 		String method = req.getMethod();
 		String userRole = (String) req.getSession().getAttribute("userCategory");
 		String actionTag = (String) req.getAttribute("actionTag");
@@ -38,7 +41,8 @@ public class AuthorizationFilter implements Filter {
 		// Authorization check using YamlLoader
 		boolean authorized = YamlLoader.isAllowed(path, method, userRole, actionTag);
 
-		if (!authorized) {
+		if (!authorized) 
+		{
 			res.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			res.getWriter().write("{\"error\":\"Forbidden - Access denied for your role - " + userRole + "\"}");
 			return;

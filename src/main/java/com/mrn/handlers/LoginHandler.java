@@ -14,7 +14,8 @@ import com.mrn.utilshub.Validator;
 public class LoginHandler extends Handler {
 
     @Override
-    protected Map<String, Object> handlePost(Object pojoInstance) throws InvalidException {
+    protected Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributeMap) throws InvalidException 
+    {
         Map<String, Object> responseMap = new HashMap<>();
         
         try {
@@ -36,36 +37,33 @@ public class LoginHandler extends Handler {
             AuthenticationDAO auth = new AuthenticationDAO();
             String storedPassword = auth.getPasswordByEmailOrPhone(email, phoneNo);
             
-            if (storedPassword == null) 
-            {
-            	 responseMap.put("success", false);
-                 responseMap.put("message", "User not found with given credentials");
-                 return responseMap;
-            }
-            
             User user;
             
             if (!BCrypt.checkpw(password, storedPassword))
             {
-            	responseMap.put("success", false);
-                responseMap.put("message", "Incorrect password");
-                return responseMap;
+            	throw new InvalidException("Incorrect Password");
             }
             else
             {
             	user = auth.getUserByEmailOrPhone(email, phoneNo);
+            	if (!"Active".equals(user.getStatus())) 
+                {
+            		throw new InvalidException("User account is not active");
+                }
             }
             
-            if (!"Active".equals(user.getStatus())) {
-                responseMap.put("success", false);
-                responseMap.put("message", "User account is not active");
-                return responseMap;
-            }
-            
-            responseMap.put("success", true);
-            responseMap.put("message", "Login successful");
+            long userId = user.getUserId();
+        	String userCategory = user.getUserCategory();
+        	
+        	responseMap.put("message", "Login successful");
             responseMap.put("userId", user.getUserId());
             responseMap.put("userCategory", user.getUserCategory());
+            
+        	if ("Employee".equals(userCategory) || "Manager".equals(userCategory))
+        	{
+        		long branchId = auth.getBranchID(userId);
+        		responseMap.put("branchId", branchId);
+        	}
         } 
         catch (InvalidException e) 
         {

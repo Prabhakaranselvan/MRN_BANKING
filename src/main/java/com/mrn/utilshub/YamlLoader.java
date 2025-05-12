@@ -13,18 +13,26 @@ import org.yaml.snakeyaml.LoaderOptions;
 import com.mrn.config.AuthRule;
 import com.mrn.config.AuthorizationConfig;
 
-public class YamlLoader {
-
+public class YamlLoader 
+{
     private static AuthorizationConfig config;
 
-    static {
-        try (InputStream input = YamlLoader.class.getClassLoader().getResourceAsStream("authorization.yaml")) {
-            if (input == null) {
+    static 
+    {
+        try (InputStream input = YamlLoader.class.getClassLoader().getResourceAsStream("authorization.yaml")) 
+        {
+            if (input == null) 
+            {
                 throw new RuntimeException("authorization.yaml not found in resources folder.");
             }
-            Yaml yaml = new Yaml(new Constructor(AuthorizationConfig.class, new LoaderOptions()));
+            LoaderOptions options = new LoaderOptions();
+            options.setAllowRecursiveKeys(false);
+            options.setMaxAliasesForCollections(50);
+            Yaml yaml = new Yaml(new Constructor(AuthorizationConfig.class, options));
             config = yaml.load(input);
-        } catch (Exception e) {
+        } 
+        catch (Exception e) 
+        {
             throw new RuntimeException("Failed to load authorization.yaml: " + e.getMessage(), e);
         }
     }

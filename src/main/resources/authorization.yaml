@@ -7,12 +7,36 @@ authorization:
       Manager: ["access"]
       SuperAdmin: ["access"]
 
+  - endpoint: /logout
+    method: POST
+    roles:
+      Client: ["access"]
+      Employee: ["access"]
+      Manager: ["access"]
+      SuperAdmin: ["access"]
+
+  - endpoint: /signup
+    method: POST
+    roles:
+      Client: ["createClient"]
+
+  - endpoint: /client
+    method: POST
+    roles:
+      Employee: ["createClient"]
+
+  - endpoint: /employee
+    method: POST
+    roles:
+      Manager: ["createEmployee"]
+      SuperAdmin: ["createEmployee"]
+
   - endpoint: /profile
     method: POST
     roles:
-      Client: ["create:self"]
       Employee: ["create:Client"]
-      Manager: ["create:Client", "create:Employee", "create:Manager"]
+      Manager: ["create:Client", "create:Employee"]
+      SuperAdmin: ["create:Client", "create:Employee", "create:Manager"]
 
   - endpoint: /branch
     method: POST

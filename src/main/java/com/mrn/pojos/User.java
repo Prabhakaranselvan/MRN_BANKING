@@ -1,14 +1,17 @@
 package com.mrn.pojos;
 
+import com.mrn.enums.Status;
+import com.mrn.enums.UserCategory;
+
 public class User {
 	private long userId;
-	private String userCategory;
+	private UserCategory userCategory;
 	private String name;
 	private String gender;
 	private String email;
 	private String phoneNo;
 	private String password;
-	private String status;
+	private Status status;
 	private long createdTime;
 	private long modifiedTime;
 	private long modifiedBy;
@@ -21,11 +24,11 @@ public class User {
 		this.userId = userId;
 	}
 
-	public String getUserCategory() {
+	public UserCategory getUserCategory() {
 		return userCategory;
 	}
 
-	public void setUserCategory(String userCategory) {
+	public void setUserCategory(UserCategory userCategory) {
 		this.userCategory = userCategory;
 	}
 
@@ -69,11 +72,11 @@ public class User {
 		this.password = password;
 	}
 
-	public String getStatus() {
+	public Status getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(Status status) {
 		this.status = status;
 	}
 
@@ -99,12 +102,6 @@ public class User {
 
 	public void setModifiedBy(long modifiedBy) {
 		this.modifiedBy = modifiedBy;
-	}
-
-	@Override
-	public String toString() {
-		return "User {" + "userId=" + userId + ", userCategory=" + userCategory + ", name=" + name + ", gender=" + gender + ", email=" + email + ", phoneNo=" + phoneNo 
-				+ ", password=" + password + ", status=" + status + ", createdTime=" + createdTime+ ", modifiedTime=" + modifiedTime + ", modifiedBy=" + modifiedBy + "}";
 	}
 
 }
