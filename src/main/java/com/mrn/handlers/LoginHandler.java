@@ -6,28 +6,26 @@ import java.util.Map;
 import org.mindrot.jbcrypt.BCrypt;
 
 import com.mrn.dao.AuthenticationDAO;
+import com.mrn.enums.Status;
+import com.mrn.enums.UserCategory;
 import com.mrn.exception.InvalidException;
 import com.mrn.pojos.Login;
 import com.mrn.pojos.User;
+import com.mrn.utilshub.ConnectionManager;
 import com.mrn.utilshub.Validator;
 
-public class LoginHandler extends Handler {
+public class LoginHandler {
 
-    @Override
-    protected Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributeMap) throws InvalidException 
+    public Map<String, Object> handlePost(Object pojoInstance) throws InvalidException 
     {
-        Map<String, Object> responseMap = new HashMap<>();
-        
         try {
             Login credentials = (Login) pojoInstance;
-            StringBuilder validationErrors = Validator.checkLoginCredentials(credentials);
             
             // Check for validation errors
+            StringBuilder validationErrors = Validator.checkLoginCredentials(credentials);
             if (validationErrors.length() > 0) 
             {
-                responseMap.put("success", false);
-                responseMap.put("message", validationErrors.toString());
-                return responseMap;
+            	throw new InvalidException(validationErrors.toString());
             }
             
             String email = credentials.getEmail();
@@ -46,46 +44,44 @@ public class LoginHandler extends Handler {
             else
             {
             	user = auth.getUserByEmailOrPhone(email, phoneNo);
-            	if (!"Active".equals(user.getStatus())) 
+            	if (user.getStatus() != Status.ACTIVE.getValue()) 
                 {
             		throw new InvalidException("User account is not active");
                 }
             }
             
             long userId = user.getUserId();
-        	String userCategory = user.getUserCategory();
+        	short userCategory = user.getUserCategory();
         	
+        	Map<String, Object> responseMap = new HashMap<>();
         	responseMap.put("message", "Login successful");
-            responseMap.put("userId", user.getUserId());
-            responseMap.put("userCategory", user.getUserCategory());
-            
-        	if ("Employee".equals(userCategory) || "Manager".equals(userCategory))
+            responseMap.put("userId", userId);
+            responseMap.put("userCategory", userCategory);
+           
+            UserCategory category = UserCategory.fromValue(userCategory);
+            if (category == UserCategory.EMPLOYEE || category == UserCategory.MANAGER)
         	{
         		long branchId = auth.getBranchID(userId);
         		responseMap.put("branchId", branchId);
         	}
+            ConnectionManager.commit();
+            return responseMap;
         } 
         catch (InvalidException e) 
         {
+        	ConnectionManager.rollback();
             throw e;
         } 
         catch (Exception e) 
         {
+        	ConnectionManager.rollback();
             throw new InvalidException("Login failed due to an unexpected error", e);
         }
+        finally 
+        {
+            ConnectionManager.close();
+        }
         
-        return responseMap;
-    }
-
-    @Override
-    protected Map<String, Object> handleGet(Object pojoInstance) throws InvalidException {
-        // Not required for login
-        return null;
-    }
-
-    @Override
-    protected Map<String, Object> handlePut(Object pojoInstance) throws InvalidException {
-        // Not required for login
-        return null;
+        
     }
 }

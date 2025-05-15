@@ -1,60 +1,58 @@
+# Authorization configuration with numeric role mapping:
+# 0 = Client, 1 = Employee, 2 = Manager, 3 = SuperAdmin
+
 authorization:
   - endpoint: /login
     method: POST
     roles:
-      Client: ["access"]
-      Employee: ["access"]
-      Manager: ["access"]
-      SuperAdmin: ["access"]
+      - 0
+      - 1
+      - 2
+      - 3
 
   - endpoint: /logout
     method: POST
     roles:
-      Client: ["access"]
-      Employee: ["access"]
-      Manager: ["access"]
-      SuperAdmin: ["access"]
+      - 0
+      - 1
+      - 2
+      - 3
 
   - endpoint: /signup
     method: POST
     roles:
-      Client: ["createClient"]
-
-  - endpoint: /client
-    method: POST
-    roles:
-      Employee: ["createClient"]
-
-  - endpoint: /employee
-    method: POST
-    roles:
-      Manager: ["createEmployee"]
-      SuperAdmin: ["createEmployee"]
-
-  - endpoint: /profile
-    method: POST
-    roles:
-      Employee: ["create:Client"]
-      Manager: ["create:Client", "create:Employee"]
-      SuperAdmin: ["create:Client", "create:Employee", "create:Manager"]
+      - 0
 
   - endpoint: /branch
     method: POST
     roles:
-      Manager: ["create:Branch"]
+      - 3
 
-  - endpoint: /user/\\d+
-    method: PUT
-    tag: editProfile
+  - endpoint: /profile
+    method: POST
     roles:
-      Client: ["edit:self"]
-      Employee: ["edit:self", "edit:Client:branch"]
-      Manager: ["edit:self", "edit:Client:branch", "edit:Employee:branch"]
+      - 1
+      - 2
+      - 3
 
-  - endpoint: /user/\\d+
-    method: PUT
-    tag: changePassword
+  - endpoint: /accounts
+    method: POST
     roles:
-      Client: ["changePassword:self"]
-      Employee: ["changePassword:self"]
-      Manager: ["changePassword:self"]
+      - 1
+      - 2
+      - 3
+
+  - endpoint: /accountrequest
+    method: POST
+    roles:
+      - 0
+
+  - endpoint: /accountapproval
+    method: POST
+    roles:
+      - 2
+      - 3
+
+
+
+

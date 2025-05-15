@@ -1,14 +1,13 @@
 package com.mrn.config;
 
 import java.util.List;
-import java.util.Map;
 
-public class AuthRule 
+
+public class EndpointAuthorization 
 {
 	private String endpoint;
 	private String method;
-	private String tag;
-	private Map<String, List<String>> roles;
+	private List<Short> roles;
 
 	public String getEndpoint() {
 		return endpoint;
@@ -25,20 +24,12 @@ public class AuthRule
 	public void setMethod(String method) {
 		this.method = method;
 	}
-
-	public String getTag() {
-		return tag;
-	}
-
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
-
-	public Map<String, List<String>> getRoles() {
+	
+	public List<Short> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(Map<String, List<String>> roles) {
+	public void setRoles(List<Short> roles) {
 		this.roles = roles;
 	}
 

@@ -8,38 +8,36 @@ import com.mrn.exception.InvalidException;
 import com.mrn.pojos.Branch;
 import com.mrn.utilshub.ConnectionManager;
 
-public class BranchHandler extends Handler{
-
-	@Override
-	protected Map<String, Object> handleGet(Object pojoInstance) throws InvalidException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributeMap) throws InvalidException 
+public class BranchHandler
+{
+	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributeMap) throws InvalidException 
 	{
 		try 
 		{
-			Map<String, Object> responseMap = new HashMap<>();
 			Branch branch = (Branch) pojoInstance;
+			
+			long modifierId = (long) attributeMap.get("userId");
+			branch.setModifiedBy(modifierId);
+			
 			BranchDAO branchDAO = new BranchDAO();
+			long nextId = branchDAO.getNextBranchId();
+			String ifsc = String.format("MRNB0%06d", nextId); // Format like MRNB000001
+			branch.setIfscCode(ifsc);
 
 			boolean success = branchDAO.addBranch(branch);
 			
             if (success) 
             {
                 ConnectionManager.commit();
-                responseMap.put("success", true);
+                Map<String, Object> responseMap = new HashMap<>();
                 responseMap.put("message", "Branch Added Successfully");
+                return responseMap;
             } 
             else 
             {
                 ConnectionManager.rollback();
-                responseMap.put("success", false);
-                responseMap.put("message", "Branch Addition Failed");
+                throw new InvalidException("Branch Addition Failed");
             }
-			return responseMap;
 		} 
 		catch (InvalidException e) 
 		{
@@ -56,12 +54,4 @@ public class BranchHandler extends Handler{
 			ConnectionManager.close();
 		}
 	}
-
-
-	@Override
-	protected Map<String, Object> handlePut(Object pojoInstance) throws InvalidException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

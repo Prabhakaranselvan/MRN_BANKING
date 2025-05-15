@@ -1,6 +1,7 @@
 package com.mrn.filters;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -10,6 +11,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.mrn.utilshub.YamlLoader;
 
 public class AuthenticationFilter implements Filter 
 {
@@ -21,15 +24,36 @@ public class AuthenticationFilter implements Filter
 		res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
 
-		String path = req.getPathInfo();
-		String exclude = ".*/(login|signup|logout)$";
-		if (path != null && path.matches(exclude)) 
+        String path = req.getPathInfo();
+		String[] parts = (path != null) ? path.split("/") : new String[0];
+		
+		String module = (parts.length >= 2) ? parts[1] : null;
+
+		if (module == null || module.isEmpty()) 
 		{
-			chain.doFilter(request, response); // Allow login requests
+		    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		    res.getWriter().write("{\"error\": \"Invalid URL path\"}");
+		    return;
+		}
+		
+		String endpoint = "/" + module;
+		List<String> validEndpoints = YamlLoader.loadEndpoints(endpoint);
+
+		if (!validEndpoints.contains(endpoint)) 
+		{
+		    res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		    res.getWriter().write("{\"error\": \"Invalid endpoint: " + endpoint +"\"}");
+		    return;
+		}
+		
+		HttpSession session = req.getSession(false);
+		String exclude = ".*/(login|signup)$";
+		if (session == null && path.matches(exclude)) 
+		{
+			chain.doFilter(request, response); // Allow login & signup requests
 			return;
 		}
 
-		HttpSession session = req.getSession(false);
 		// Block other requests without session
 		if (session == null || session.getAttribute("userId") == null) 
 		{

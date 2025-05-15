@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.mrn.pojos.Client;
+import com.mrn.pojos.Employee;
 import com.mrn.pojos.Login;
 import com.mrn.pojos.User;
 import com.mrn.pojos.UserWrapper;
@@ -17,7 +18,7 @@ public class Validator
     private static StringBuilder errorMsg = new StringBuilder();
 
     static {
-    	validationPatterns.put("UserCategory", "^(Manager|Employee|Client)$");
+    	validationPatterns.put("UserCategory", "^(0|1|2)$");
         validationPatterns.put("Name", "^[A-Za-z]+(?:[-' ][A-Za-z]+)*$");
         validationPatterns.put("Gender", "^(Male|Female|Other)$");
         validationPatterns.put("Email Address", "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
@@ -56,26 +57,39 @@ public class Validator
         }
     }
     
+    private static void checkUserCategory(short category, String fieldName) 
+    {
+        if (category < 0 || category > 2) 
+        {
+            errorMsg.append(fieldName).append(" should be either 0, 1, or 2.<br/>");
+        }
+    }
+    
     public static StringBuilder checkUserWrapper(UserWrapper wrapper) 
     {
         errorMsg.setLength(0);
         User user = wrapper.getUser();
-        String category = user.getUserCategory();
+        Short category = user.getUserCategory();
         
-        checkField(category, "UserCategory");
+        checkUserCategory(category, "UserCategory");
         checkField(user.getName(), "Name");
         checkField(user.getGender(), "Gender");
         checkField(user.getEmail(), "Email Address");
         checkField(user.getPhoneNo(), "Phone Number");
         checkField(user.getPassword(), "Password");
         
-        if ("Client".equals(category))
+        if (category==0)
         {
         	Client client = wrapper.getClient();
         	checkEmpty(client.getdob(), "Date of Birth");
             checkField(client.getAadhar(), "Aadhar Number");
             checkField(client.getPan(), "PAN");
             checkEmpty(client.getAddress(), "Address");
+        }
+        else
+        {
+        	Employee employee = wrapper.getEmployee();
+        	//checkField(employee.getBranchId(), "BranchID");
         }
         
         return errorMsg;

@@ -16,13 +16,19 @@ public class ModuleResolver
 		POJO_MAP.put("signup", com.mrn.pojos.UserWrapper.class);
 		POJO_MAP.put("profile", com.mrn.pojos.UserWrapper.class);
 		POJO_MAP.put("branch", com.mrn.pojos.Branch.class);
+		POJO_MAP.put("accounts", com.mrn.pojos.Accounts.class);
+		POJO_MAP.put("accountrequest", com.mrn.pojos.AccountRequest.class);
+		POJO_MAP.put("accountapproval", com.mrn.pojos.AccountRequest.class);
 		
 
 		// Populate Handler class mappings
 		HANDLER_MAP.put("login", com.mrn.handlers.LoginHandler.class);
-		HANDLER_MAP.put("signup", com.mrn.handlers.UserHandler.class);
+		HANDLER_MAP.put("signup", com.mrn.handlers.SignUpHandler.class);
 		HANDLER_MAP.put("profile", com.mrn.handlers.UserHandler.class);
 		HANDLER_MAP.put("branch", com.mrn.handlers.BranchHandler.class);
+		HANDLER_MAP.put("accounts", com.mrn.handlers.AccountsHandler.class);
+		HANDLER_MAP.put("accountrequest", com.mrn.handlers.AccountRequestHandler.class);
+		HANDLER_MAP.put("accountapproval", com.mrn.handlers.AccountApprovalHandler.class);
 		
 		
 		// Populate Method name mappings

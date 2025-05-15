@@ -8,6 +8,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import com.mrn.dao.ClientDAO;
 import com.mrn.dao.EmployeeDAO;
 import com.mrn.dao.UserDAO;
+import com.mrn.enums.Status;
+import com.mrn.enums.UserCategory;
 import com.mrn.exception.InvalidException;
 import com.mrn.pojos.Client;
 import com.mrn.pojos.Employee;
@@ -16,42 +18,38 @@ import com.mrn.pojos.UserWrapper;
 import com.mrn.utilshub.ConnectionManager;
 import com.mrn.utilshub.Validator;
 
-public class UserHandler extends Handler {	
+public class UserHandler 
+{	
 
-    @Override
-    protected Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributeMap) throws InvalidException 
+    public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributeMap) throws InvalidException 
     {
         try 
         {
             UserWrapper wrapper = (UserWrapper) pojoInstance;
             User user = wrapper.getUser();
-            Map<String, Object> responseMap = new HashMap<>();
             
-// Check for validation errors
+            // Check for validation errors
             StringBuilder validationErrors = Validator.checkUserWrapper(wrapper);
             if (validationErrors.length() > 0) 
             {
             	throw new InvalidException(validationErrors.toString());
             }
             
- // Extract modifier (performer) details
-            long modifierId = (long) attributeMap.get("userId");
-            int modifierCategoryValue = (int) attributeMap.get("userCategory");
-            UserCategory performerCategory = UserCategory.fromValue(modifierCategoryValue);
-
-            // Get target user category from the incoming user object
-            int targetCategory = user.getUserCategory().toUpperCase());
-
-            // Permission check: performer must be of higher category
-            if (performerCategory.getValue() <= targetCategory.getValue()) {
-                throw new InvalidException("You don't have permission to create this user category.");
-            }
-            String modifierCategory = (String) attributeMap.get("userCategory");
-            String category = user.getUserCategory();
+            // Extract modifier & target user category
+            UserCategory modifierCategory = UserCategory.fromValue((short) attributeMap.get("userCategory"));
+            UserCategory targetCategory = UserCategory.fromValue(user.getUserCategory());
             
+            // Permission check: performer must be of higher category
+            if (modifierCategory.ordinal() <= targetCategory.ordinal()) 
+            {
+                throw new InvalidException("You don't have permission to create the user category: " + targetCategory);
+            }
             
             user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(12)));
-            user.setStatus("Active");
+            
+            short active = (short) Status.ACTIVE.getValue();
+            user.setStatus(active);
+            
             long modifierId = (long) attributeMap.get("userId");
             user.setModifiedBy(modifierId);
 
@@ -59,18 +57,17 @@ public class UserHandler extends Handler {
             long userId = userDAO.addUser(user);
             
             boolean success;
-
-            switch (category) 
+            switch (targetCategory) 
             {
-                case "Client":
+                case CLIENT:
                     Client client = wrapper.getClient();                  
                     client.setClientId(userId);
                     ClientDAO clientDAO = new ClientDAO();
                     success = clientDAO.addClient(client);
                     break;
 
-                case "Employee":
-                case "Manager":
+                case EMPLOYEE:
+                case MANAGER:
                     Employee employee = wrapper.getEmployee();
                     employee.setEmployeeId(userId);
                     EmployeeDAO employeeDAO = new EmployeeDAO();
@@ -84,17 +81,16 @@ public class UserHandler extends Handler {
             if (success) 
             {
                 ConnectionManager.commit();
-                responseMap.put("success", true);
+                Map<String, Object> responseMap = new HashMap<>();
                 responseMap.put("message", "User Added Successfully");
                 responseMap.put("userId", userId);
+                return responseMap;
             } 
             else 
             {
                 ConnectionManager.rollback();
-                responseMap.put("success", false);
-                responseMap.put("message", "User Addition Failed");
+                throw new InvalidException("User Addition Failed");
             }
-            return responseMap;
         } 
         catch (InvalidException e) 
         {
@@ -111,18 +107,5 @@ public class UserHandler extends Handler {
             ConnectionManager.close();
         }
     }
-
-	@Override
-	protected Map<String, Object> handleGet(Object pojoInstance) throws InvalidException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected Map<String, Object> handlePut(Object pojoInstance) throws InvalidException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	
 }

@@ -17,15 +17,22 @@ public class UserDAO {
 		
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS)) 
 		{
-			pstmt.setString(1, user.getUserCategory());
+			pstmt.setShort(1, user.getUserCategory());
 			pstmt.setString(2, user.getName());
 			pstmt.setString(3, user.getGender());
 			pstmt.setString(4, user.getEmail());
 			pstmt.setString(5, user.getPhoneNo());
 			pstmt.setString(6, user.getPassword());
-			pstmt.setString(7, user.getStatus());			
-			pstmt.setLong(8, user.getModifiedBy());
-
+			pstmt.setShort(7, user.getStatus());
+			Long modifiedBy = user.getModifiedBy();
+			if (modifiedBy != null) 
+			{
+				pstmt.setLong(8, modifiedBy);
+			} 
+			else 
+			{
+				pstmt.setNull(8, java.sql.Types.BIGINT);
+			}
 			int affectedRows = pstmt.executeUpdate();
 			if (affectedRows <= 0) 
 			{

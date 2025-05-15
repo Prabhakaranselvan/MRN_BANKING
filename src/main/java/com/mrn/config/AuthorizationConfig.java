@@ -4,14 +4,14 @@ import java.util.List;
 
 public class AuthorizationConfig 
 {
-    private List<AuthRule> authorization;
+    private List<EndpointAuthorization> authorization;
 
-    public List<AuthRule> getAuthorization() 
+    public List<EndpointAuthorization> getAuthorization() 
     {
         return authorization;
     }
 
-    public void setAuthorization(List<AuthRule> authorization) 
+    public void setAuthorization(List<EndpointAuthorization> authorization) 
     {
         this.authorization = authorization;
     }

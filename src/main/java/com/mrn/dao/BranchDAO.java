@@ -5,29 +5,23 @@ import com.mrn.pojos.Branch;
 import com.mrn.utilshub.ConnectionManager;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 public class BranchDAO {
 
 	public boolean addBranch(Branch branch) throws InvalidException {
-		String sql = "INSERT INTO branch (branch_name, branch_location, contact_no, branch_manager_id, ifsc_code, created_time, "
-				+ "modified_time, modified_by) VALUES (?, ?, ?, ?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?)";
+		String sql = "INSERT INTO branch (branch_name, branch_location, contact_no, ifsc_code, created_time, modified_time, modified_by) "
+				+ "VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?)";
 
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql)) {
 
 			pstmt.setString(1, branch.getBranchName());
 			pstmt.setString(2, branch.getBranchLocation());
 			pstmt.setString(3, branch.getContactNo());
-
-			if (branch.getBranchManagerId() != null) {
-				pstmt.setLong(4, branch.getBranchManagerId());
-			} else {
-				pstmt.setNull(4, java.sql.Types.BIGINT);
-			}
-
-			pstmt.setString(5, branch.getIfscCode());
-			pstmt.setLong(6, branch.getModifiedBy());
+			pstmt.setString(4, branch.getIfscCode());
+			pstmt.setLong(5, branch.getModifiedBy());
 
 			int affectedRows = pstmt.executeUpdate();
 			return affectedRows > 0;
@@ -61,5 +55,30 @@ public class BranchDAO {
 			throw new InvalidException("Error occured while insterting Branch Details", e);
 		}
 	}
+	
+	public long getNextBranchId() throws InvalidException 
+	{
+	    String sql = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'MRNBankDB' AND TABLE_NAME = 'branch'";
+	    
+	    try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql);
+	         ResultSet rs = pstmt.executeQuery()) 
+		{
+	        if (rs.next()) 
+	        {
+	            return rs.getLong("AUTO_INCREMENT");
+	        } 
+	        else 
+	        {
+	            throw new InvalidException("Unable to retrieve next Branch ID");
+	        }
+
+	    } 
+		catch (SQLException e) 
+		{
+	        throw new InvalidException("Database error while fetching next Branch ID", e);
+	    }
+	}
+
+	
 
 }

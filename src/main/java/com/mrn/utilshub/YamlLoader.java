@@ -2,16 +2,16 @@ package com.mrn.utilshub;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.LoaderOptions;
 
-import com.mrn.config.AuthRule;
 import com.mrn.config.AuthorizationConfig;
+import com.mrn.config.EndpointAuthorization;
 
 public class YamlLoader 
 {
@@ -37,28 +37,25 @@ public class YamlLoader
         }
     }
 
-    public static AuthorizationConfig getConfig() {
+    public static AuthorizationConfig getConfig() 
+    {
         return config;
     }
 
-    public static boolean isAllowed(String path, String method, String role, String tag) 
+    public static boolean isAllowed(String path, String method, short role) 
     {
-        if (config == null || config.getAuthorization() == null) return false;
-
-        for (AuthRule rule : config.getAuthorization()) 
+        if (config == null || config.getAuthorization() == null) 
+        {
+        	return false;
+    	}
+        for (EndpointAuthorization rule : config.getAuthorization()) 
         {
             if (rule.getMethod().equals(method) && matchesPath(path, rule.getEndpoint())) 
             {
-                Map<String, List<String>> roleMap = rule.getRoles();
-                if (roleMap.containsKey(role)) 
+                List<Short> roleMap = rule.getRoles();
+                if (roleMap.contains(role)) 
                 {
-                    for (String permission : roleMap.get(role)) 
-                    {
-                        if (tag == null || permission.contains(tag)) 
-                        {
-                            return true;
-                        }
-                    }
+                	return true;
                 }
             }
         }
@@ -71,11 +68,13 @@ public class YamlLoader
     	Matcher matcher = pattern.matcher(path);
     	return matcher.matches();
     }
-// Regex support — supports hardcoded regex like /user/\\d+ or dynamic path variable pattern /user/{user_id}
-//        String regex = rulePath
-//                .replaceAll("\\{[^/]+\\}", "\\\\d+")
-//                .replaceAll("/", "\\\\/");
-//        Pattern pattern = Pattern.compile("^" + regex + "$");
-//        return pattern.matcher(path).matches();
+    
+    public static List<String> loadEndpoints(String yamlFilePath) 
+    {
+        return config.getAuthorization().stream()
+                .map(EndpointAuthorization::getEndpoint)
+                .distinct()
+                .collect(Collectors.toList());
+    }
 
 }

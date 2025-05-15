@@ -5,7 +5,6 @@ public class Branch {
 	private String branchName;
 	private String branchLocation;
 	private String contactNo;
-	private Long branchManagerId;
 	private String ifscCode;
 	private long createdTime;
 	private long modifiedTime;
@@ -41,14 +40,6 @@ public class Branch {
 
 	public void setContactNo(String contactNo) {
 		this.contactNo = contactNo;
-	}
-
-	public Long getBranchManagerId() {
-		return branchManagerId;
-	}
-
-	public void setBranchManagerId(Long branchManagerId) {
-		this.branchManagerId = branchManagerId;
 	}
 
 	public String getIfscCode() {

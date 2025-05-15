@@ -25,21 +25,25 @@ public class AuthorizationFilter implements Filter
 		String exclude = ".*/(login|signup|logout)$";
 		if (path != null && path.matches(exclude)) 
 		{
-			chain.doFilter(request, response); // Allow login requests
+			chain.doFilter(request, response); // Allow login signup and logout requests
 			return;
 		}
 		
 		String method = req.getMethod();
-		String userRole = (String) req.getSession().getAttribute("userCategory");
-		String actionTag = (String) req.getAttribute("actionTag");
-
-		if (userRole == null) {
-			res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing user role.");
-			return;
-		}
+		short userRole = (short) req.getSession().getAttribute("userCategory");
+//		try 
+//		{
+//		    UserCategory.fromValue(userRole);
+//		} 
+//		catch (InvalidException e) 
+//		{
+//			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//			res.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+//		    return;
+//		}
 
 		// Authorization check using YamlLoader
-		boolean authorized = YamlLoader.isAllowed(path, method, userRole, actionTag);
+		boolean authorized = YamlLoader.isAllowed(path, method, userRole);
 
 		if (!authorized) 
 		{

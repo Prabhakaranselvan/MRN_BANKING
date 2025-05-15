@@ -52,12 +52,12 @@ public class AuthenticationDAO
 	            {
 	                User user = new User();
 	                user.setUserId(rs.getLong("user_id"));
-	                //user.setUserCategory(rs.getString("user_category"));
+	                user.setUserCategory(rs.getShort("user_category"));
 	                user.setName(rs.getString("name"));
 	                user.setEmail(rs.getString("email"));
 	                user.setPhoneNo(rs.getString("phone_no"));
 	                user.setPassword(rs.getString("password"));
-	                //user.setStatus(rs.getString("status"));
+	                user.setStatus(rs.getShort("status"));
 	                return user;
 	            } 
 	            else 

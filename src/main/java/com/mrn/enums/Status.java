@@ -4,8 +4,8 @@ import com.mrn.exception.InvalidException;
 
 public enum Status 
 {
-    ACTIVE(0),
-    INACTIVE(1),
+	INACTIVE(0),
+	ACTIVE(1),
     CLOSED(2);
 
     private final int value;

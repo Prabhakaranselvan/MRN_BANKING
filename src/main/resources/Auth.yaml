@@ -130,4 +130,20 @@ authorization:
   - endpoint: /branch
     method: POST
     roles:
-      Manager: ["addBranch"]
+       Manager: ["create:Branch"]
+
+  - endpoint: /user/\\d+
+    method: PUT
+    tag: editProfile
+    roles:
+       Client: ["edit:self"]
+       Employee: ["edit:self", "edit:Client:branch"]
+       Manager: ["edit:self", "edit:Client:branch", "edit:Employee:branch"]
+
+  - endpoint: /user/\\d+
+    method: PUT
+    tag: changePassword
+    roles:
+       Client: ["changePassword:self"]
+       Employee: ["changePassword:self"]
+       Manager: ["changePassword:self"]

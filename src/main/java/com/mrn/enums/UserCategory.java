@@ -7,7 +7,7 @@ public enum UserCategory
     CLIENT(0),
     EMPLOYEE(1),
     MANAGER(2),
-    SUPERADMIN(3);
+    GENERAL_MANAGER(3);
 
     private final int value;
 

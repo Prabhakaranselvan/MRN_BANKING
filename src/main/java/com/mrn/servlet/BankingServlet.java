@@ -19,11 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
-import com.mrn.enums.HttpMethod;
 import com.mrn.exception.InvalidException;
 import com.mrn.utilshub.ModuleResolver;
 
-public class BankingServlet extends HttpServlet {
+public class BankingServlet extends HttpServlet 
+{
 	private static final long serialVersionUID = 1L;
 
 	
@@ -33,14 +33,7 @@ public class BankingServlet extends HttpServlet {
 		try 
 		{
 			String path = request.getPathInfo();
-			String[] parts = (path != null) ? path.split("/") : new String[0];
-			if (parts.length < 2 || parts[1] == null || parts[1].isEmpty()) 
-			{
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				writeJsonError(response, "Invalid module in URL path");
-				return;
-			}
-
+			String[] parts = path.split("/");
 			String module = parts[1];	
 
 			if ("logout".equalsIgnoreCase(module)) 
@@ -63,17 +56,23 @@ public class BankingServlet extends HttpServlet {
 			Object handlerInstance = handlerClass.getDeclaredConstructor().newInstance();
 			
 			String method = ModuleResolver.getMethodName(request.getMethod());
-			Map<String, Object> attributeMap = getSessionAttributes(request);
-			Method handleMethod = handlerClass.getMethod(method, Object.class , Map.class);
-			@SuppressWarnings("unchecked")
-			Map<String, Object> resultMap = (Map<String, Object>) handleMethod.invoke(handlerInstance, pojoInstance, attributeMap);
 
-			if ("login".equalsIgnoreCase(module)) 
+			if ("login".equals(module)) 
 			{
+				Method handleMethod = handlerClass.getMethod(method, Object.class);
+				@SuppressWarnings("unchecked")
+				Map<String, Object> resultMap = (Map<String, Object>) handleMethod.invoke(handlerInstance, pojoInstance);
 			    createSession(request, response, resultMap);
+			    sendResponse(response, resultMap);
 			}
-
-			sendResponse(response, resultMap);
+			else
+			{
+				Map<String, Object> attributeMap = getSessionAttributes(request);
+				Method handleMethod = handlerClass.getMethod(method, Object.class , Map.class);
+				@SuppressWarnings("unchecked")
+				Map<String, Object> resultMap = (Map<String, Object>) handleMethod.invoke(handlerInstance, pojoInstance, attributeMap);
+				sendResponse(response, resultMap);
+			}
 		} 
 		catch (InvocationTargetException e) 
 		{
@@ -101,9 +100,7 @@ public class BankingServlet extends HttpServlet {
 	private void sendResponse(HttpServletResponse response, Map<String, Object> resultMap) throws IOException 
 	{
 	    Gson gson = new Gson();
-	    
-	    boolean success = (boolean) resultMap.getOrDefault("success", false);
-	    response.setStatus(success ? HttpServletResponse.SC_OK : HttpServletResponse.SC_BAD_REQUEST);
+	    response.setStatus(HttpServletResponse.SC_OK);
 	    
 	    String json = gson.toJson(resultMap);
 	    response.getWriter().write(json);
@@ -116,7 +113,7 @@ public class BankingServlet extends HttpServlet {
 	
 	private void createSession(HttpServletRequest request, HttpServletResponse response, Map<String, Object> resultMap) 
 	{
-        HttpSession session = request.getSession(true); // creates session if not exists
+        HttpSession session = request.getSession(); // creates session if not exists
         
         // Define keys you want to set as session attributes
         List<String> sessionKeys = new ArrayList<>(Arrays.asList("userId", "userCategory", "branchId"));
