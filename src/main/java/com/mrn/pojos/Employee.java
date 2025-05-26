@@ -1,6 +1,6 @@
 package com.mrn.pojos;
 
-public class Employee {
+public class Employee extends User {
 	private long employeeId;
 	private long branchId;
 

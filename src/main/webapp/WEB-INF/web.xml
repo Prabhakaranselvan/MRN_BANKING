@@ -18,8 +18,8 @@
     </cookie-config>
   </session-config>
 
- 
-<!-- Authentication Filter -->
+
+<!-- Authentication Filter
   <filter>
       <filter-name>AuthenticationFilter</filter-name>
       <filter-class>com.mrn.filters.AuthenticationFilter</filter-class>
@@ -28,9 +28,9 @@
       <filter-name>AuthenticationFilter</filter-name>
       <url-pattern>/MRNBank/*</url-pattern>
       <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
+  </filter-mapping> -->
 
-<!-- Authorization Filter -->
+<!-- Authorization Filter
   <filter>
       <filter-name>AuthorizationFilter</filter-name>
       <filter-class>com.mrn.filters.AuthorizationFilter</filter-class>
@@ -39,7 +39,7 @@
       <filter-name>AuthorizationFilter</filter-name>
       <url-pattern>/MRNBank/*</url-pattern>
       <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
+  </filter-mapping> -->
 
   <!-- Servlet -->
   <servlet>

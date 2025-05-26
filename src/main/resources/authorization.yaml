@@ -23,6 +23,19 @@ authorization:
     roles:
       - 0
 
+  - endpoint: /client
+    method: POST
+    roles:
+      - 1
+      - 2
+      - 3
+
+  - endpoint: /employee
+    method: POST
+    roles:
+      - 2
+      - 3
+
   - endpoint: /branch
     method: POST
     roles:
@@ -50,6 +63,14 @@ authorization:
   - endpoint: /accountapproval
     method: POST
     roles:
+      - 2
+      - 3
+
+  - endpoint: /transaction
+    method: POST
+    roles:
+      - 0
+      - 1
       - 2
       - 3
 

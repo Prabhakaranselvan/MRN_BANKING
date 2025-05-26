@@ -20,6 +20,7 @@ import com.mrn.utilshub.Validator;
 
 public class UserHandler 
 {	
+	
 
     public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributeMap) throws InvalidException 
     {

@@ -14,7 +14,7 @@ import com.mrn.utilshub.ConnectionManager;
 public class AccountRequestDAO {
 
     public boolean addAccountRequest(AccountRequest request) throws InvalidException {
-        String sql = "INSERT INTO request_accounts (branch_id, client_id, account_type, status, requested_time, modified_time, modified_by) "
+        String sql = "INSERT INTO account_request (branch_id, client_id, account_type, status, requested_time, modified_time, modified_by) "
                    + "VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?)";
 
         try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql)) {
@@ -28,11 +28,11 @@ public class AccountRequestDAO {
 
         } catch (SQLIntegrityConstraintViolationException e) {
             String message = e.getMessage();
-            if (message.contains("request_accounts_branch_id_foreign")) {
+            if (message.contains("account_request_branch_id_foreign")) {
                 throw new InvalidException("Invalid Branch ID.");
-            } else if (message.contains("request_accounts_client_id_foreign")) {
+            } else if (message.contains("account_request_client_id_foreign")) {
                 throw new InvalidException("Invalid Client ID.");
-            } else if (message.contains("request_accounts_modified_by_foreign")) {
+            } else if (message.contains("account_request_modified_by_foreign")) {
                 throw new InvalidException("Invalid ModifiedBy User ID.");
             } else {
                 throw new InvalidException("Foreign key constraint violation", e);
@@ -44,7 +44,7 @@ public class AccountRequestDAO {
     }
 
     public Accounts getRequestAsAccount(long requestId) throws InvalidException {
-        String sql = "SELECT client_id, branch_id, account_type, status FROM request_accounts WHERE request_id = ?";
+        String sql = "SELECT client_id, branch_id, account_type, status FROM account_request WHERE request_id = ?";
 
         try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql)) {
             pstmt.setLong(1, requestId);
@@ -67,7 +67,7 @@ public class AccountRequestDAO {
     }
 
     public boolean updateRequestStatus(long requestId, short reviewStatus, long approverId) throws InvalidException {
-        String sql = "UPDATE request_accounts SET status = ?, modified_by = ?, modified_time = UNIX_TIMESTAMP() WHERE request_id = ?";
+        String sql = "UPDATE account_request SET status = ?, modified_by = ?, modified_time = UNIX_TIMESTAMP() WHERE request_id = ?";
 
         try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql)) {
             pstmt.setShort(1, reviewStatus);

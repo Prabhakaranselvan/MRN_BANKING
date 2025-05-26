@@ -1,6 +1,6 @@
 package com.mrn.pojos;
 
-public class Client {
+public class Client extends User {
 	private Long clientId;
 	private String dob;
 	private String aadhar;
@@ -15,11 +15,11 @@ public class Client {
 		this.clientId = clientId;
 	}
 
-	public String getdob() {
+	public String getDob() {
 		return dob;
 	}
 
-	public void setdob(String dob) {
+	public void setDob(String dob) {
 		this.dob = dob;
 	}
 
@@ -48,8 +48,8 @@ public class Client {
 	}
 
 	@Override
-	public String toString() 
-	{
-		return "Client {" + "clientId=" + clientId + ", dob=" + dob + ", aadhar=" + aadhar + ", pan=" + pan + ", address=" + address + "}";
+	public String toString() {
+		return "Client {" + "clientId=" + clientId + ", dob=" + dob + ", aadhar=" + aadhar + ", pan=" + pan
+				+ ", address=" + address + "}";
 	}
 }

@@ -17,7 +17,7 @@ import com.mrn.utilshub.Validator;
 
 public class SignUpHandler 
 {	
-	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributeMap) throws InvalidException 
+	public Map<String, Object> handlePost(Object pojoInstance) throws InvalidException 
     {
         try 
         {
