@@ -37,7 +37,7 @@ public class AuthenticationFilter implements Filter
 		}
 		
 		String endpoint = "/" + module;
-		List<String> validEndpoints = YamlLoader.loadEndpoints(endpoint);
+		List<String> validEndpoints = YamlLoader.loadEndpoints();
 
 		if (!validEndpoints.contains(endpoint)) 
 		{

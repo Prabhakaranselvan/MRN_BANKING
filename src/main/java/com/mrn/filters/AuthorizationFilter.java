@@ -30,6 +30,7 @@ public class AuthorizationFilter implements Filter
 		}
 		
 		String method = req.getMethod();
+		String headerMethod = req.getHeader("Method");
 		short userRole = (short) req.getSession().getAttribute("userCategory");
 //		try 
 //		{
@@ -43,7 +44,7 @@ public class AuthorizationFilter implements Filter
 //		}
 
 		// Authorization check using YamlLoader
-		boolean authorized = YamlLoader.isAllowed(path, method, userRole);
+		boolean authorized = YamlLoader.isAllowed(path, headerMethod, method, userRole);
 
 		if (!authorized) 
 		{

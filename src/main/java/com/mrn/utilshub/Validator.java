@@ -5,10 +5,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.mrn.pojos.Branch;
 import com.mrn.pojos.Client;
+import com.mrn.pojos.Employee;
 import com.mrn.pojos.Login;
 import com.mrn.pojos.User;
-import com.mrn.pojos.UserWrapper;
 
 public class Validator 
 {
@@ -24,8 +25,107 @@ public class Validator
         validationPatterns.put("Password", "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,20}$");
         validationPatterns.put("Aadhar Number", "^\\d{12}$");
         validationPatterns.put("PAN", "^[A-Z]{5}\\d{4}[A-Z]$");
+        validationPatterns.put("Branch Name", "^[A-Za-z0-9 .'-]{3,50}$");
+        validationPatterns.put("Branch Location", "^[A-Za-z .'-]{3,50}$");
     }
 
+
+    
+    public static StringBuilder checkLoginCredentials(Login credentials) 
+    {
+        errorMsg.setLength(0);
+        
+        checkField(credentials.getEmail(), "Email Address");
+        checkField(credentials.getPassword(), "Password");
+        
+        return errorMsg;
+    }
+    
+    public static StringBuilder checkUser(User user) 
+    {
+        errorMsg.setLength(0);
+        
+        checkField(user.getName(), "Name");
+        checkField(user.getGender(), "Gender");
+        checkField(user.getEmail(), "Email Address");
+        checkField(user.getPhoneNo(), "Phone Number");
+        checkField(user.getPassword(), "Password");
+        if (user instanceof Client) {
+            Client client = (Client) user;
+            checkEmpty(client.getDob(), "Date of Birth");
+            checkField(client.getAadhar(), "Aadhar Number");
+            checkField(client.getPan(), "PAN");
+            checkEmpty(client.getAddress(), "Address");
+        }
+        else if (user instanceof Employee)
+        {
+        	Employee employee = (Employee) user;
+        	checkUserCategory(employee.getUserCategory(), "UserCategory");
+        	checkLongField(employee.getBranchId(), "BranchID");
+        }
+  
+        return errorMsg;
+    }
+    
+    public static StringBuilder checkSelfUpdate(User user) 
+    {
+        errorMsg.setLength(0);
+        
+        checkField(user.getEmail(), "Email Address");
+        checkField(user.getPhoneNo(), "Phone Number");
+        checkField(user.getPassword(), "Password");
+        if (user instanceof Client) {
+            Client client = (Client) user;
+            checkEmpty(client.getAddress(), "Address");
+        }
+
+        return errorMsg;
+    }
+    
+    public static StringBuilder checkBranch(Branch branch) {
+        errorMsg.setLength(0);
+
+        checkField(branch.getBranchName(), "Branch Name");
+        checkField(branch.getBranchLocation(), "Branch Location");
+        checkField(branch.getContactNo(), "Phone Number");
+
+        return errorMsg;
+    }
+
+//    public static StringBuilder checkClient(Client client) 
+//    {
+//        errorMsg.setLength(0);
+//        
+//        checkField(client.getName(), "Name");
+//        checkField(client.getGender(), "Gender");
+//        checkField(client.getEmail(), "Email Address");
+//        checkField(client.getPhoneNo(), "Phone Number");
+//        checkField(client.getPassword(), "Password");
+//    	checkEmpty(client.getDob(), "Date of Birth");
+//        checkField(client.getAadhar(), "Aadhar Number");
+//        checkField(client.getPan(), "PAN");
+//        checkEmpty(client.getAddress(), "Address");
+//  
+//        return errorMsg;
+//    }
+//    
+//    
+//    public static StringBuilder checkEmployee(Employee employee) 
+//    {
+//        errorMsg.setLength(0);
+//        Short category = employee.getUserCategory();
+//        
+//        checkUserCategory(category, "UserCategory");
+//        checkField(employee.getName(), "Name");
+//        checkField(employee.getGender(), "Gender");
+//        checkField(employee.getEmail(), "Email Address");
+//        checkField(employee.getPhoneNo(), "Phone Number");
+//        checkField(employee.getPassword(), "Password");
+//        checkLongField(employee.getBranchId(), "BranchID");
+//        
+//        return errorMsg;
+//    }
+    
     private static boolean checkNull(String field, String fieldName) 
     {
         if (field == null) 
@@ -59,70 +159,20 @@ public class Validator
         }
     }
     
+    private static void checkLongField(long value, String fieldName) 
+    {
+        if (value < 1) 
+        {
+            errorMsg.append(fieldName).append(" cannot be Zero or Negative.<br/>");
+        }
+    }
+
+    
     private static void checkUserCategory(short category, String fieldName) 
     {
-        if (category < 0 || category > 2) 
+        if (category < 1 || category > 2) 
         {
-            errorMsg.append(fieldName).append(" should be either 0, 1, or 2.<br/>");
+            errorMsg.append(fieldName).append(" should be either 1, or 2.<br/>");
         }
-    }
-    
-    public static StringBuilder checkClient(Client client) 
-    {
-        errorMsg.setLength(0);
-        
-        checkField(client.getName(), "Name");
-        checkField(client.getGender(), "Gender");
-        checkField(client.getEmail(), "Email Address");
-        checkField(client.getPhoneNo(), "Phone Number");
-        checkField(client.getPassword(), "Password");
-    	checkEmpty(client.getDob(), "Date of Birth");
-        checkField(client.getAadhar(), "Aadhar Number");
-        checkField(client.getPan(), "PAN");
-        checkEmpty(client.getAddress(), "Address");
-  
-        return errorMsg;
-    }
-    
-    public static StringBuilder checkLoginCredentials(Login credentials) 
-    {
-        errorMsg.setLength(0);
-        
-        checkField(credentials.getEmail(), "Email Address");
-        checkField(credentials.getPassword(), "Password");
-        
-        return errorMsg;
-    }
-    
-    
-    public static StringBuilder checkUserWrapper(UserWrapper wrapper) 
-    {
-        errorMsg.setLength(0);
-        User user = wrapper.getUser();
-        Short category = user.getUserCategory();
-        
-        checkUserCategory(category, "UserCategory");
-        checkField(user.getName(), "Name");
-        checkField(user.getGender(), "Gender");
-        checkField(user.getEmail(), "Email Address");
-        checkField(user.getPhoneNo(), "Phone Number");
-        checkField(user.getPassword(), "Password");
-        
-        if (category==0)
-        {
-        	Client client = wrapper.getClient();
-        	checkEmpty(client.getDob(), "Date of Birth");
-            checkField(client.getAadhar(), "Aadhar Number");
-            checkField(client.getPan(), "PAN");
-            checkEmpty(client.getAddress(), "Address");
-        }
-        else
-        {
-        	//Employee employee = wrapper.getEmployee();
-        	//checkField(employee.getBranchId(), "BranchID");
-        }
-        
-        return errorMsg;
     }
 }
-

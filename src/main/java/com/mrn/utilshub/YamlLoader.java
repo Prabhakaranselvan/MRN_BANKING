@@ -42,7 +42,7 @@ public class YamlLoader
         return config;
     }
 
-    public static boolean isAllowed(String path, String method, short role) 
+    public static boolean isAllowed(String path, String headerMethod, String method, short role) 
     {
         if (config == null || config.getAuthorization() == null) 
         {
@@ -50,7 +50,7 @@ public class YamlLoader
     	}
         for (EndpointAuthorization rule : config.getAuthorization()) 
         {
-            if (rule.getMethod().equals(method) && matchesPath(path, rule.getEndpoint())) 
+            if ( rule.getHeader().equals(headerMethod) && rule.getMethod().equals(method) && matchesPath(path, rule.getEndpoint())) 
             {
                 List<Short> roleMap = rule.getRoles();
                 if (roleMap.contains(role)) 
@@ -69,7 +69,7 @@ public class YamlLoader
     	return matcher.matches();
     }
     
-    public static List<String> loadEndpoints(String yamlFilePath) 
+    public static List<String> loadEndpoints() 
     {
         return config.getAuthorization().stream()
                 .map(EndpointAuthorization::getEndpoint)

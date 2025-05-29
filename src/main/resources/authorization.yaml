@@ -3,6 +3,7 @@
 
 authorization:
   - endpoint: /login
+    header: POST
     method: POST
     roles:
       - 0
@@ -11,6 +12,7 @@ authorization:
       - 3
 
   - endpoint: /logout
+    header: POST
     method: POST
     roles:
       - 0
@@ -19,54 +21,190 @@ authorization:
       - 3
 
   - endpoint: /signup
+    header: POST
     method: POST
     roles:
       - 0
 
+#Get All Clients
   - endpoint: /client
+    header: GET
+    method: GET
+    roles:
+      - 1
+      - 2
+      - 3
+
+#Get Single Client profile By ID
+  - endpoint: /client
+    header: GET
+    method: POST
+    roles:
+      - 0
+      - 1
+      - 2
+      - 3
+
+#Add Client
+  - endpoint: /client
+    header: POST
     method: POST
     roles:
       - 1
       - 2
       - 3
 
+#Update Client 
+  - endpoint: /client
+    header: PUT
+    method: POST
+    roles:
+      - 0
+      - 1
+      - 2
+      - 3
+
+#Get All Employee or Managers
   - endpoint: /employee
+    header: GET
+    method: GET
+    roles:
+      - 2
+      - 3
+
+#Get Single Employee or Manager profile By ID
+  - endpoint: /employee
+    header: GET
+    method: POST
+    roles:
+      - 1
+      - 2
+      - 3
+
+#Add Employee or Manager
+  - endpoint: /employee
+    header: POST
     method: POST
     roles:
       - 2
       - 3
 
+#Update Employee or Manager 
+  - endpoint: /employee
+    header: PUT
+    method: POST
+    roles:
+      - 1
+      - 2
+      - 3
+
+#Get all Branches
   - endpoint: /branch
-    method: POST
+    header: GET
+    method: GET
     roles:
-      - 3
-
-  - endpoint: /profile
-    method: POST
-    roles:
+      - 0
       - 1
       - 2
       - 3
 
+#Get Single Branch by ID
+  - endpoint: /branch
+    header: GET
+    method: POST
+    roles:
+      - 0
+      - 1
+      - 2
+      - 3
+
+#Add Branch
+  - endpoint: /branch
+    header: POST
+    method: POST
+    roles:
+      - 3
+ 
+#Update Branch
+  - endpoint: /branch
+    header: PUT
+    method: POST
+    roles:
+      - 3
+
+#Get All Accounts Of a Branch
   - endpoint: /accounts
+    header: GET
+    method: GET
+    roles:
+      - 1
+      - 2
+      - 3
+
+#Get all Accounts of a user by ID
+  - endpoint: /accounts
+    header: GET
+    method: POST
+    roles:
+      - 0
+      - 1
+      - 2
+      - 3
+
+#Get Details of a Single Account By Account No
+  - endpoint: /accounts
+    header: GET
+    method: POST
+    roles:
+      - 0
+      - 1
+      - 2
+      - 3
+
+#Add Account To a User
+  - endpoint: /accounts
+    header: POST
     method: POST
     roles:
       - 1
       - 2
       - 3
 
+#Update
+  - endpoint: /accounts
+    header: POST
+    method: POST
+    roles:
+      - 1
+      - 2
+      - 3
+
+#Give Request To Create Account
   - endpoint: /accountrequest
+    header: POST
     method: POST
     roles:
       - 0
 
+#Get All Request To Create Account
+  - endpoint: /accountrequest
+    header: GET
+    method: GET
+    roles:
+      - 2
+      - 3
+
+#Accept are Reject an Account Request
   - endpoint: /accountapproval
+    header: POST
     method: POST
     roles:
       - 2
       - 3
 
-  - endpoint: /transaction
+#Get Account Statement Of the User by Id or Account No
+  - endpoint: /accountstatement
+    header: GET
     method: POST
     roles:
       - 0
@@ -74,6 +212,14 @@ authorization:
       - 2
       - 3
 
-
+#Do Transactions
+  - endpoint: /transaction
+    header: POST
+    method: POST
+    roles:
+      - 0
+      - 1
+      - 2
+      - 3
 
 

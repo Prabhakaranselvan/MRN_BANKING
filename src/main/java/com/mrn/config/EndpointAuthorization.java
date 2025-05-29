@@ -2,10 +2,9 @@ package com.mrn.config;
 
 import java.util.List;
 
-
-public class EndpointAuthorization 
-{
+public class EndpointAuthorization {
 	private String endpoint;
+	private String header;
 	private String method;
 	private List<Short> roles;
 
@@ -24,7 +23,15 @@ public class EndpointAuthorization
 	public void setMethod(String method) {
 		this.method = method;
 	}
-	
+
+	public String getHeader() {
+		return header;
+	}
+
+	public void setHeader(String header) {
+		this.header = header;
+	}
+
 	public List<Short> getRoles() {
 		return roles;
 	}

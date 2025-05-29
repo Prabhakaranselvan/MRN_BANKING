@@ -18,7 +18,7 @@ public class ModuleResolver {
 		POJO_MAP.put("login", com.mrn.pojos.Login.class);
 		POJO_MAP.put("signup", com.mrn.pojos.Client.class);
 		POJO_MAP.put("client", com.mrn.pojos.Client.class);
-		POJO_MAP.put("profile", com.mrn.pojos.UserWrapper.class);
+		POJO_MAP.put("employee", com.mrn.pojos.Employee.class);
 		POJO_MAP.put("branch", com.mrn.pojos.Branch.class);
 		POJO_MAP.put("accounts", com.mrn.pojos.Accounts.class);
 		POJO_MAP.put("accountrequest", com.mrn.pojos.AccountRequest.class);
@@ -29,7 +29,7 @@ public class ModuleResolver {
 		HANDLER_MAP.put("login", com.mrn.handlers.LoginHandler.class);
 		HANDLER_MAP.put("signup", com.mrn.handlers.ClientHandler.class);
 		HANDLER_MAP.put("client", com.mrn.handlers.ClientHandler.class);
-		HANDLER_MAP.put("profile", com.mrn.handlers.UserHandler.class);
+		HANDLER_MAP.put("employee", com.mrn.handlers.EmployeeHandler.class);
 		HANDLER_MAP.put("branch", com.mrn.handlers.BranchHandler.class);
 		HANDLER_MAP.put("accounts", com.mrn.handlers.AccountsHandler.class);
 		HANDLER_MAP.put("accountrequest", com.mrn.handlers.AccountRequestHandler.class);
