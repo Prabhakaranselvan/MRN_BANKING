@@ -10,7 +10,6 @@ import com.mrn.servlet.RequestStrategy;
 public class ModuleResolver {
 	private static final Map<String, Class<?>> POJO_MAP = new HashMap<>();
 	private static final Map<String, Class<?>> HANDLER_MAP = new HashMap<>();
-	private static final Map<String, String> METHOD_MAP = new HashMap<>();
 	private static final Map<String, RequestStrategy> STRATEGIES = new HashMap<>();
 
 	static {
@@ -35,11 +34,6 @@ public class ModuleResolver {
 		HANDLER_MAP.put("accountrequest", com.mrn.handlers.AccountRequestHandler.class);
 		HANDLER_MAP.put("accountapproval", com.mrn.handlers.AccountApprovalHandler.class);
 		HANDLER_MAP.put("transaction", com.mrn.handlers.TransactionHandler.class);
-
-		// Populate Method name mappings
-		METHOD_MAP.put("POST", "handlePost");
-		METHOD_MAP.put("GET", "handleGet");
-		METHOD_MAP.put("PUT", "handlePut");
 
 		// header method = GET, http method = GET
 		STRATEGIES.put("GET|GET", (handler, body, session) -> {
@@ -72,10 +66,6 @@ public class ModuleResolver {
 
 	public static Class<?> getHandlerClass(String module) {
 		return HANDLER_MAP.get(module);
-	}
-
-	public static String getMethodName(String httpMethod) {
-		return METHOD_MAP.get(httpMethod);
 	}
 
 	public static RequestStrategy getStrategy(String key) {

@@ -31,8 +31,8 @@ public class EmployeeHandler
 			
 			if (sessionRole == UserCategory.MANAGER.ordinal())
 			{
-				long branchId = (long) session.get("branchId");
-				employees.addAll(employeeDAO.getEmployeesByBranchId(branchId));
+				long sessionBranchId = (long) session.get("branchId");
+				employees.addAll(employeeDAO.getEmployeesByBranchId(sessionBranchId));
 			}
 			else if (sessionRole == UserCategory.GENERAL_MANAGER.ordinal())
 			{
@@ -105,6 +105,7 @@ public class EmployeeHandler
 		}
 	}
 
+
 	// POST|POST /employee
 	// 2,3
 	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException
@@ -126,9 +127,9 @@ public class EmployeeHandler
 				{
 					throw new InvalidException("Managers can only create employees, not " + targetRole);
 				}
-				long modifierBranchId = (long) session.get("branchId");
+				long sessionBranchId = (long) session.get("branchId");
 				long targetBranchId = employee.getBranchId();
-				if (targetBranchId != modifierBranchId)
+				if (targetBranchId != sessionBranchId)
 				{
 					throw new InvalidException("Managers can only assign employees to their own branch.");
 				}

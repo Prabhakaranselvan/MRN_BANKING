@@ -13,126 +13,124 @@ import com.mrn.exception.InvalidException;
 import com.mrn.pojos.Transaction;
 import com.mrn.utilshub.ConnectionManager;
 
-public class TransactionHandler 
+public class TransactionHandler
 {
-    public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributes) throws InvalidException 
-    {
-    	try 
-    	{
-		    Transaction txn = (Transaction) pojoInstance;
-		
-		    long userId = (long) attributes.get("userId");
-		    short userCatValue = (short) attributes.get("userCategory");
-		    UserCategory userCategory = UserCategory.fromValue(userCatValue);
-		    TxnType txnType = TxnType.fromValue(txn.getTxnType());
-		    long accountNo = txn.getAccountNo();
-		    
-		    AccountsDAO accountsDAO = new AccountsDAO();
-            // Permission checks
-            if (userCategory == UserCategory.CLIENT) 
-            {
-                if (txnType != TxnType.DEBIT || accountsDAO.getClientIdFromAccount(accountNo) != userId) 
-                {
-                	
-                    throw new InvalidException("Clients can only transfer from their own accounts.");
-                }
-            } 
-            else if (userCategory == UserCategory.EMPLOYEE || userCategory == UserCategory.MANAGER) 
-            {
-                long branchId = (long) attributes.get("branchId");
-                if (accountsDAO.getBranchIdFromAccount(accountNo) != branchId) 
-                {
-                    throw new InvalidException("You can only operate on accounts from your branch.");
-                }
-            }
-            
-            BigDecimal txnAmount = txn.getAmount();
-            // Balance check
-            BigDecimal currentBalance = accountsDAO.getBalanceWithLock(accountNo);
-       
-            // Prepare transaction
-            BigDecimal newBalance;
-    		if (txnType == TxnType.WITHDRAWAL || txnType == TxnType.DEBIT) 
-    		{
-    			if (currentBalance.compareTo(txnAmount) < 0) 
-                {
-                    throw new InvalidException("Insufficient balance for this transaction.");
-                }
-    			newBalance = currentBalance.subtract(txnAmount);
-    		}
-    		else
+	AccountsDAO accountsDAO = new AccountsDAO(); 
+	
+	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException
+	{
+		try
+		{
+			Transaction txn = (Transaction) pojoInstance;
+
+			long sessionUserId = (long) session.get("userId");
+			UserCategory sessionRole = UserCategory.fromValue((short) session.get("userCategory"));
+			TxnType txnType = TxnType.fromValue(txn.getTxnType());
+			long accountNo = txn.getAccountNo();
+			long clientId = accountsDAO.getClientIdFromAccount(accountNo);
+			txn.setClientId(clientId);
+			// Permission checks
+			if (sessionRole == UserCategory.CLIENT)
 			{
-    			newBalance = currentBalance.add(txnAmount); 
+				if (txnType != TxnType.DEBIT || clientId != sessionUserId)
+				{
+					throw new InvalidException("Clients can only transfer from their own accounts.");
+				}
 			}
-    		txn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
-            txn.setDoneBy(userId);
-            txn.setClosingBalance(newBalance);
+			else if (sessionRole == UserCategory.EMPLOYEE || sessionRole == UserCategory.MANAGER)
+			{
+				long branchId = (long) session.get("branchId");
+				if (accountsDAO.getBranchIdFromAccount(accountNo) != branchId)
+				{
+					throw new InvalidException("You can only operate on accounts from your branch.");
+				}
+			}
 
-            TransactionDAO txnDAO = new TransactionDAO();
-            boolean success;
-            
-            if (txnType == TxnType.DEBIT) 
-            {
-            	long peerAccNo = txn.getPeerAccNo();
-            	if (!accountsDAO.doesAccountExist(peerAccNo)) {
-                    throw new InvalidException("Peer account doesn't belong to our bank.");
-                }
-            		long peerClientId = accountsDAO.getClientIdFromAccount(peerAccNo);
-            		BigDecimal receiverBalance = accountsDAO.getBalanceWithLock(peerAccNo);
-            		
-            		Transaction receiverTxn = new Transaction();
-                    receiverTxn.setClientId(peerClientId);
-                    receiverTxn.setAccountNo(peerAccNo);
-                    receiverTxn.setPeerAccNo(accountNo);
-                    receiverTxn.setAmount(txnAmount);
-                    receiverTxn.setTxnType((short) TxnType.CREDIT.getValue());
-                    receiverTxn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
-                    receiverTxn.setTxnRefNo(txn.getTxnRefNo());
-                    receiverTxn.setClosingBalance(receiverBalance.add(txnAmount));
-                    receiverTxn.setDoneBy(userId);
-                    
-                    success = txnDAO.addTransaction(txn) && txnDAO.addTransaction(receiverTxn);
-                    if (success) 
-                    {
-                        accountsDAO.updateBalance(accountNo, newBalance, userId);
-                        accountsDAO.updateBalance(peerAccNo, receiverTxn.getClosingBalance(), userId);
-                    }
-            	
-            }
-            else
-            {
-            	success = txnDAO.addTransaction(txn);
-            	if (success) 
-                {
-                    accountsDAO.updateBalance(accountNo, newBalance, userId);
-                }
-            }
-            
-            if (success) 
-            {  ConnectionManager.commit();
-                Map<String, Object> response = new HashMap<>();
-                response.put("message", "Transaction successful");
-                return response;
-            } 
-            else 
-            {
-                throw new InvalidException("Transaction failed.");
-            }
+			BigDecimal txnAmount = txn.getAmount();
+			// Balance check
+			BigDecimal currentBalance = accountsDAO.getBalanceWithLock(accountNo);
 
-        } 
-    	catch (InvalidException e) 
-    	{
-            ConnectionManager.rollback();
-            throw e;
-        } 
-    	catch (Exception e) 
-    	{
-            ConnectionManager.rollback();
-            throw new InvalidException("Unexpected error during transaction", e);
-        } 
-    	finally 
-    	{
-            ConnectionManager.close();
-        }
-    }
+			// Prepare transaction
+			BigDecimal newBalance;
+			if (txnType == TxnType.WITHDRAWAL || txnType == TxnType.DEBIT)
+			{
+				if (currentBalance.compareTo(txnAmount) < 0)
+				{
+					throw new InvalidException("Insufficient balance for this transaction.");
+				}
+				newBalance = currentBalance.subtract(txnAmount);
+			}
+			else
+			{
+				newBalance = currentBalance.add(txnAmount);
+			}
+			txn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
+			txn.setDoneBy(sessionUserId);
+			txn.setClosingBalance(newBalance);
+
+			TransactionDAO txnDAO = new TransactionDAO();
+			boolean success;
+
+			long peerAccNo = txn.getPeerAccNo();
+			if (txnType == TxnType.DEBIT && accountsDAO.doesAccountExist(peerAccNo))
+			{
+				long peerClientId = accountsDAO.getClientIdFromAccount(peerAccNo);
+				BigDecimal receiverBalance = accountsDAO.getBalanceWithLock(peerAccNo);
+
+				Transaction receiverTxn = new Transaction();
+				receiverTxn.setClientId(peerClientId);
+				receiverTxn.setAccountNo(peerAccNo);
+				receiverTxn.setPeerAccNo(accountNo);
+				receiverTxn.setAmount(txnAmount);
+				receiverTxn.setTxnType((short) TxnType.CREDIT.getValue());
+				receiverTxn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
+				receiverTxn.setTxnRefNo(txn.getTxnRefNo());
+				receiverTxn.setClosingBalance(receiverBalance.add(txnAmount));
+				receiverTxn.setDoneBy(sessionUserId);
+
+				success = txnDAO.addTransaction(txn) && txnDAO.addTransaction(receiverTxn);
+				if (success)
+				{
+					accountsDAO.updateBalance(accountNo, newBalance, sessionUserId);
+					accountsDAO.updateBalance(peerAccNo, receiverTxn.getClosingBalance(), sessionUserId);
+				}
+
+			}
+			else
+			{
+				success = txnDAO.addTransaction(txn);
+				if (success)
+				{
+					accountsDAO.updateBalance(accountNo, newBalance, sessionUserId);
+				}
+			}
+
+			if (success)
+			{
+				ConnectionManager.commit();
+				Map<String, Object> response = new HashMap<>();
+				response.put("message", "Transaction successful");
+				return response;
+			}
+			else
+			{
+				throw new InvalidException("Transaction failed.");
+			}
+
+		}
+		catch (InvalidException e)
+		{
+			ConnectionManager.rollback();
+			throw e;
+		}
+		catch (Exception e)
+		{
+			ConnectionManager.rollback();
+			throw new InvalidException("Unexpected error during transaction", e);
+		}
+		finally
+		{
+			ConnectionManager.close();
+		}
+	}
 }

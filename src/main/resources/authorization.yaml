@@ -172,7 +172,7 @@ authorization:
 
 #Update
   - endpoint: /accounts
-    header: POST
+    header: PUT
     method: POST
     roles:
       - 1

@@ -14,6 +14,8 @@ public class BranchHandler
 {
 	BranchDAO branchDAO = new BranchDAO();
 
+	// GET|GET /branch
+	// 0,1,2,3
 	public Map<String, Object> handleGet(Map<String, Object> session) throws InvalidException
 	{
 		try
@@ -39,6 +41,8 @@ public class BranchHandler
 		}
 	}
 
+	// GET|POST /branch
+    // 0,1,2,3
 	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException
 	{
 		try
@@ -65,6 +69,8 @@ public class BranchHandler
 		}
 	}
 
+	// POST|POST /branch
+	// 3
 	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> attributeMap) throws InvalidException
 	{
 		try
@@ -109,7 +115,8 @@ public class BranchHandler
 		}
 	}
 
-	// PUT /branch
+	// PUT|POST /branch
+	// 3
 	public Map<String, Object> handlePut(Object pojoInstance, Map<String, Object> session) throws InvalidException
 	{
 		try

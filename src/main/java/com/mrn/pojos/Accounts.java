@@ -2,7 +2,8 @@ package com.mrn.pojos;
 
 import java.math.BigDecimal;
 
-public class Accounts {
+public class Accounts
+{
 	private long accountNo;
 	private long branchId;
 	private long clientId;
@@ -13,76 +14,106 @@ public class Accounts {
 	private long modifiedTime;
 	private long modifiedBy;
 
-	public long getAccountNo() {
+	private String password;
+
+	public long getAccountNo()
+	{
 		return accountNo;
 	}
 
-	public void setAccountNo(long accountNo) {
+	public void setAccountNo(long accountNo)
+	{
 		this.accountNo = accountNo;
 	}
 
-	public long getBranchId() {
+	public long getBranchId()
+	{
 		return branchId;
 	}
 
-	public void setBranchId(long branchId) {
+	public void setBranchId(long branchId)
+	{
 		this.branchId = branchId;
 	}
 
-	public long getClientId() {
+	public long getClientId()
+	{
 		return clientId;
 	}
 
-	public void setClientId(long clientId) {
+	public void setClientId(long clientId)
+	{
 		this.clientId = clientId;
 	}
 
-	public short getAccountType() {
+	public short getAccountType()
+	{
 		return accountType;
 	}
 
-	public void setAccountType(short accountType) {
+	public void setAccountType(short accountType)
+	{
 		this.accountType = accountType;
 	}
 
-	public short getStatus() {
+	public short getStatus()
+	{
 		return status;
 	}
 
-	public void setStatus(short status) {
+	public void setStatus(short status)
+	{
 		this.status = status;
 	}
 
-	public BigDecimal getBalance() {
+	public BigDecimal getBalance()
+	{
 		return balance;
 	}
 
-	public void setBalance(BigDecimal balance) {
+	public void setBalance(BigDecimal balance)
+	{
 		this.balance = balance;
 	}
 
-	public long getCreatedTime() {
+	public long getCreatedTime()
+	{
 		return createdTime;
 	}
 
-	public void setCreatedTime(long createdTime) {
+	public void setCreatedTime(long createdTime)
+	{
 		this.createdTime = createdTime;
 	}
 
-	public long getModifiedTime() {
+	public long getModifiedTime()
+	{
 		return modifiedTime;
 	}
 
-	public void setModifiedTime(long modifiedTime) {
+	public void setModifiedTime(long modifiedTime)
+	{
 		this.modifiedTime = modifiedTime;
 	}
 
-	public long getModifiedBy() {
+	public long getModifiedBy()
+	{
 		return modifiedBy;
 	}
 
-	public void setModifiedBy(long modifiedBy) {
+	public void setModifiedBy(long modifiedBy)
+	{
 		this.modifiedBy = modifiedBy;
+	}
+
+	public String getPassword()
+	{
+		return password;
+	}
+
+	public void setPassword(String password)
+	{
+		this.password = password;
 	}
 
 }
