@@ -1,5 +1,7 @@
 package com.mrn.utilshub;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +47,11 @@ public class Utility {
 	    response.put("message", message);
 	    response.put(key, value);
 	    return response;
+	}
+	
+	public static long convertDateToEpoch(String dateStr) {
+	    LocalDate date = LocalDate.parse(dateStr); // Format: yyyy-MM-dd
+	    return date.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
 	}
 
 

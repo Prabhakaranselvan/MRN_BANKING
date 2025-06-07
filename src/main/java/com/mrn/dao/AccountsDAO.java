@@ -281,6 +281,42 @@ public class AccountsDAO
 			throw new InvalidException("Error occurred while updating Account", e);
 		}
 	}
+	
+	public List<Long> getAccountsNoOfClientId(long clientId) throws InvalidException {
+	    String sql = "SELECT account_no FROM accounts WHERE client_id = ?";
+	    List<Long> accountNumbers = new ArrayList<>();
+
+	    try (PreparedStatement stmt = ConnectionManager.getConnection().prepareStatement(sql)) {
+	        stmt.setLong(1, clientId);
+	        ResultSet rs = stmt.executeQuery();
+	        while (rs.next()) {
+	            accountNumbers.add(rs.getLong("account_no"));
+	        }
+	    } catch (SQLException e) {
+	        throw new InvalidException("Failed to fetch accounts for client ID: " + clientId, e);
+	    }
+
+	    return accountNumbers;
+	}
+
+	public List<Long> getAccountsNoOfClientInBranch(long clientId, long branchId) throws InvalidException {
+	    String sql = "SELECT account_no FROM accounts WHERE client_id = ? AND branch_id = ?";
+	    List<Long> accountNumbers = new ArrayList<>();
+
+	    try (PreparedStatement stmt = ConnectionManager.getConnection().prepareStatement(sql)) {
+	        stmt.setLong(1, clientId);
+	        stmt.setLong(2, branchId);
+	        ResultSet rs = stmt.executeQuery();
+	        while (rs.next()) {
+	            accountNumbers.add(rs.getLong("account_no"));
+	        }
+	    } catch (SQLException e) {
+	        throw new InvalidException("Failed to fetch accounts for client ID and branch", e);
+	    }
+
+	    return accountNumbers;
+	}
+
 
 
 }

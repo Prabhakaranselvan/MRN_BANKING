@@ -223,3 +223,14 @@ authorization:
       - 3
 
 
+#Do Transactions
+  - endpoint: /accountstatement
+    header: GET
+    method: POST
+    roles:
+      - 0
+      - 1
+      - 2
+      - 3
+
+
