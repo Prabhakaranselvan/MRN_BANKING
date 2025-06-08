@@ -20,4 +20,11 @@ public class AccessValidator
 		AccessPolicy policy = AccessPolicyRegistry.getPolicy(context.getSessionRole());
 		policy.validatePostAccess(context);
 	}
+	
+	public static void validatePut(Object pojoInstance, Map<String, Object> session) throws InvalidException
+	{
+		AccessContext context = new AccessContext(session, pojoInstance);
+		AccessPolicy policy = AccessPolicyRegistry.getPolicy(context.getSessionRole());
+		policy.validatePutAccess(context);
+	}
 }

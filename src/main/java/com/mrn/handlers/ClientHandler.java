@@ -11,7 +11,7 @@ import com.mrn.enums.UserCategory;
 import com.mrn.exception.InvalidException;
 import com.mrn.pojos.Client;
 import com.mrn.pojos.User;
-import com.mrn.strategies.client.ClientUpdateStrategy;
+import com.mrn.strategies.UpdateStrategy;
 import com.mrn.strategies.client.ClientUpdateStrategyFactory;
 import com.mrn.utilshub.TransactionExecutor;
 import com.mrn.utilshub.Utility;
@@ -19,8 +19,8 @@ import com.mrn.utilshub.Validator;
 
 public class ClientHandler
 {
-	UserDAO userDAO = new UserDAO();
-	ClientDAO clientDAO = new ClientDAO();
+	private final UserDAO userDAO = new UserDAO();
+	private final ClientDAO clientDAO = new ClientDAO();
 
 	// GET|GET /client
 	// 1,2,3
@@ -80,9 +80,10 @@ public class ClientHandler
 		return TransactionExecutor.execute(() ->
 		{
 			Client updatedClient = (Client) pojoInstance;
-			AccessValidator.validateGet(pojoInstance, session);
+			AccessValidator.validatePut(pojoInstance, session);
 			short sessionRole = (short) session.get("userCategory");
-			ClientUpdateStrategy strategy = ClientUpdateStrategyFactory.getStrategy(sessionRole);
+			
+			UpdateStrategy strategy = ClientUpdateStrategyFactory.getStrategy(sessionRole);
 			strategy.update(updatedClient, session);
 			return Utility.createResponse("Client updated Successfully");
 		});

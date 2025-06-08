@@ -12,7 +12,7 @@ import com.mrn.utilshub.Validator;
 
 public class BranchHandler
 {
-	BranchDAO branchDAO = new BranchDAO();
+	private final BranchDAO branchDAO = new BranchDAO();
 
 	// GET|GET /branch
 	// 0,1,2,3

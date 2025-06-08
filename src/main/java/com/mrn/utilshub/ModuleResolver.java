@@ -7,12 +7,14 @@ import java.util.Map;
 import com.mrn.servlet.RequestStrategy;
 
 @SuppressWarnings("unchecked")
-public class ModuleResolver {
+public class ModuleResolver
+{
 	private static final Map<String, Class<?>> POJO_MAP = new HashMap<>();
 	private static final Map<String, Class<?>> HANDLER_MAP = new HashMap<>();
 	private static final Map<String, RequestStrategy> STRATEGIES = new HashMap<>();
 
-	static {
+	static
+	{
 		// Populate POJO class mappings
 		POJO_MAP.put("login", com.mrn.pojos.Login.class);
 		POJO_MAP.put("signup", com.mrn.pojos.Client.class);
@@ -38,39 +40,54 @@ public class ModuleResolver {
 		HANDLER_MAP.put("accountstatement", com.mrn.handlers.TransactionHandler.class);
 
 		// header method = GET, http method = GET
-		STRATEGIES.put("GET|GET", (handler, body, session) -> {
-			Method method = handler.getClass().getMethod("handleGet", Map.class);
-			return (Map<String, Object>) method.invoke(handler, session);
+		STRATEGIES.put("GET|GET", (handler, body, queryParams, session) ->
+		{
+			if (queryParams.isEmpty())
+			{
+				Method method = handler.getClass().getMethod("handleGet", Map.class);
+				return (Map<String, Object>) method.invoke(handler, session);
+			}
+			else
+			{
+				Method method = handler.getClass().getMethod("handleGet",Map.class, Map.class);
+				return (Map<String, Object>) method.invoke(handler, queryParams, session);
+			}
 		});
 
 		// header method = GET, http method = POST
-		STRATEGIES.put("GET|POST", (handler, body, session) -> {
+		STRATEGIES.put("GET|POST", (handler, body, queryParams, session) ->
+		{
 			Method method = handler.getClass().getMethod("handleGet", Object.class, Map.class);
 			return (Map<String, Object>) method.invoke(handler, body, session);
 		});
 
 		// header method = POST, http method = POST
-		STRATEGIES.put("POST|POST", (handler, body, session) -> {
+		STRATEGIES.put("POST|POST", (handler, body, queryParams, session) ->
+		{
 			Method method = handler.getClass().getMethod("handlePost", Object.class, Map.class);
 			return (Map<String, Object>) method.invoke(handler, body, session);
 		});
 
 		// header method = PUT, http method = POST
-		STRATEGIES.put("PUT|POST", (handler, body, session) -> {
+		STRATEGIES.put("PUT|POST", (handler, body, queryParams, session) ->
+		{
 			Method method = handler.getClass().getMethod("handlePut", Object.class, Map.class);
 			return (Map<String, Object>) method.invoke(handler, body, session);
 		});
 	}
 
-	public static Class<?> getPojoClass(String module) {
+	public static Class<?> getPojoClass(String module)
+	{
 		return POJO_MAP.get(module);
 	}
 
-	public static Class<?> getHandlerClass(String module) {
+	public static Class<?> getHandlerClass(String module)
+	{
 		return HANDLER_MAP.get(module);
 	}
 
-	public static RequestStrategy getStrategy(String key) {
+	public static RequestStrategy getStrategy(String key)
+	{
 		return STRATEGIES.get(key);
 	}
 

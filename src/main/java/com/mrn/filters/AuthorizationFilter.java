@@ -22,6 +22,10 @@ public class AuthorizationFilter implements Filter
 		HttpServletResponse res = (HttpServletResponse) response;
 
 		String path = req.getPathInfo();
+		String query = req.getQueryString();
+		if (query != null) {
+		    path += "?" + query;  // Append query parameters to the path
+		}
 		String exclude = ".*/(login|signup|logout)$";
 		if (path != null && path.matches(exclude)) 
 		{
@@ -32,16 +36,6 @@ public class AuthorizationFilter implements Filter
 		String method = req.getMethod();
 		String headerMethod = req.getHeader("Method");
 		short userRole = (short) req.getSession().getAttribute("userCategory");
-//		try 
-//		{
-//		    UserCategory.fromValue(userRole);
-//		} 
-//		catch (InvalidException e) 
-//		{
-//			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//			res.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
-//		    return;
-//		}
 
 		// Authorization check using YamlLoader
 		boolean authorized = YamlLoader.isAllowed(path, headerMethod, method, userRole);

@@ -15,6 +15,8 @@ import com.mrn.utilshub.Validator;
 
 public class LoginHandler
 {
+	private final AuthenticationDAO auth = new AuthenticationDAO();
+	
 	public Map<String, Object> handlePost(Object pojoInstance) throws InvalidException
 	{
 		return TransactionExecutor.execute(() ->
@@ -26,7 +28,7 @@ public class LoginHandler
 			String phoneNo = credentials.getPhoneNo();
 			String password = credentials.getPassword();
 
-			AuthenticationDAO auth = new AuthenticationDAO();
+			
 			String storedPassword = auth.getPasswordByEmailOrPhone(email, phoneNo);
 
 			Utility.validatePassword(password, storedPassword);

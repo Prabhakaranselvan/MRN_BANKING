@@ -1,9 +1,7 @@
 package com.mrn.accesscontrol;
 
 import com.mrn.exception.InvalidException;
-import com.mrn.pojos.Accounts;
 import com.mrn.pojos.Client;
-import com.mrn.pojos.Employee;
 
 public class ClientAccessPolicy implements AccessPolicy
 {
@@ -14,7 +12,7 @@ public class ClientAccessPolicy implements AccessPolicy
 		Object resource = ctx.getTargetResource();
 		long sessionUserId = ctx.getSessionUserId();
 
-		if (resource instanceof Client)
+		if (resource instanceof Client) // GET|POST /client
 		{
 			Client client = (Client) resource;
 			if (client.getUserId() != sessionUserId)
@@ -22,14 +20,6 @@ public class ClientAccessPolicy implements AccessPolicy
 				throw new InvalidException("Clients can only access their own profile");
 			}
 		}
-//		else if (resource instanceof Accounts)
-//		{
-//			Accounts acc = (Accounts) resource;
-//			if (acc.getClientId() != sessionUserId)
-//			{
-//				throw new InvalidException("Client can only view their own account.");
-//			}
-//		}
 		else
 		{
 			throw new InvalidException("Unauthorized access.");
@@ -48,7 +38,7 @@ public class ClientAccessPolicy implements AccessPolicy
 		Object resource = ctx.getTargetResource();
 		long sessionUserId = ctx.getSessionUserId();
 
-		if (resource instanceof Client)
+		if (resource instanceof Client) // PUT|POST /client
 		{
 			Client client = (Client) resource;
 			if (client.getUserId() != sessionUserId)

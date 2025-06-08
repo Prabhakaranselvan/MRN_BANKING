@@ -45,6 +45,7 @@ public class BankingServlet extends HttpServlet
 			String httpMethod = request.getMethod().toUpperCase();
 
 			Object pojoInstance = null;
+			Map<String, String> queryParams = new HashMap<>();
 			if (!"GET".equals(httpMethod))
 			{
 				try (BufferedReader reader = request.getReader())
@@ -54,6 +55,10 @@ public class BankingServlet extends HttpServlet
 					Class<?> pojoClass = ModuleResolver.getPojoClass(module);
 					pojoInstance = gson.fromJson(jsonString, pojoClass);
 				}
+			}
+			else
+			{
+				request.getParameterMap().forEach((k, v) -> queryParams.put(k, v[0]));
 			}
 
 			Class<?> handlerClass = ModuleResolver.getHandlerClass(module);
@@ -77,8 +82,8 @@ public class BankingServlet extends HttpServlet
 				}
 				String key = headerMethod + "|" + httpMethod;
 				RequestStrategy strategy = ModuleResolver.getStrategy(key);
-				Map<String, Object> attributeMap = getSessionAttributes(request);
-				resultMap = strategy.handle(handlerInstance, pojoInstance, attributeMap);
+				Map<String, Object> sessionMap = getSessionAttributes(request);
+				resultMap = strategy.handle(handlerInstance, pojoInstance, queryParams, sessionMap);
 			}
 			sendResponse(response, resultMap);
 		}
@@ -121,7 +126,14 @@ public class BankingServlet extends HttpServlet
 
 	private void createSession(HttpServletRequest request, HttpServletResponse response, Map<String, Object> resultMap)
 	{
-		HttpSession session = request.getSession(); // creates session if not exists
+		// Invalidate old session if exists
+		HttpSession oldSession = request.getSession(false);
+		if (oldSession != null) {
+			oldSession.invalidate();
+		}
+
+		// Create a new session
+		HttpSession newSession = request.getSession(true);
 
 		// Define keys you want to set as session attributes
 		List<String> sessionKeys = new ArrayList<>(Arrays.asList("userId", "userCategory", "branchId"));
@@ -132,10 +144,10 @@ public class BankingServlet extends HttpServlet
 			Object value = resultMap.get(key);
 			if (value != null)
 			{
-				session.setAttribute(key, value);
+				newSession.setAttribute(key, value);
 			}
 		}
-		session.setMaxInactiveInterval(30 * 60); // 30 minutes timeout
+		newSession.setMaxInactiveInterval(30 * 60); // 30 minutes timeout
 	}
 
 	private void handleLogout(HttpServletRequest request, HttpServletResponse response) throws IOException
@@ -162,7 +174,7 @@ public class BankingServlet extends HttpServlet
 	public static Map<String, Object> getSessionAttributes(HttpServletRequest request)
 	{
 		HttpSession session = request.getSession(false); // don't create if it doesn't exist
-		Map<String, Object> attributeMap = new HashMap<>();
+		Map<String, Object> sessionMap = new HashMap<>();
 
 		if (session != null)
 		{
@@ -171,10 +183,10 @@ public class BankingServlet extends HttpServlet
 			{
 				String name = attributeNames.nextElement();
 				Object value = session.getAttribute(name);
-				attributeMap.put(name, value);
+				sessionMap.put(name, value);
 			}
 		}
-		return attributeMap;
+		return sessionMap;
 	}
 
 }

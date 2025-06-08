@@ -17,8 +17,9 @@ public class UserDAO
 	{
 		String sql = "INSERT INTO user (user_category, name, gender, email, phone_no, password, status, created_time, "
 				+ "modified_time, modified_by) VALUES (?, ?, ?, ?, ?, ?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?)";
-		
-		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS))
+
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql,
+				PreparedStatement.RETURN_GENERATED_KEYS))
 		{
 			pstmt.setShort(1, user.getUserCategory());
 			pstmt.setString(2, user.getName());
@@ -64,7 +65,6 @@ public class UserDAO
 		}
 	}
 
-	
 	public List<User> getUsersByCategory(short category) throws InvalidException
 	{
 		List<User> users = new ArrayList<>();
@@ -91,7 +91,31 @@ public class UserDAO
 		}
 		return users;
 	}
-	
+
+	public short getUserCategoryById(long userId) throws InvalidException
+	{
+		String sql = "SELECT user_category FROM user WHERE user_id = ?";
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
+		{
+			pstmt.setLong(1, userId);
+			try (ResultSet rs = pstmt.executeQuery())
+			{
+				if (rs.next())
+				{
+					return rs.getShort("user_category");
+				}
+				else
+				{
+					throw new InvalidException("User not found with ID: " + userId);
+				}
+			}
+		}
+		catch (SQLException e)
+		{
+			throw new InvalidException("Error fetching user category by ID", e);
+		}
+	}
+
 	public String getPasswordByUserId(long userId) throws InvalidException
 	{
 		String sql = "SELECT password FROM user WHERE user_id = ?";
@@ -115,7 +139,7 @@ public class UserDAO
 			throw new InvalidException("Error retrieving password for user_id: " + userId, e);
 		}
 	}
-	
+
 	public void updateByThemself(User user) throws InvalidException
 	{
 		String sql = "UPDATE user SET email = ?, phone_no = ?, modified_time = UNIX_TIMESTAMP(), modified_by = ? WHERE user_id = ?";
@@ -143,7 +167,6 @@ public class UserDAO
 		}
 	}
 
-	
 	public void updateByHigherAuthority(User user) throws InvalidException
 	{
 		String sql = "UPDATE user SET name = ?, gender = ?, email = ?, phone_no = ?, status = ?, modified_time = UNIX_TIMESTAMP(), "
@@ -175,7 +198,6 @@ public class UserDAO
 		}
 	}
 
-	
 	private InvalidException handleConstraintViolation(SQLIntegrityConstraintViolationException e)
 	{
 		String message = e.getMessage();
@@ -192,44 +214,5 @@ public class UserDAO
 			return new InvalidException("constraint violation occured", e);
 		}
 	}
-	
-
-//	public User getUserById(long userId) throws InvalidException
-//	{
-//		String sql = "SELECT * FROM user WHERE user_id = ?";
-//		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
-//		{
-//			pstmt.setLong(1, userId);
-//			try (ResultSet rs = pstmt.executeQuery())
-//			{
-//				if (rs.next())
-//				{
-//					User user = new User();
-//					user.setUserId(rs.getLong("user_id"));
-//					user.setUserCategory(rs.getShort("user_category"));
-//					user.setName(rs.getString("name"));
-//					user.setGender(rs.getString("gender"));
-//					user.setEmail(rs.getString("email"));
-//					user.setPhoneNo(rs.getString("phone_no"));
-//					user.setStatus(rs.getShort("status"));
-//					user.setCreatedTime(rs.getLong("created_time"));
-//					user.setModifiedTime(rs.getLong("modified_time"));
-//
-//					long modifiedByValue = rs.getLong("modified_by");
-//					user.setModifiedBy(rs.wasNull() ? null : modifiedByValue);
-//
-//					return user;
-//				}
-//				else
-//				{
-//					throw new InvalidException("User not found with ID: " + userId);
-//				}
-//			}
-//		}
-//		catch (SQLException e)
-//		{
-//			throw new InvalidException("Database error: " + e.getMessage());
-//		}
-//	}
 
 }

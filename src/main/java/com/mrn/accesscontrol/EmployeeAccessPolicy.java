@@ -1,8 +1,6 @@
 package com.mrn.accesscontrol;
 
 import com.mrn.exception.InvalidException;
-import com.mrn.pojos.Accounts;
-import com.mrn.pojos.Client;
 import com.mrn.pojos.Employee;
 
 public class EmployeeAccessPolicy implements AccessPolicy
@@ -12,23 +10,20 @@ public class EmployeeAccessPolicy implements AccessPolicy
 	public void validateGetAccess(AccessContext ctx) throws InvalidException
 	{
 		Object resource = ctx.getTargetResource();
-		long branchId = ctx.getSessionBranchId();
+		long sessionUserId = ctx.getSessionUserId();		
+//		long branchId = ctx.getSessionBranchId();
 
-		if (resource instanceof Accounts)
-		{
-			Accounts acc = (Accounts) resource;
-			if (acc.getBranchId() != branchId)
-			{
-				throw new InvalidException("Manager can only view accounts from their branch.");
-			}
-		}
-		else if (resource instanceof Employee)
+		if (resource instanceof Employee) // GET|POST /employee
 		{
 			Employee emp = (Employee) resource;
-			if (emp.getBranchId() != branchId)
+			if (emp.getUserId() != sessionUserId)
 			{
-				throw new InvalidException("Manager can only access employees in their branch.");
+				throw new InvalidException("Employees can only view their own profile");
 			}
+		}		
+		else
+		{
+			throw new InvalidException("Unauthorized access.");
 		}
 	}
 
@@ -41,20 +36,6 @@ public class EmployeeAccessPolicy implements AccessPolicy
 	@Override
 	public void validatePutAccess(AccessContext ctx) throws InvalidException
 	{
-//		Object resource = ctx.getTargetResource();
-//		long sessionUserId = ctx.getSessionUserId();
-//
-//		if (resource instanceof Client)
-//		{
-//			Client client = (Client) resource;
-//			if (client.getUserId() != sessionUserId)
-//			{
-//				throw new InvalidException("Clients can only edit their own profile");
-//			}
-//		}
-//		else
-//		{
-//			throw new InvalidException("Unauthorized access.");
-//		}
+		
 	}
 }
