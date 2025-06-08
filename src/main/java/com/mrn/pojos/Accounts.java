@@ -4,64 +4,64 @@ import java.math.BigDecimal;
 
 public class Accounts
 {
-	private long accountNo;
-	private long branchId;
-	private long clientId;
-	private short accountType;
-	private short status;
+	private Long accountNo;
+	private Long branchId;
+	private Long clientId;
+	private Short accountType;
+	private Short status;
 	private BigDecimal balance;
-	private long createdTime;
-	private long modifiedTime;
-	private long modifiedBy;
+	private Long createdTime;
+	private Long modifiedTime;
+	private Long modifiedBy;
 
 	private String password;
 
-	public long getAccountNo()
+	public Long getAccountNo()
 	{
 		return accountNo;
 	}
 
-	public void setAccountNo(long accountNo)
+	public void setAccountNo(Long accountNo)
 	{
 		this.accountNo = accountNo;
 	}
 
-	public long getBranchId()
+	public Long getBranchId()
 	{
 		return branchId;
 	}
 
-	public void setBranchId(long branchId)
+	public void setBranchId(Long branchId)
 	{
 		this.branchId = branchId;
 	}
 
-	public long getClientId()
+	public Long getClientId()
 	{
 		return clientId;
 	}
 
-	public void setClientId(long clientId)
+	public void setClientId(Long clientId)
 	{
 		this.clientId = clientId;
 	}
 
-	public short getAccountType()
+	public Short getAccountType()
 	{
 		return accountType;
 	}
 
-	public void setAccountType(short accountType)
+	public void setAccountType(Short accountType)
 	{
 		this.accountType = accountType;
 	}
 
-	public short getStatus()
+	public Short getStatus()
 	{
 		return status;
 	}
 
-	public void setStatus(short status)
+	public void setStatus(Short status)
 	{
 		this.status = status;
 	}
@@ -76,32 +76,32 @@ public class Accounts
 		this.balance = balance;
 	}
 
-	public long getCreatedTime()
+	public Long getCreatedTime()
 	{
 		return createdTime;
 	}
 
-	public void setCreatedTime(long createdTime)
+	public void setCreatedTime(Long createdTime)
 	{
 		this.createdTime = createdTime;
 	}
 
-	public long getModifiedTime()
+	public Long getModifiedTime()
 	{
 		return modifiedTime;
 	}
 
-	public void setModifiedTime(long modifiedTime)
+	public void setModifiedTime(Long modifiedTime)
 	{
 		this.modifiedTime = modifiedTime;
 	}
 
-	public long getModifiedBy()
+	public Long getModifiedBy()
 	{
 		return modifiedBy;
 	}
 
-	public void setModifiedBy(long modifiedBy)
+	public void setModifiedBy(Long modifiedBy)
 	{
 		this.modifiedBy = modifiedBy;
 	}
@@ -115,5 +115,7 @@ public class Accounts
 	{
 		this.password = password;
 	}
+
+
 
 }

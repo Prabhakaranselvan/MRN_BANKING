@@ -1,22 +1,16 @@
 package com.mrn.pojos;
 
-public class Employee extends User {
-	private long employeeId;
-	private long branchId;
+public class Employee extends User
+{
+	private Long branchId;
 
-	public long getEmployeeId() {
-		return employeeId;
-	}
-
-	public void setEmployeeId(long employeeId) {
-		this.employeeId = employeeId;
-	}
-
-	public long getBranchId() {
+	public Long getBranchId()
+	{
 		return branchId;
 	}
 
-	public void setBranchId(long branchId) {
+	public void setBranchId(Long branchId)
+	{
 		this.branchId = branchId;
 	}
 

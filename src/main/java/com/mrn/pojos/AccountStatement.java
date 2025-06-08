@@ -2,28 +2,27 @@ package com.mrn.pojos;
 
 public class AccountStatement
 {
-	private long clientId;
-	private long accountNo; // Can be 0 to indicate all accounts
+	private Long clientId;
+	private Long accountNo; // Can be 0 to indicate all accounts
 	private String fromDate; // Format: yyyy-MM-dd
 	private String toDate; // Format: yyyy-MM-dd
 
-	// Getters and Setters
-	public long getClientId()
+	public Long getClientId()
 	{
 		return clientId;
 	}
 
-	public void setClientId(long clientId)
+	public void setClientId(Long clientId)
 	{
 		this.clientId = clientId;
 	}
 
-	public long getAccountNo()
+	public Long getAccountNo()
 	{
 		return accountNo;
 	}
 
-	public void setAccountNo(long accountNo)
+	public void setAccountNo(Long accountNo)
 	{
 		this.accountNo = accountNo;
 	}
@@ -47,4 +46,5 @@ public class AccountStatement
 	{
 		this.toDate = toDate;
 	}
+
 }

@@ -14,7 +14,7 @@ import com.mrn.utilshub.ConnectionManager;
 public class BranchDAO
 {
 
-	public boolean addBranch(Branch branch) throws InvalidException
+	public void addBranch(Branch branch) throws InvalidException
 	{
 		String sql = "INSERT INTO branch (branch_name, branch_location, contact_no, ifsc_code, created_time, modified_time, modified_by) "
 				+ "VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?)";
@@ -28,8 +28,10 @@ public class BranchDAO
 			pstmt.setString(4, branch.getIfscCode());
 			pstmt.setLong(5, branch.getModifiedBy());
 
-			int affectedRows = pstmt.executeUpdate();
-			return affectedRows > 0;
+			if (pstmt.executeUpdate() <= 0)
+			{
+				throw new InvalidException("Branch Addition Failed");
+			}
 
 		}
 		catch (SQLIntegrityConstraintViolationException e)
@@ -149,7 +151,7 @@ public class BranchDAO
 		}
 	}
 
-	public boolean updateBranchDetails(Branch branch) throws InvalidException
+	public void updateBranchDetails(Branch branch) throws InvalidException
 	{
 		String sql = "UPDATE branch SET branch_name = ?, branch_location = ?, contact_no = ?, "
 				+ "modified_time = UNIX_TIMESTAMP(), modified_by = ? WHERE branch_id = ?";
@@ -163,8 +165,10 @@ public class BranchDAO
 			pstmt.setLong(4, branch.getModifiedBy());
 			pstmt.setLong(5, branch.getBranchId());
 
-			int affectedRows = pstmt.executeUpdate();
-			return affectedRows > 0;
+			if (pstmt.executeUpdate() <= 0)
+			{
+				throw new InvalidException("Branch Updation Failed");
+			}
 
 		}
 		catch (SQLIntegrityConstraintViolationException e)

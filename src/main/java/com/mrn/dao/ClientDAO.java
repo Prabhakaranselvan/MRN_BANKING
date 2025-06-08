@@ -13,18 +13,21 @@ import com.mrn.utilshub.ConnectionManager;
 public class ClientDAO
 {
 
-	public boolean addClient(Client client) throws InvalidException
+	public void addClient(Client client) throws InvalidException
 	{
 		String sql = "INSERT INTO client (client_id, date_of_birth, aadhar, pan, address) VALUES (?, ?, ?, ?, ?)";
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{
-			pstmt.setLong(1, client.getClientId());
+			pstmt.setLong(1, client.getUserId());
 			pstmt.setDate(2, Date.valueOf(client.getDob()));
 			pstmt.setString(3, client.getAadhar());
 			pstmt.setString(4, client.getPan());
 			pstmt.setString(5, client.getAddress());
 
-			return pstmt.executeUpdate() > 0;
+			if (pstmt.executeUpdate() <= 0)
+			{
+				throw new InvalidException("Insertion at Client Table Failed");
+			}
 		}
 		catch (SQLIntegrityConstraintViolationException e)
 		{
@@ -79,19 +82,19 @@ public class ClientDAO
 		}
 	}
 
-	public boolean updateByThemself(Client client) throws InvalidException
+	public void updateByThemself(Client client) throws InvalidException
 	{
-		String updateClientSql = "UPDATE client SET address = ? WHERE client_id = ?";
-
-		try (PreparedStatement pstmtClient = ConnectionManager.getConnection().prepareStatement(updateClientSql))
+		String sql = "UPDATE client SET address = ? WHERE client_id = ?";
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{
 
-			pstmtClient.setString(1, client.getAddress());
-			pstmtClient.setLong(2, client.getUserId());
+			pstmt.setString(1, client.getAddress());
+			pstmt.setLong(2, client.getUserId());
 
-			int rowsUpdated = pstmtClient.executeUpdate();
-			return rowsUpdated > 0;
-
+			if (pstmt.executeUpdate() <= 0)
+			{
+				throw new InvalidException("Update at User Table Failed");
+			}
 		}
 		catch (SQLIntegrityConstraintViolationException e)
 		{
@@ -103,11 +106,11 @@ public class ClientDAO
 		}
 	}
 
-	public boolean updateByHigherAuthority(Client client) throws InvalidException
+	public void updateByHigherAuthority(Client client) throws InvalidException
 	{
-		String updateClientSql = "UPDATE client SET date_of_birth = ?, aadhar = ?, pan = ?, address = ? WHERE client_id = ?";
+		String sql = "UPDATE client SET date_of_birth = ?, aadhar = ?, pan = ?, address = ? WHERE client_id = ?";
 
-		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(updateClientSql))
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{
 
 			pstmt.setDate(1, Date.valueOf(client.getDob()));
@@ -116,9 +119,10 @@ public class ClientDAO
 			pstmt.setString(4, client.getAddress());
 			pstmt.setLong(5, client.getUserId());
 
-			int rowsUpdated = pstmt.executeUpdate();
-			return rowsUpdated > 0;
-
+			if (pstmt.executeUpdate() <= 0)
+			{
+				throw new InvalidException("Update at User Table Failed");
+			}
 		}
 		catch (SQLIntegrityConstraintViolationException e)
 		{

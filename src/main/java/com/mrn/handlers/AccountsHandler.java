@@ -14,53 +14,39 @@ import com.mrn.utilshub.ConnectionManager;
 import com.mrn.utilshub.Utility;
 import com.mrn.utilshub.Validator;
 
-public class AccountsHandler
-{
+public class AccountsHandler {
 
 	AccountsDAO accountsDAO = new AccountsDAO();
 	UserDAO userDAO = new UserDAO();
 
 	// GET|GET /accounts
 	// 1,2,3
-	public Map<String, Object> handleGet(Map<String, Object> session) throws InvalidException
-	{
-		try
-		{
+	public Map<String, Object> handleGet(Map<String, Object> session) throws InvalidException {
+		try {
 			UserCategory sessionRole = UserCategory.fromValue((short) session.get("userCategory"));
 			List<Accounts> accounts = new ArrayList<>();
 
-			if (sessionRole == UserCategory.EMPLOYEE || sessionRole == UserCategory.MANAGER)
-			{
+			if (sessionRole == UserCategory.EMPLOYEE || sessionRole == UserCategory.MANAGER) {
 				long sessionBranchId = (long) session.get("branchId");
 				accounts.addAll(accountsDAO.getAccountsByBranchId(sessionBranchId));
-			}
-			else if (sessionRole == UserCategory.GENERAL_MANAGER)
-			{
+			} else if (sessionRole == UserCategory.GENERAL_MANAGER) {
 				accounts.addAll(accountsDAO.getAllAccounts());
 			}
 			ConnectionManager.commit();
 			return Utility.createResponse("Accounts List Fetched Successfully", "Accounts", accounts);
-		}
-		catch (InvalidException e)
-		{
+		} catch (InvalidException e) {
 			ConnectionManager.rollback();
 			throw e;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			ConnectionManager.rollback();
 			throw new InvalidException("Failed to fetch account details", e);
-		}
-		finally
-		{
+		} finally {
 			ConnectionManager.close();
 		}
 	}
 
-	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException
-	{
-		try
-		{
+	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException {
+		try {
 			Accounts account = (Accounts) pojoInstance;
 
 			long accountNo = account.getAccountNo(); // May be null
@@ -70,25 +56,18 @@ public class AccountsHandler
 
 			List<Accounts> accounts = new ArrayList<>();
 
-			if (accountNo == 0)
-			{
+			if (accountNo == 0) {
 				accounts.addAll(accountsDAO.getAccountsByClientId(clientId));
-			}
-			else
-			{
+			} else {
 				Accounts dbAccount = accountsDAO.getAccountByAccountNo(accountNo);
 				if (sessionRole == UserCategory.CLIENT) // Clients can only access their own accounts
 				{
-					if (dbAccount.getClientId() != sessionUserId)
-					{
+					if (dbAccount.getClientId() != sessionUserId) {
 						throw new InvalidException("Access denied to this account");
 					}
-				}
-				else if (sessionRole == UserCategory.EMPLOYEE || sessionRole == UserCategory.MANAGER)
-				{
+				} else if (sessionRole == UserCategory.EMPLOYEE || sessionRole == UserCategory.MANAGER) {
 					long sessionBranchId = (long) session.get("branchId");
-					if (dbAccount.getBranchId() != sessionBranchId)
-					{
+					if (dbAccount.getBranchId() != sessionBranchId) {
 						throw new InvalidException("Access denied to this account");
 					}
 				}
@@ -96,40 +75,30 @@ public class AccountsHandler
 			}
 			ConnectionManager.commit();
 			return Utility.createResponse("Account details fetched successfully", "Accounts", accounts);
-		}
-		catch (InvalidException e)
-		{
+		} catch (InvalidException e) {
 			ConnectionManager.rollback();
 			throw e;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			ConnectionManager.rollback();
 			throw new InvalidException("Failed to fetch account details", e);
-		}
-		finally
-		{
+		} finally {
 			ConnectionManager.close();
 		}
 	}
 
 	// POST|POST /accounts
 	// 1,2,3
-	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException
-	{
-		try
-		{
+	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException {
+		try {
 			Accounts account = (Accounts) pojoInstance;
 
 			UserCategory sessionRole = UserCategory.fromValue((short) session.get("userCategory"));
 
-			if (sessionRole == UserCategory.EMPLOYEE || sessionRole == UserCategory.MANAGER)
-			{
+			if (sessionRole == UserCategory.EMPLOYEE || sessionRole == UserCategory.MANAGER) {
 				// Extract performer and target user's brannchId
 				long sessionBranchId = (long) session.get("branchId");
 				long targetBranchId = account.getBranchId();
-				if (sessionBranchId != targetBranchId)
-				{
+				if (sessionBranchId != targetBranchId) {
 					throw new InvalidException("You can add account to only your branch");
 				}
 			}
@@ -141,85 +110,63 @@ public class AccountsHandler
 
 			boolean success = accountsDAO.addAccount(account);
 
-			if (success)
-			{
+			if (success) {
 				ConnectionManager.commit();
 				return Utility.createResponse("Account Created Successfully");
-			}
-			else
-			{
+			} else {
 				ConnectionManager.rollback();
 				throw new InvalidException("Account Creation Failed");
 			}
-		}
-		catch (InvalidException e)
-		{
+		} catch (InvalidException e) {
 			ConnectionManager.rollback();
 			throw e;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			ConnectionManager.rollback();
 			throw new InvalidException("Account Creation failed due to an unexpected error.", e);
-		}
-		finally
-		{
+		} finally {
 			ConnectionManager.close();
 		}
 	}
 
-	public Map<String, Object> handlePut(Object pojoInstance, Map<String, Object> session) throws InvalidException
-	{
-		try
-		{
+	public Map<String, Object> handlePut(Object pojoInstance, Map<String, Object> session) throws InvalidException {
+		try {
 			Accounts updatedAccount = (Accounts) pojoInstance;
 			long sessionUserId = (long) session.get("userId");
 			short sessionRole = (short) session.get("userCategory");
-			
+
 			Utility.checkError(Validator.checkAccountUpdate(updatedAccount));
 			Utility.validatePassword(updatedAccount.getPassword(), userDAO.getPasswordByUserId(sessionUserId));
-			
+
 			updatedAccount.setModifiedBy(sessionUserId);
 			updatedAccount.setModifiedTime(System.currentTimeMillis());
 
 			long targetAccountNo = updatedAccount.getAccountNo();
 			long actualBranchId = accountsDAO.getBranchIdFromAccount(targetAccountNo);
 
-			if (sessionRole == UserCategory.EMPLOYEE.ordinal() || sessionRole == UserCategory.MANAGER.ordinal())
-			{
+			if (sessionRole == UserCategory.EMPLOYEE.ordinal() || sessionRole == UserCategory.MANAGER.ordinal()) {
 				long sessionBranchId = (long) session.get("branchId");
 
-				if (sessionBranchId != actualBranchId)
-				{
+				if (sessionBranchId != actualBranchId) {
 					throw new InvalidException("You can only update accounts within your branch");
 				}
 			}
-				
+
 			boolean updated = accountsDAO.updateAccount(updatedAccount);
 
-			if (updated)
-			{
+			if (updated) {
 				ConnectionManager.commit();
 				return Utility.createResponse("Account updated successfully");
-			}
-			else
-			{
+			} else {
 				ConnectionManager.rollback();
 				throw new InvalidException("Account update failed");
 			}
-		}
-		catch (InvalidException e)
-		{
+		} catch (InvalidException e) {
 			ConnectionManager.rollback();
 			throw e;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			ConnectionManager.rollback();
 			throw new InvalidException("Failed to update account", e);
-		}
-		finally
-		{
+		} finally {
 			ConnectionManager.close();
 		}
 	}

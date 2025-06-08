@@ -138,7 +138,7 @@ public class Validator
 	}
 
 
-	private static boolean checkNull(String field, String fieldName)
+	private static boolean checkNull(Object field, String fieldName)
 	{
 		if (field == null)
 		{
@@ -171,9 +171,9 @@ public class Validator
 		}
 	}
 
-	private static void checkLongField(long value, String fieldName)
+	private static void checkLongField(Long value, String fieldName)
 	{
-		if (value < 1)
+		if (!checkNull(value, fieldName) && value < 1)
 		{
 			errorMsg.append(fieldName).append(" cannot be Zero or Negative.<br/>");
 		}

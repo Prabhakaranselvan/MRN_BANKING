@@ -2,113 +2,138 @@ package com.mrn.pojos;
 
 import java.math.BigDecimal;
 
-public class Transaction {
-	private long txnId;
-	private long clientId;
-	private long accountNo;
-	private long peerAccNo;
+public class Transaction
+{
+	private Long txnId;
+	private Long clientId;
+	private Long accountNo;
+	private Long peerAccNo;
 	private BigDecimal amount;
-	private short txnType;
-	private long txnTime;
-	private short txnStatus;
-	private long txnRefNo;
+	private Short txnType;
+	private Long txnTime;
+	private Short txnStatus;
+	private Long txnRefNo;
 	private BigDecimal closingBalance;
 	private String description;
-	private long doneBy;
+	private Long doneBy;
 
-	public long getTxnId() {
+	public Long getTxnId()
+	{
 		return txnId;
 	}
 
-	public void setTxnId(long txnId) {
+	public void setTxnId(Long txnId)
+	{
 		this.txnId = txnId;
 	}
 
-	public long getClientId() {
+	public Long getClientId()
+	{
 		return clientId;
 	}
 
-	public void setClientId(long clientId) {
+	public void setClientId(Long clientId)
+	{
 		this.clientId = clientId;
 	}
 
-	public long getAccountNo() {
+	public Long getAccountNo()
+	{
 		return accountNo;
 	}
 
-	public void setAccountNo(long accountNo) {
+	public void setAccountNo(Long accountNo)
+	{
 		this.accountNo = accountNo;
 	}
 
-	public long getPeerAccNo() {
+	public Long getPeerAccNo()
+	{
 		return peerAccNo;
 	}
 
-	public void setPeerAccNo(long peerAccNo) {
+	public void setPeerAccNo(Long peerAccNo)
+	{
 		this.peerAccNo = peerAccNo;
 	}
 
-	public BigDecimal getAmount() {
+	public BigDecimal getAmount()
+	{
 		return amount;
 	}
 
-	public void setAmount(BigDecimal amount) {
+	public void setAmount(BigDecimal amount)
+	{
 		this.amount = amount;
 	}
 
-	public short getTxnType() {
+	public Short getTxnType()
+	{
 		return txnType;
 	}
 
-	public void setTxnType(short txnType) {
+	public void setTxnType(Short txnType)
+	{
 		this.txnType = txnType;
 	}
 
-	public long getTxnTime() {
+	public Long getTxnTime()
+	{
 		return txnTime;
 	}
 
-	public void setTxnTime(long txnTime) {
+	public void setTxnTime(Long txnTime)
+	{
 		this.txnTime = txnTime;
 	}
 
-	public short getTxnStatus() {
+	public Short getTxnStatus()
+	{
 		return txnStatus;
 	}
 
-	public void setTxnStatus(short txnStatus) {
+	public void setTxnStatus(Short txnStatus)
+	{
 		this.txnStatus = txnStatus;
 	}
 
-	public long getTxnRefNo() {
+	public Long getTxnRefNo()
+	{
 		return txnRefNo;
 	}
 
-	public void setTxnRefNo(long txnRefNo) {
+	public void setTxnRefNo(Long txnRefNo)
+	{
 		this.txnRefNo = txnRefNo;
 	}
 
-	public BigDecimal getClosingBalance() {
+	public BigDecimal getClosingBalance()
+	{
 		return closingBalance;
 	}
 
-	public void setClosingBalance(BigDecimal closingBalance) {
+	public void setClosingBalance(BigDecimal closingBalance)
+	{
 		this.closingBalance = closingBalance;
 	}
 
-	public String getDescription() {
+	public String getDescription()
+	{
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(String description)
+	{
 		this.description = description;
 	}
 
-	public long getDoneBy() {
+	public Long getDoneBy()
+	{
 		return doneBy;
 	}
 
-	public void setDoneBy(long doneBy) {
+	public void setDoneBy(Long doneBy)
+	{
 		this.doneBy = doneBy;
 	}
 

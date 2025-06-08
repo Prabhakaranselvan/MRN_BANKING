@@ -15,55 +15,41 @@ import com.mrn.utilshub.ConnectionManager;
 import com.mrn.utilshub.Utility;
 import com.mrn.utilshub.Validator;
 
-public class EmployeeHandler
-{
+public class EmployeeHandler {
 	UserDAO userDAO = new UserDAO();
 	EmployeeDAO employeeDAO = new EmployeeDAO();
 
 	// GET|GET /employee
 	// 2,3
-	public Map<String, Object> handleGet(Map<String, Object> session) throws InvalidException
-	{
-		try
-		{
+	public Map<String, Object> handleGet(Map<String, Object> session) throws InvalidException {
+		try {
 			short sessionRole = (short) session.get("userCategory");
 			List<User> employees = new ArrayList<>();
-			
-			if (sessionRole == UserCategory.MANAGER.ordinal())
-			{
+
+			if (sessionRole == UserCategory.MANAGER.ordinal()) {
 				long sessionBranchId = (long) session.get("branchId");
 				employees.addAll(employeeDAO.getEmployeesByBranchId(sessionBranchId));
-			}
-			else if (sessionRole == UserCategory.GENERAL_MANAGER.ordinal())
-			{
+			} else if (sessionRole == UserCategory.GENERAL_MANAGER.ordinal()) {
 				employees.addAll(userDAO.getUsersByCategory((short) UserCategory.EMPLOYEE.ordinal()));
 				employees.addAll(userDAO.getUsersByCategory((short) UserCategory.MANAGER.ordinal()));
 			}
 			ConnectionManager.commit();
 			return Utility.createResponse("Employees List Fetched Successfully", "Employees", employees);
-		}
-		catch (InvalidException e)
-		{
+		} catch (InvalidException e) {
 			ConnectionManager.rollback();
 			throw e;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			ConnectionManager.rollback();
 			throw new InvalidException("Failed to fetch client details", e);
-		}
-		finally
-		{
+		} finally {
 			ConnectionManager.close();
 		}
 	}
 
 	// GET|POST /employee
 	// 1,2,3
-	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException
-	{
-		try
-		{
+	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException {
+		try {
 			Employee employee = (Employee) pojoInstance;
 			long sessionUserId = (long) session.get("userId");
 			short sessionRole = (short) session.get("userCategory");
@@ -72,46 +58,32 @@ public class EmployeeHandler
 			short targetRole = employee.getUserCategory();
 			long targetUserId = employee.getUserId();
 
-			if (sessionRole == targetRole)
-			{
-				if (sessionUserId != targetUserId)
-				{
+			if (sessionRole == targetRole) {
+				if (sessionUserId != targetUserId) {
 					throw new InvalidException("You can only access your own profile");
 				}
-			}
-			else if (sessionRole > targetRole && sessionRole == UserCategory.MANAGER.ordinal())
-			{
-				if ((long) session.get("branchId") != employee.getBranchId())
-				{
+			} else if (sessionRole > targetRole && sessionRole == UserCategory.MANAGER.ordinal()) {
+				if ((long) session.get("branchId") != employee.getBranchId()) {
 					throw new InvalidException("You can only access employees within your branch");
 				}
 			}
 			ConnectionManager.commit();
 			return Utility.createResponse("Employee Detail Fetched Successfully", "Employee", employee);
-		}
-		catch (InvalidException e)
-		{
+		} catch (InvalidException e) {
 			ConnectionManager.rollback();
 			throw e;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			ConnectionManager.rollback();
 			throw new InvalidException("Failed to fetch Employee details", e);
-		}
-		finally
-		{
+		} finally {
 			ConnectionManager.close();
 		}
 	}
 
-
 	// POST|POST /employee
 	// 2,3
-	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException
-	{
-		try
-		{
+	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException {
+		try {
 			Employee employee = (Employee) pojoInstance;
 
 			// Check for validation errors
@@ -121,16 +93,13 @@ public class EmployeeHandler
 			UserCategory sessionRole = UserCategory.fromValue((short) session.get("userCategory"));
 			UserCategory targetRole = UserCategory.fromValue(employee.getUserCategory());
 
-			if (sessionRole == UserCategory.MANAGER)
-			{
-				if (targetRole != UserCategory.EMPLOYEE)
-				{
+			if (sessionRole == UserCategory.MANAGER) {
+				if (targetRole != UserCategory.EMPLOYEE) {
 					throw new InvalidException("Managers can only create employees, not " + targetRole);
 				}
 				long sessionBranchId = (long) session.get("branchId");
 				long targetBranchId = employee.getBranchId();
-				if (targetBranchId != sessionBranchId)
-				{
+				if (targetBranchId != sessionBranchId) {
 					throw new InvalidException("Managers can only assign employees to their own branch.");
 				}
 			}
@@ -149,39 +118,28 @@ public class EmployeeHandler
 			employee.setEmployeeId(userId);
 			boolean success = employeeDAO.addEmployee(employee);
 
-			if (success)
-			{
+			if (success) {
 				ConnectionManager.commit();
 				return Utility.createResponse("Employee Added Successfully", "userId", userId);
-			}
-			else
-			{
+			} else {
 				ConnectionManager.rollback();
 				throw new InvalidException("Employee Addition Failed");
 			}
-		}
-		catch (InvalidException e)
-		{
+		} catch (InvalidException e) {
 			ConnectionManager.rollback();
 			throw e;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			ConnectionManager.rollback();
 			throw new InvalidException("Employee Addition failed due to an unexpected error", e);
-		}
-		finally
-		{
+		} finally {
 			ConnectionManager.close();
 		}
 	}
 
 	// PUT|POST /employee
 	// 1,2,3
-	public Map<String, Object> handlePut(Object pojoInstance, Map<String, Object> session) throws InvalidException
-	{
-		try
-		{
+	public Map<String, Object> handlePut(Object pojoInstance, Map<String, Object> session) throws InvalidException {
+		try {
 
 			Employee updatedEmployee = (Employee) pojoInstance;
 			long sessionUserId = (long) session.get("userId");
@@ -194,61 +152,44 @@ public class EmployeeHandler
 			boolean updated = false;
 
 			// Self-update check
-			if (sessionRole == targetRole)
-			{
-				if (sessionUserId != targetUserId)
-				{
+			if (sessionRole == targetRole) {
+				if (sessionUserId != targetUserId) {
 					throw new InvalidException("You can only edit your own profile");
 				}
 				Utility.checkError(Validator.checkSelfUpdate(updatedEmployee));
 				Utility.validatePassword(updatedEmployee.getPassword(), userDAO.getPasswordByUserId(sessionUserId));
 				updated = userDAO.updateByThemself(updatedEmployee);
-			}
-			else if (sessionRole > targetRole)
-			{
+			} else if (sessionRole > targetRole) {
 				boolean isManager = sessionRole == UserCategory.MANAGER.ordinal();
 
-				if (isManager)
-				{
+				if (isManager) {
 					long managerBranchId = (long) session.get("branchId");
 					long employeeBranchId = employeeDAO.getBranchIdByEmployeeId(targetUserId);
 
-					if (employeeBranchId != managerBranchId)
-					{
+					if (employeeBranchId != managerBranchId) {
 						throw new InvalidException("You can only update employees within your branch");
 					}
 				}
 				Utility.checkError(Validator.checkUser(updatedEmployee));
 				Utility.validatePassword(updatedEmployee.getPassword(), userDAO.getPasswordByUserId(sessionUserId));
 				updated = userDAO.updateByHigherAuthority(updatedEmployee);
-			}
-			else
-			{
+			} else {
 				throw new InvalidException("You don't have permission to update this profile");
 			}
-			if (updated)
-			{
+			if (updated) {
 				ConnectionManager.commit();
 				return Utility.createResponse("Employee updated Successfully");
-			}
-			else
-			{
+			} else {
 				ConnectionManager.rollback();
 				throw new InvalidException("Update failed");
 			}
-		}
-		catch (InvalidException e)
-		{
+		} catch (InvalidException e) {
 			ConnectionManager.rollback();
 			throw e;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			ConnectionManager.rollback();
 			throw new InvalidException("Employee update failed", e);
-		}
-		finally
-		{
+		} finally {
 			ConnectionManager.close();
 		}
 	}

@@ -15,10 +15,10 @@ public class UserDAO
 {
 	public long addUser(User user) throws InvalidException
 	{
-		String sql = "INSERT INTO user (user_category, name, gender, email, phone_no, password, status, created_time, modified_time, modified_by) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?)";
-		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql,
-				PreparedStatement.RETURN_GENERATED_KEYS))
+		String sql = "INSERT INTO user (user_category, name, gender, email, phone_no, password, status, created_time, "
+				+ "modified_time, modified_by) VALUES (?, ?, ?, ?, ?, ?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?)";
+		
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS))
 		{
 			pstmt.setShort(1, user.getUserCategory());
 			pstmt.setString(2, user.getName());
@@ -36,8 +36,8 @@ public class UserDAO
 			{
 				pstmt.setNull(8, java.sql.Types.BIGINT);
 			}
-			int affectedRows = pstmt.executeUpdate();
-			if (affectedRows <= 0)
+
+			if (pstmt.executeUpdate() <= 0)
 			{
 				throw new InvalidException("Insertion at User Table Failed");
 			}
@@ -91,8 +91,6 @@ public class UserDAO
 		}
 		return users;
 	}
-
-
 	
 	public String getPasswordByUserId(long userId) throws InvalidException
 	{
@@ -117,12 +115,11 @@ public class UserDAO
 			throw new InvalidException("Error retrieving password for user_id: " + userId, e);
 		}
 	}
-
 	
-	public boolean updateByThemself(User user) throws InvalidException
+	public void updateByThemself(User user) throws InvalidException
 	{
-		String updateUserSql = "UPDATE user SET email = ?, phone_no = ?, modified_time = UNIX_TIMESTAMP(), modified_by = ? WHERE user_id = ?";
-		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(updateUserSql))
+		String sql = "UPDATE user SET email = ?, phone_no = ?, modified_time = UNIX_TIMESTAMP(), modified_by = ? WHERE user_id = ?";
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{
 
 			pstmt.setString(1, user.getEmail());
@@ -130,8 +127,10 @@ public class UserDAO
 			pstmt.setLong(3, user.getModifiedBy());
 			pstmt.setLong(4, user.getUserId());
 
-			int rowsUpdated = pstmt.executeUpdate();
-			return rowsUpdated > 0;
+			if (pstmt.executeUpdate() <= 0)
+			{
+				throw new InvalidException("Update at User Table Failed");
+			}
 
 		}
 		catch (SQLIntegrityConstraintViolationException e)
@@ -145,11 +144,11 @@ public class UserDAO
 	}
 
 	
-	public boolean updateByHigherAuthority(User user) throws InvalidException
+	public void updateByHigherAuthority(User user) throws InvalidException
 	{
-		String updateUserSql = "UPDATE user SET name = ?, gender = ?, email = ?, phone_no = ?, status = ?, modified_time = UNIX_TIMESTAMP(), "
+		String sql = "UPDATE user SET name = ?, gender = ?, email = ?, phone_no = ?, status = ?, modified_time = UNIX_TIMESTAMP(), "
 				+ "modified_by = ? WHERE user_id = ?";
-		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(updateUserSql))
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{
 
 			pstmt.setString(1, user.getName());
@@ -160,8 +159,10 @@ public class UserDAO
 			pstmt.setLong(6, user.getModifiedBy());
 			pstmt.setLong(7, user.getUserId());
 
-			int rowsUpdated = pstmt.executeUpdate();
-			return rowsUpdated > 0;
+			if (pstmt.executeUpdate() <= 0)
+			{
+				throw new InvalidException("Update at User Table Failed");
+			}
 
 		}
 		catch (SQLIntegrityConstraintViolationException e)

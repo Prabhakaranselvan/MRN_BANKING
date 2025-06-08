@@ -1,76 +1,93 @@
 package com.mrn.pojos;
 
-public class AccountRequest {
-	private long requestId;
-	private long branchId;
-	private long clientId;
-	private short accountType;
-	private short status;
-	private long requestedTime;
-	private long modifiedTime;
-	private long modifiedBy;
+public class AccountRequest
+{
+	private Long requestId;
+	private Long branchId;
+	private Long clientId;
+	private Short accountType;
+	private Short status;
+	private Long requestedTime;
+	private Long modifiedTime;
+	private Long modifiedBy;
 
-	public long getRequestId() {
+	public Long getRequestId()
+	{
 		return requestId;
 	}
 
-	public void setRequestId(long requestId) {
+	public void setRequestId(Long requestId)
+	{
 		this.requestId = requestId;
 	}
 
-	public long getBranchId() {
+	public Long getBranchId()
+	{
 		return branchId;
 	}
 
-	public void setBranchId(long branchId) {
+	public void setBranchId(Long branchId)
+	{
 		this.branchId = branchId;
 	}
 
-	public long getClientId() {
+	public Long getClientId()
+	{
 		return clientId;
 	}
 
-	public void setClientId(long clientId) {
+	public void setClientId(Long clientId)
+	{
 		this.clientId = clientId;
 	}
 
-	public short getAccountType() {
+	public Short getAccountType()
+	{
 		return accountType;
 	}
 
-	public void setAccountType(short accountType) {
+	public void setAccountType(Short accountType)
+	{
 		this.accountType = accountType;
 	}
 
-	public short getStatus() {
+	public Short getStatus()
+	{
 		return status;
 	}
 
-	public void setStatus(short status) {
+	public void setStatus(Short status)
+	{
 		this.status = status;
 	}
 
-	public long getRequestedTime() {
+	public Long getRequestedTime()
+	{
 		return requestedTime;
 	}
 
-	public void setRequestedTime(long requestedTime) {
+	public void setRequestedTime(Long requestedTime)
+	{
 		this.requestedTime = requestedTime;
 	}
 
-	public long getModifiedTime() {
+	public Long getModifiedTime()
+	{
 		return modifiedTime;
 	}
 
-	public void setModifiedTime(long modifiedTime) {
+	public void setModifiedTime(Long modifiedTime)
+	{
 		this.modifiedTime = modifiedTime;
 	}
 
-	public long getModifiedBy() {
+	public Long getModifiedBy()
+	{
 		return modifiedBy;
 	}
 
-	public void setModifiedBy(long modifiedBy) {
+	public void setModifiedBy(Long modifiedBy)
+	{
 		this.modifiedBy = modifiedBy;
 	}
 
