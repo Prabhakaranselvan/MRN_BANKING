@@ -84,7 +84,7 @@ public class EmployeeDAO
 		}
 		catch (SQLException e)
 		{
-			throw new InvalidException("Error fetching employees by branch: " + e.getMessage());
+			throw new InvalidException("Error fetching employees by branch.", e);
 		}
 
 		return employees;
@@ -142,7 +142,7 @@ public class EmployeeDAO
 		}
 		catch (SQLException e)
 		{
-			throw new InvalidException("Error fetching filtered employees: " + e.getMessage());
+			throw new InvalidException("Error fetching filtered employees.", e);
 		}
 		return employees;
 	}
@@ -182,7 +182,7 @@ public class EmployeeDAO
 		}
 		catch (SQLException e)
 		{
-			throw new InvalidException("Error fetching client: " + e.getMessage());
+			throw new InvalidException("Error fetching Employee by ID. ", e);
 		}
 	}
 

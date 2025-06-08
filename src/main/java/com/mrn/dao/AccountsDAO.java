@@ -14,11 +14,10 @@ import com.mrn.utilshub.ConnectionManager;
 
 public class AccountsDAO
 {
-
-	public boolean addAccount(Accounts acc) throws InvalidException
+	public void addAccount(Accounts acc) throws InvalidException
 	{
-		String sql = "INSERT INTO accounts (branch_id, client_id, account_type, status, balance, created_time, modified_time, modified_by) "
-				+ "VALUES (?, ?, ?, ?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?)";
+		String sql = "INSERT INTO accounts (branch_id, client_id, account_type, status, balance, created_time, modified_time, "
+				+ "modified_by) VALUES (?, ?, ?, ?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?)";
 
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{
@@ -29,7 +28,10 @@ public class AccountsDAO
 			pstmt.setBigDecimal(5, acc.getBalance());
 			pstmt.setLong(6, acc.getModifiedBy());
 
-			return pstmt.executeUpdate() > 0;
+			if (pstmt.executeUpdate() <= 0)
+			{
+				throw new InvalidException("Account creation failed");
+			}
 		}
 		catch (SQLIntegrityConstraintViolationException e)
 		{
@@ -57,17 +59,17 @@ public class AccountsDAO
 		}
 	}
 
-	public long getBranchIdFromAccount(long accNo) throws SQLException, InvalidException
+	public long getBranchIdFromAccount(long accNo) throws InvalidException
 	{
 		return fetchLongField(accNo, "branch_id");
 	}
 
-	public long getClientIdFromAccount(long accNo) throws SQLException, InvalidException
+	public long getClientIdFromAccount(long accNo) throws InvalidException
 	{
 		return fetchLongField(accNo, "client_id");
 	}
 
-	private long fetchLongField(long accNo, String fieldName) throws SQLException, InvalidException
+	private long fetchLongField(long accNo, String fieldName) throws InvalidException
 	{
 		String sql = "SELECT " + fieldName + " FROM accounts WHERE account_no = ?";
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
@@ -83,9 +85,13 @@ public class AccountsDAO
 				throw new InvalidException("Account not found.");
 			}
 		}
+		catch (SQLException e)
+		{
+			throw new InvalidException("Error occurred while getting " + fieldName, e);
+		}
 	}
 
-	public BigDecimal getBalanceWithLock(long accNo) throws SQLException, InvalidException
+	public BigDecimal getBalanceWithLock(long accNo) throws InvalidException
 	{
 		String sql = "SELECT balance FROM accounts WHERE account_no = ? FOR UPDATE";
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
@@ -101,9 +107,13 @@ public class AccountsDAO
 				throw new InvalidException("Account not found for balance check.");
 			}
 		}
+		catch (SQLException e)
+		{
+			throw new InvalidException("Error occurred while getting Balance.", e);
+		}
 	}
 
-	public void updateBalance(long accNo, BigDecimal newBal, long modifiedBy) throws SQLException, InvalidException
+	public void updateBalance(long accNo, BigDecimal newBal, long modifiedBy) throws InvalidException
 	{
 		String sql = "UPDATE accounts SET balance = ?, modified_time = UNIX_TIMESTAMP(), modified_by = ? WHERE account_no = ?";
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
@@ -116,9 +126,13 @@ public class AccountsDAO
 				throw new InvalidException("Failed to update account balance.");
 			}
 		}
+		catch (SQLException e)
+		{
+			throw new InvalidException("Error occurred while updating Balance.", e);
+		}
 	}
 
-	public boolean doesAccountExist(long peerAccNo) throws SQLException
+	public boolean doesAccountExist(long peerAccNo) throws InvalidException 
 	{
 		String sql = "SELECT 1 FROM accounts WHERE account_no = ?";
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
@@ -127,16 +141,29 @@ public class AccountsDAO
 			ResultSet rs = pstmt.executeQuery();
 			return rs.next(); // returns true if a record exists
 		}
+		catch (SQLException e)
+		{
+			throw new InvalidException("Error occurred while checking account Existence.", e);
+		}
 	}
 
-	public List<Accounts> getAccountsByBranchId(long branchId) throws InvalidException
+	public List<Accounts> getAllAccounts(Long branchId) throws InvalidException
 	{
 		List<Accounts> accounts = new ArrayList<>();
-		String sql = "SELECT account_no, branch_id, client_id, account_type, status, balance FROM accounts WHERE branch_id = ?";
+		StringBuilder sql = new StringBuilder("SELECT account_no, branch_id, client_id, account_type, status, balance "
+				+ "FROM accounts WHERE 1=1");
 
-		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
+		if (branchId != null)
 		{
-			pstmt.setLong(1, branchId);
+			sql.append(" AND branch_id = ?");
+		}
+
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql.toString()))
+		{
+			if (branchId != null)
+			{
+				pstmt.setLong(1, branchId);
+			}
 			try (ResultSet rs = pstmt.executeQuery())
 			{
 				while (rs.next())
@@ -154,35 +181,6 @@ public class AccountsDAO
 		catch (SQLException e)
 		{
 			throw new InvalidException("Error fetching accounts by branch ID", e);
-		}
-
-		return accounts;
-	}
-
-	public List<Accounts> getAllAccounts() throws InvalidException
-	{
-		List<Accounts> accounts = new ArrayList<>();
-		String sql = "SELECT account_no, branch_id, client_id, account_type, status, balance FROM accounts";
-
-		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
-		{
-			try (ResultSet rs = pstmt.executeQuery())
-			{
-				while (rs.next())
-				{
-					Accounts account = new Accounts();
-					account.setAccountNo(rs.getLong("account_no"));
-					account.setClientId(rs.getLong("client_id"));
-					account.setAccountType(rs.getShort("account_type"));
-					account.setStatus(rs.getShort("status"));
-					account.setBalance(rs.getBigDecimal("balance"));
-					accounts.add(account);
-				}
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new InvalidException("Error fetching all accounts", e);
 		}
 
 		return accounts;
@@ -249,8 +247,8 @@ public class AccountsDAO
 		}
 		return accounts;
 	}
-	
-	public boolean updateAccount(Accounts acc) throws InvalidException
+
+	public void updateAccount(Accounts acc) throws InvalidException
 	{
 		String sql = "UPDATE accounts SET account_type = ?, status = ?, modified_time = UNIX_TIMESTAMP(),"
 				+ " modified_by = ? WHERE account_no = ?";
@@ -262,7 +260,10 @@ public class AccountsDAO
 			pstmt.setLong(3, acc.getModifiedBy());
 			pstmt.setLong(4, acc.getAccountNo());
 
-			return pstmt.executeUpdate() > 0;
+			if (pstmt.executeUpdate() <= 0)
+			{
+				throw new InvalidException("Account update failed");
+			}
 		}
 		catch (SQLIntegrityConstraintViolationException e)
 		{
@@ -281,42 +282,50 @@ public class AccountsDAO
 			throw new InvalidException("Error occurred while updating Account", e);
 		}
 	}
-	
-	public List<Long> getAccountsNoOfClientId(long clientId) throws InvalidException {
-	    String sql = "SELECT account_no FROM accounts WHERE client_id = ?";
-	    List<Long> accountNumbers = new ArrayList<>();
 
-	    try (PreparedStatement stmt = ConnectionManager.getConnection().prepareStatement(sql)) {
-	        stmt.setLong(1, clientId);
-	        ResultSet rs = stmt.executeQuery();
-	        while (rs.next()) {
-	            accountNumbers.add(rs.getLong("account_no"));
-	        }
-	    } catch (SQLException e) {
-	        throw new InvalidException("Failed to fetch accounts for client ID: " + clientId, e);
-	    }
+	public List<Long> getAccountsNoOfClientId(long clientId) throws InvalidException
+	{
+		String sql = "SELECT account_no FROM accounts WHERE client_id = ?";
+		List<Long> accountNumbers = new ArrayList<>();
 
-	    return accountNumbers;
+		try (PreparedStatement stmt = ConnectionManager.getConnection().prepareStatement(sql))
+		{
+			stmt.setLong(1, clientId);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next())
+			{
+				accountNumbers.add(rs.getLong("account_no"));
+			}
+		}
+		catch (SQLException e)
+		{
+			throw new InvalidException("Failed to fetch accounts for client ID: " + clientId, e);
+		}
+
+		return accountNumbers;
 	}
 
-	public List<Long> getAccountsNoOfClientInBranch(long clientId, long branchId) throws InvalidException {
-	    String sql = "SELECT account_no FROM accounts WHERE client_id = ? AND branch_id = ?";
-	    List<Long> accountNumbers = new ArrayList<>();
+	public List<Long> getAccountsNoOfClientInBranch(long clientId, long branchId) throws InvalidException
+	{
+		String sql = "SELECT account_no FROM accounts WHERE client_id = ? AND branch_id = ?";
+		List<Long> accountNumbers = new ArrayList<>();
 
-	    try (PreparedStatement stmt = ConnectionManager.getConnection().prepareStatement(sql)) {
-	        stmt.setLong(1, clientId);
-	        stmt.setLong(2, branchId);
-	        ResultSet rs = stmt.executeQuery();
-	        while (rs.next()) {
-	            accountNumbers.add(rs.getLong("account_no"));
-	        }
-	    } catch (SQLException e) {
-	        throw new InvalidException("Failed to fetch accounts for client ID and branch", e);
-	    }
+		try (PreparedStatement stmt = ConnectionManager.getConnection().prepareStatement(sql))
+		{
+			stmt.setLong(1, clientId);
+			stmt.setLong(2, branchId);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next())
+			{
+				accountNumbers.add(rs.getLong("account_no"));
+			}
+		}
+		catch (SQLException e)
+		{
+			throw new InvalidException("Failed to fetch accounts for client ID and branch", e);
+		}
 
-	    return accountNumbers;
+		return accountNumbers;
 	}
-
-
 
 }

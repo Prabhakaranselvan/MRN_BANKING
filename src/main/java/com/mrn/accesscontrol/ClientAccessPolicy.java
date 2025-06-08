@@ -1,6 +1,7 @@
 package com.mrn.accesscontrol;
 
 import com.mrn.exception.InvalidException;
+import com.mrn.pojos.Accounts;
 import com.mrn.pojos.Client;
 
 public class ClientAccessPolicy implements AccessPolicy
@@ -18,6 +19,14 @@ public class ClientAccessPolicy implements AccessPolicy
 			if (client.getUserId() != sessionUserId)
 			{
 				throw new InvalidException("Clients can only access their own profile");
+			}
+		}
+		else if (resource instanceof Accounts)
+		{
+			Accounts acc = (Accounts) resource;
+			if (acc.getClientId() != sessionUserId)
+			{
+				throw new InvalidException("Clients can only access their own Accounts");
 			}
 		}
 		else

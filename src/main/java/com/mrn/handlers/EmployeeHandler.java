@@ -98,7 +98,6 @@ public class EmployeeHandler
 			AccessValidator.validatePut(updatedEmp, session);
 			short sessionRole = (short) session.get("userCategory");
 			
-			
 			UpdateStrategy strategy = EmployeeUpdateStrategyFactory.getStrategy(sessionRole, targetRole);
 			strategy.update(updatedEmp, session);
 			return Utility.createResponse("Employee updated Successfully");

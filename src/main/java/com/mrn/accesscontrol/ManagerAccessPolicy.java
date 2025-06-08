@@ -2,6 +2,8 @@ package com.mrn.accesscontrol;
 
 import com.mrn.enums.UserCategory;
 import com.mrn.exception.InvalidException;
+import com.mrn.pojos.AccountRequest;
+import com.mrn.pojos.Accounts;
 import com.mrn.pojos.Employee;
 
 public class ManagerAccessPolicy implements AccessPolicy
@@ -33,6 +35,14 @@ public class ManagerAccessPolicy implements AccessPolicy
 				}
 			}
 		}
+		else if (resource instanceof Accounts)
+		{
+			Accounts acc = (Accounts) resource;
+			if (acc.getBranchId() != sessionBranchId)
+			{
+				throw new InvalidException("Access denied to this account");
+			}
+		}
 		else
 		{
 			throw new InvalidException("Unauthorized access.");
@@ -56,6 +66,22 @@ public class ManagerAccessPolicy implements AccessPolicy
 			if (emp.getBranchId() != sessionBranchId)
 			{
 				throw new InvalidException("You can only add employees to your own branch.");
+			}
+		}
+		else if (resource instanceof AccountRequest) // POST|POST /employee
+		{
+			AccountRequest req = (AccountRequest) resource;
+			if (req.getBranchId() != sessionBranchId) 
+			{
+				throw new InvalidException("Managers can only approve requests from their own branch.");
+			}
+		}
+		else if (resource instanceof Accounts)
+		{
+			Accounts acc = (Accounts) resource;
+			if (acc.getBranchId() != sessionBranchId)
+			{
+				throw new InvalidException("You can add account to only your branch");
 			}
 		}
 		else
@@ -93,6 +119,14 @@ public class ManagerAccessPolicy implements AccessPolicy
 				{
 					throw new InvalidException("You can only update employees within your branch");
 				}
+			}
+		}
+		else if (resource instanceof Accounts)
+		{
+			Accounts acc = (Accounts) resource;
+			if (acc.getBranchId() != sessionBranchId)
+			{
+				throw new InvalidException("You can only update accounts within your branch");
 			}
 		}
 		else

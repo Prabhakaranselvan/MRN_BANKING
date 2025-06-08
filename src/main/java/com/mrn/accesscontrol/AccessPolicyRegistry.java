@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import com.mrn.enums.UserCategory;
+import com.mrn.exception.InvalidException;
 
 public class AccessPolicyRegistry
 {
@@ -16,12 +17,12 @@ public class AccessPolicyRegistry
 		policies.put(UserCategory.MANAGER, new ManagerAccessPolicy());
 	}
 
-	public static AccessPolicy getPolicy(UserCategory role)
+	public static AccessPolicy getPolicy(UserCategory role) throws InvalidException
 	{
 		AccessPolicy policy = policies.get(role);
 		if (policy == null)
 		{
-			throw new UnsupportedOperationException("No access policy defined for role: " + role);
+			throw new InvalidException("No access policy defined for role: " + role);
 		}
 		return policy;
 	}
