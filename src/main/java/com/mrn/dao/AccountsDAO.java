@@ -121,7 +121,7 @@ public class AccountsDAO
 			pstmt.setBigDecimal(1, newBal);
 			pstmt.setLong(2, modifiedBy);
 			pstmt.setLong(3, accNo);
-			if (pstmt.executeUpdate() == 0)
+			if (pstmt.executeUpdate() <= 0)
 			{
 				throw new InvalidException("Failed to update account balance.");
 			}

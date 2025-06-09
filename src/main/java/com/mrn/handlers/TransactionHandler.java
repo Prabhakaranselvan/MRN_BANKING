@@ -5,175 +5,180 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import com.mrn.accesscontrol.AccessValidator;
 import com.mrn.dao.AccountsDAO;
 import com.mrn.dao.TransactionDAO;
 import com.mrn.enums.TxnStatus;
 import com.mrn.enums.TxnType;
-import com.mrn.enums.UserCategory;
 import com.mrn.exception.InvalidException;
 import com.mrn.pojos.AccountStatement;
 import com.mrn.pojos.Transaction;
-import com.mrn.utilshub.ConnectionManager;
+import com.mrn.utilshub.TransactionExecutor;
 import com.mrn.utilshub.Utility;
+import com.mrn.utilshub.Validator;
 
-public class TransactionHandler {
-	AccountsDAO accountsDAO = new AccountsDAO();
-	TransactionDAO txnDAO = new TransactionDAO();
+public class TransactionHandler
+{
+	private final AccountsDAO accountsDAO = new AccountsDAO();
+	private final TransactionDAO txnDAO = new TransactionDAO();
 
-	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException {
-		try {
+	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException
+	{
+		return TransactionExecutor.execute(() ->
+		{
 			AccountStatement input = (AccountStatement) pojoInstance;
 			Long accountNo = input.getAccountNo();
 			Long clientId = input.getClientId();
 			String fromDateStr = input.getFromDate();
 			String toDateStr = input.getToDate();
 
-			long sessionUserId = (long) session.get("userId");
-			UserCategory sessionRole = UserCategory.fromValue((short) session.get("userCategory"));
-			long sessionBranchId = session.containsKey("branchId") ? (long) session.get("branchId") : -1;
-
-			// Validate client access
-			if (sessionRole == UserCategory.CLIENT && clientId != sessionUserId) {
-				throw new InvalidException("Clients can only access their own transactions.");
-			}
-
-			// Validate branch access for EMPLOYEE / MANAGER
-			if ((sessionRole == UserCategory.EMPLOYEE || sessionRole == UserCategory.MANAGER) && accountNo != 0) {
-				long accBranchId = accountsDAO.getBranchIdFromAccount(accountNo);
-				if (accBranchId != sessionBranchId) {
-					throw new InvalidException("You can only view transactions from your branch.");
-				}
-			}
-
-			// Collect eligible account numbers
-			List<Long> accountNumbers = new ArrayList<>();
-			if (accountNo == 0) {
-				if (sessionRole == UserCategory.CLIENT) {
-					accountNumbers.addAll(accountsDAO.getAccountsNoOfClientId(clientId));
-				} else {
-					accountNumbers.addAll(accountsDAO.getAccountsNoOfClientInBranch(clientId, sessionBranchId));
-				}
-			} else {
-				accountNumbers.add(accountNo);
-			}
-
 			// Convert dates if provided
 			Long fromEpoch = null, toEpoch = null;
-			if (fromDateStr != null && toDateStr != null) {
+			boolean hasDateRange = fromDateStr != null && toDateStr != null;
+			if (hasDateRange)
+			{
 				fromEpoch = Utility.convertDateToEpoch(fromDateStr);
-				toEpoch = Utility.convertDateToEpoch(toDateStr) + (24 * 60 * 60 * 1000L) - 1; // include entire toDate
+				toEpoch = Utility.convertDateToEpoch(toDateStr) + (24 * 60 * 60) - 1;
 			}
-
-			// Fetch transactions
+			// Collect eligible account numbers
 			List<Transaction> txnList = new ArrayList<>();
-			for (Long accNo : accountNumbers) {
-				List<Transaction> txns = (fromEpoch != null && toEpoch != null)
-						? txnDAO.getTransactionsByAccount(accNo, fromEpoch, toEpoch)
-						: txnDAO.getLastNTransactionsByAccount(accNo, 10);
+			if (accountNo == null)
+			{
+				List<Transaction> txns = hasDateRange ? txnDAO.getTransactionsByClientId(clientId, fromEpoch, toEpoch)
+						: txnDAO.getLastNTransactionsByClientId(clientId, 10);
+				txnList.addAll(txns);
+			}
+			else
+			{
+				List<Transaction> txns = hasDateRange ? txnDAO.getTransactionsByAccount(accountNo, fromEpoch, toEpoch)
+						: txnDAO.getLastNTransactionsByAccount(accountNo, 10);
 				txnList.addAll(txns);
 			}
 
-			ConnectionManager.commit();
 			return Utility.createResponse("Transaction list fetched successfully", "Transactions", txnList);
-		} catch (InvalidException e) {
-			ConnectionManager.rollback();
-			throw e;
-		} catch (Exception e) {
-			ConnectionManager.rollback();
-			throw new InvalidException("Failed to fetch account statement", e);
-		} finally {
-			ConnectionManager.close();
-		}
+		});
 	}
 
-	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException {
-		try {
+	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException
+	{
+		return TransactionExecutor.execute(() ->
+		{
 			Transaction txn = (Transaction) pojoInstance;
-
+			Utility.checkError(Validator.checkTransaction(txn));
 			long sessionUserId = (long) session.get("userId");
-			UserCategory sessionRole = UserCategory.fromValue((short) session.get("userCategory"));
+
+			validateAndPrepareTransaction(txn, sessionUserId, session);
+
 			TxnType txnType = TxnType.fromValue(txn.getTxnType());
-			long accountNo = txn.getAccountNo();
-			long clientId = accountsDAO.getClientIdFromAccount(accountNo);
-			txn.setClientId(clientId);
-			// Permission checks
-			if (sessionRole == UserCategory.CLIENT) {
-				if (txnType != TxnType.DEBIT || clientId != sessionUserId) {
-					throw new InvalidException("Clients can only transfer from their own accounts.");
-				}
-			} else if (sessionRole == UserCategory.EMPLOYEE || sessionRole == UserCategory.MANAGER) {
-				long branchId = (long) session.get("branchId");
-				if (accountsDAO.getBranchIdFromAccount(accountNo) != branchId) {
-					throw new InvalidException("You can only operate on accounts from your branch.");
-				}
+			Long peerAccNo = txn.getPeerAccNo();
+
+			if (txnType == TxnType.DEBIT && accountsDAO.doesAccountExist(peerAccNo))
+			{
+				processTransferTransaction(txn, peerAccNo, sessionUserId);
 			}
-
-			BigDecimal txnAmount = txn.getAmount();
-			// Balance check
-			BigDecimal currentBalance = accountsDAO.getBalanceWithLock(accountNo);
-
-			// Prepare transaction
-			BigDecimal newBalance;
-			if (txnType == TxnType.WITHDRAWAL || txnType == TxnType.DEBIT) {
-				if (currentBalance.compareTo(txnAmount) < 0) {
-					throw new InvalidException("Insufficient balance for this transaction.");
-				}
-				newBalance = currentBalance.subtract(txnAmount);
-			} else {
-				newBalance = currentBalance.add(txnAmount);
+			else
+			{
+				processSimpleTransaction(txn, sessionUserId);
 			}
-			txn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
-			txn.setDoneBy(sessionUserId);
-			txn.setClosingBalance(newBalance);
+			return Utility.createResponse("Transaction successfully");
+		});
+	}
 
-			boolean success;
+	private void validateAndPrepareTransaction(Transaction txn, long userId, Map<String, Object> session)
+			throws InvalidException
+	{
+		long clientId = accountsDAO.getClientIdFromAccount(txn.getAccountNo());
+		txn.setClientId(clientId);
+		AccessValidator.validatePost(txn, session);
+		txn.setTxnRefNo(generateTxnRefNo());
+		txn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
+		txn.setDoneBy(userId);
+	}
+	
+	private long generateTxnRefNo()
+	{
+		long timestamp = System.currentTimeMillis();
+		int randomSuffix = new Random().nextInt(900) + 100; // ensures 3-digit
+		return Long.parseLong(timestamp + "" + randomSuffix);
+	}
 
-			long peerAccNo = txn.getPeerAccNo();
-			if (txnType == TxnType.DEBIT && accountsDAO.doesAccountExist(peerAccNo)) {
-				long peerClientId = accountsDAO.getClientIdFromAccount(peerAccNo);
-				BigDecimal receiverBalance = accountsDAO.getBalanceWithLock(peerAccNo);
 
-				Transaction receiverTxn = new Transaction();
-				receiverTxn.setClientId(peerClientId);
-				receiverTxn.setAccountNo(peerAccNo);
-				receiverTxn.setPeerAccNo(accountNo);
-				receiverTxn.setAmount(txnAmount);
-				receiverTxn.setTxnType((short) TxnType.CREDIT.getValue());
-				receiverTxn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
-				receiverTxn.setTxnRefNo(txn.getTxnRefNo());
-				receiverTxn.setClosingBalance(receiverBalance.add(txnAmount));
-				receiverTxn.setDoneBy(sessionUserId);
-
-				success = txnDAO.addTransaction(txn) && txnDAO.addTransaction(receiverTxn);
-				if (success) {
-					accountsDAO.updateBalance(accountNo, newBalance, sessionUserId);
-					accountsDAO.updateBalance(peerAccNo, receiverTxn.getClosingBalance(), sessionUserId);
-				}
-			} else {
-				success = txnDAO.addTransaction(txn);
-				if (success) {
-					accountsDAO.updateBalance(accountNo, newBalance, sessionUserId);
-				}
-			}
-
-			if (success) {
-				ConnectionManager.commit();
-				Map<String, Object> response = new HashMap<>();
-				response.put("message", "Transaction successful");
-				return response;
-			} else {
-				throw new InvalidException("Transaction failed.");
-			}
-
-		} catch (InvalidException e) {
-			ConnectionManager.rollback();
-			throw e;
-		} catch (Exception e) {
-			ConnectionManager.rollback();
-			throw new InvalidException("Unexpected error during transaction", e);
-		} finally {
-			ConnectionManager.close();
+	private void processSimpleTransaction(Transaction txn, long userId) throws InvalidException
+	{
+		BigDecimal currentBalance = accountsDAO.getBalanceWithLock(txn.getAccountNo());
+		BigDecimal txnAmount = txn.getAmount();
+		TxnType txnType = TxnType.fromValue(txn.getTxnType());
+		boolean isAmountDeduction = txnType == TxnType.WITHDRAWAL || txnType == TxnType.DEBIT;
+		
+		if (isAmountDeduction && currentBalance.compareTo(txnAmount) < 0)
+		{
+			throw new InvalidException("Insufficient balance for this transaction.");
 		}
+		BigDecimal newBalance = isAmountDeduction ? currentBalance.subtract(txnAmount) : currentBalance.add(txnAmount);
+		txn.setClosingBalance(newBalance);
+
+		txnDAO.addTransaction(txn);
+		accountsDAO.updateBalance(txn.getAccountNo(), newBalance, userId);
+	}
+
+	private void processTransferTransaction(Transaction senderTxn, long peerAccNo, long userId) throws InvalidException
+	{
+		long senderAccNo = senderTxn.getAccountNo();
+		BigDecimal txnAmount = senderTxn.getAmount();
+
+		// Lock both accounts in consistent order to avoid deadlock
+		Map<Long, BigDecimal> balances = lockAccountsInOrder(senderAccNo, peerAccNo);
+
+		BigDecimal senderBalance = balances.get(senderAccNo);
+		BigDecimal receiverBalance = balances.get(peerAccNo);
+
+		if (senderBalance.compareTo(txnAmount) < 0)
+		{
+			throw new InvalidException("Insufficient balance for this transaction.");
+		}
+
+		BigDecimal senderNewBalance = senderBalance.subtract(txnAmount);
+		BigDecimal receiverNewBalance = receiverBalance.add(txnAmount);
+
+		senderTxn.setClosingBalance(senderNewBalance);
+
+		Transaction receiverTxn = createReceiverTransaction(senderTxn, peerAccNo, receiverNewBalance, userId);
+
+		txnDAO.addTransaction(senderTxn);
+		txnDAO.addTransaction(receiverTxn);
+		accountsDAO.updateBalance(senderAccNo, senderNewBalance, userId);
+		accountsDAO.updateBalance(peerAccNo, receiverNewBalance, userId);
+	}
+
+	private Map<Long, BigDecimal> lockAccountsInOrder(long acc1, long acc2) throws InvalidException
+	{
+		long first = Math.min(acc1, acc2);
+		long second = Math.max(acc1, acc2);
+
+		Map<Long, BigDecimal> balances = new HashMap<>();
+		balances.put(first, accountsDAO.getBalanceWithLock(first));
+		balances.put(second, accountsDAO.getBalanceWithLock(second));
+
+		return balances;
+	}
+
+	private Transaction createReceiverTransaction(Transaction senderTxn, long peerAccNo, BigDecimal newBalance,
+			long userId) throws InvalidException
+	{
+		long peerClientId = accountsDAO.getClientIdFromAccount(peerAccNo);
+
+		Transaction txn = new Transaction();
+		txn.setClientId(peerClientId);
+		txn.setAccountNo(peerAccNo);
+		txn.setPeerAccNo(senderTxn.getAccountNo());
+		txn.setAmount(senderTxn.getAmount());
+		txn.setTxnType((short) TxnType.CREDIT.getValue());
+		txn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
+		txn.setTxnRefNo(senderTxn.getTxnRefNo());
+		txn.setClosingBalance(newBalance);
+		txn.setDoneBy(userId);
+		return txn;
 	}
 }

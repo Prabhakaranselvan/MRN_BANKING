@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import com.mrn.enums.AccountType;
 import com.mrn.enums.Status;
+import com.mrn.enums.TxnType;
 import com.mrn.enums.UserCategory;
 import com.mrn.exception.InvalidException;
 import com.mrn.pojos.Accounts;
@@ -15,6 +16,7 @@ import com.mrn.pojos.Branch;
 import com.mrn.pojos.Client;
 import com.mrn.pojos.Employee;
 import com.mrn.pojos.Login;
+import com.mrn.pojos.Transaction;
 import com.mrn.pojos.User;
 
 public class Validator
@@ -124,6 +126,20 @@ public class Validator
 		return errorMsg;
 	}
 
+	public static StringBuilder checkTransaction(Transaction txn)
+	{
+		errorMsg.setLength(0);
+
+		checkLongField(txn.getAccountNo(), "Account Number");
+		checkDecimalField(txn.getAmount(), "Transaction Amount");
+		validateEnum(() -> TxnType.fromValue(txn.getTxnType()));
+		if (txn.getTxnType() == TxnType.DEBIT.getValue())
+		{
+			checkLongField(txn.getPeerAccNo(), "Peer Account Number");
+		}
+		return errorMsg;
+	}
+
 	// Helper method that appends the exception message if validation fails
 	private static void validateEnum(EnumValidation enumCheck)
 	{
@@ -136,7 +152,6 @@ public class Validator
 			errorMsg.append(e.getMessage());
 		}
 	}
-
 
 	private static boolean checkNull(Object field, String fieldName)
 	{
@@ -194,7 +209,7 @@ public class Validator
 //			errorMsg.append(fieldName).append(" should be either 1, or 2.<br/>");
 //		}
 //	}
-	
+
 //  public static StringBuilder checkClient(Client client) 
 //  {
 //      errorMsg.setLength(0);

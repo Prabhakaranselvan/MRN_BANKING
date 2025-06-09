@@ -1,13 +1,16 @@
 package com.mrn.accesscontrol;
 
+import com.mrn.dao.AccountsDAO;
 import com.mrn.enums.UserCategory;
 import com.mrn.exception.InvalidException;
 import com.mrn.pojos.AccountRequest;
 import com.mrn.pojos.Accounts;
 import com.mrn.pojos.Employee;
+import com.mrn.pojos.Transaction;
 
 public class ManagerAccessPolicy implements AccessPolicy
 {
+	private final AccountsDAO accountsDAO = new AccountsDAO();
 	@Override
 	public void validateGetAccess(AccessContext ctx) throws InvalidException
 	{
@@ -82,6 +85,14 @@ public class ManagerAccessPolicy implements AccessPolicy
 			if (acc.getBranchId() != sessionBranchId)
 			{
 				throw new InvalidException("You can add account to only your branch");
+			}
+		}
+		else if (resource instanceof Transaction) // POST|POST /transaction
+		{
+			Transaction txn = (Transaction) resource;
+			if (accountsDAO.getBranchIdFromAccount(txn.getAccountNo()) != sessionBranchId)
+			{
+				throw new InvalidException("You can only operate on accounts from your branch.");
 			}
 		}
 		else
