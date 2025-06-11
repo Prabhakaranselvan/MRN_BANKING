@@ -1,53 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd" id="WebApp_ID" version="4.0">
-  <display-name>MRN_BANKING</display-name>
-  <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>index.htm</welcome-file>
-    <welcome-file>default.html</welcome-file>
-    <welcome-file>default.jsp</welcome-file>
-    <welcome-file>default.htm</welcome-file>
-  </welcome-file-list>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+	id="WebApp_ID" version="4.0">
+	<display-name>MRN_BANKING</display-name>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+	</welcome-file-list>
 
-  <session-config>
-    <cookie-config>
-        <http-only>true</http-only>
-        <secure>true</secure>
-        <max-age>1800</max-age>
-    </cookie-config>
-  </session-config>
+	<session-config>
+		<cookie-config>
+			<http-only>true</http-only>
+			<secure>true</secure>
+			<max-age>1800</max-age>
+		</cookie-config>
+	</session-config>
 
 
-<!-- Authentication Filter  -->
-  <filter>
-      <filter-name>AuthenticationFilter</filter-name>
-      <filter-class>com.mrn.filters.AuthenticationFilter</filter-class>
-  </filter>
-  <filter-mapping>
-      <filter-name>AuthenticationFilter</filter-name>
-      <url-pattern>/MRNBank/*</url-pattern>
-      <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
+	<!-- Authentication Filter -->
+	<filter>
+		<filter-name>AuthenticationFilter</filter-name>
+		<filter-class>com.mrn.filters.AuthenticationFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthenticationFilter</filter-name>
+		<url-pattern>/MRNBank/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
 
-<!-- Authorization Filter  -->
-  <filter>
-      <filter-name>AuthorizationFilter</filter-name>
-      <filter-class>com.mrn.filters.AuthorizationFilter</filter-class>
-  </filter>
-  <filter-mapping>
-      <filter-name>AuthorizationFilter</filter-name>
-      <url-pattern>/MRNBank/*</url-pattern>
-      <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
+	<!-- Authorization Filter -->
+	<filter>
+		<filter-name>AuthorizationFilter</filter-name>
+		<filter-class>com.mrn.filters.AuthorizationFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthorizationFilter</filter-name>
+		<url-pattern>/MRNBank/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
 
-  <!-- Servlet -->
-  <servlet>
-      <servlet-name>BankingServlet</servlet-name>
-      <servlet-class>com.mrn.servlet.BankingServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-      <servlet-name>BankingServlet</servlet-name>
-      <url-pattern>/MRNBank/*</url-pattern>
-  </servlet-mapping>
+	<!-- Servlet -->
+	<servlet>
+		<servlet-name>BankingServlet</servlet-name>
+		<servlet-class>com.mrn.servlet.BankingServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>BankingServlet</servlet-name>
+		<url-pattern>/MRNBank/*</url-pattern>
+	</servlet-mapping>
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+
 </web-app>
