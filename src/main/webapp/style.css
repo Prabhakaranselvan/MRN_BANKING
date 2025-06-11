@@ -1,0 +1,260 @@
+@import
+	url("https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap")
+	;
+
+@import url("https://use.fontawesome.com/releases/v6.5.1/css/all.css");
+
+* {
+	font-family: "Poppins", sans-serif;
+}
+
+.banner {
+	width: 100%;
+	height: 6.5vh;
+	padding: 0 30px;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	color: black;
+	background-color: #FFF;
+	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+	position: fixed;
+	top: 0px;
+	z-index: 1000;
+}
+
+.logo-container {
+	display: flex;
+	align-items: center;
+	gap: 2.5px;
+	cursor: pointer;
+}
+
+.logo {
+	height: 60px;
+	width: auto;
+}
+
+.bank-name {
+	height: 40px;
+	width: 120px;
+}
+
+.banner-buttons {
+	display: flex;
+	gap: 20px;
+}
+
+.banner-button {
+	padding: 0;
+	background: #CD342E;
+	color: white;
+	border: none;
+	border-radius: 50%;
+	font-size: 24px;
+	width: 45px;
+	height: 45px;
+	cursor: pointer;
+	transition: background 0.3s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.banner-button .material-symbols-outlined {
+	font-size: 32px;
+}
+
+.banner-button:hover {
+	background-color: #007BFF;
+}
+
+body {
+	margin: 0;
+	width: 100%;
+	background-color: #FFFF;
+	display: flex;
+	flex-direction: column;
+	padding-top: 6.5vh;
+}
+
+.inner-body {
+	width: 100%;
+	height: 88.5vh;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.login-image {
+	width: auto;
+	height: 700px;
+	padding-right: 300px;
+}
+
+.out-box {
+	width: 450px;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+}
+
+.box {
+	position: relative;
+	width: 300px;
+	height: 150px;
+	filter: drop-shadow(0 15px 50px #ccc);
+	border-radius: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: 0.5s;
+	background: #ffffff;
+	border-radius: 20px;
+}
+
+.box:hover {
+	width: 450px;
+	height: 500px;
+}
+
+.box:hover .login {
+	inset: 25px;
+}
+
+.box:hover .loginBx {
+	transform: translateY(0px);
+}
+
+.login {
+	position: absolute;
+	inset: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	border-radius: 10px;
+	background: #ffffffcc; /* semi-transparent white */
+	color: #222;
+	z-index: 1000;
+	box-shadow: inset 0 10px 20px #cccccc80;
+	border-bottom: 2px solid #dddddd80;
+	transition: 0.5s;
+	overflow: hidden;
+}
+
+.loginBx {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	gap: 20px;
+	width: 70%;
+	transform: translateY(148px);
+	transition: 0.5s;
+}
+
+h2 {
+	text-transform: uppercase;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	margin-block-start: 0px;
+	color: #333;
+}
+
+h2 i {
+	color: #0078D7;
+	text-shadow: 0 0 5px #89CFF0, 0 0 15px #89CFF0;
+}
+
+input {
+	width: 100%;
+	padding: 10px 20px;
+	outline: none;
+	border: none;
+	font-size: 1em;
+	color: #333;
+	background: #f9f9f9;
+	border: 2px solid #ccc;
+	border-radius: 30px;
+}
+
+input::placeholder {
+	color: #888;
+}
+
+input[type="submit"] {
+	background: #0078D7;
+	border: none;
+	font-weight: 500;
+	color: #fff;
+	cursor: pointer;
+	transition: 0.5s;
+}
+
+input[type="submit"]:hover {
+	box-shadow: 0 0 10px #89CFF0, 0 0 30px #89CFF0;
+}
+
+.group {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.group a {
+	color: #333;
+	text-decoration: none;
+}
+
+.group a:nth-child(2) {
+	color: #0078D7;
+	font-weight: 600;
+}
+
+dialog {
+	padding: 20px;
+	border: none;
+	border-radius: 10px;
+	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+	background: #fff;
+	color: #333;
+	text-align: center;
+	font-family: sans-serif;
+}
+
+dialog::backdrop {
+	background: rgba(0, 0, 0, 0.3);
+}
+
+dialog button {
+	margin-top: 15px;
+	padding: 8px 16px;
+	border: none;
+	border-radius: 5px;
+	background-color: #0078D7;
+	color: white;
+	cursor: pointer;
+	transition: 0.3s ease;
+}
+
+dialog button:hover {
+	background-color: #005bb5;
+}
+
+
+.footer {
+	height: 5vh;
+	width: 100%;
+	color: black;
+	display: flex;
+	font-weight: bold;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	margin-top: 5px;
+	z-index: 1000;
+}
