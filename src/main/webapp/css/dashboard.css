@@ -1,0 +1,130 @@
+@charset "UTF-8";
+
+body {
+	margin: 0;
+	width: 100%;
+	font-family: 'Segoe UI', sans-serif;
+    background-color: #f9fbfd;
+	display: flex;
+	flex-direction: column;
+	padding-top: 6.5vh;
+}
+
+.dashboard-wrapper {
+    display: flex;
+    min-height: 93.5vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+	 width: 55px; 
+    background-color: #2062e4;
+     transition: width 1s ease, padding-left 1s ease;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.sidebar.expanded {
+    width: 230px;
+    align-items: flex-start;
+    padding-left: 20px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.logo-icon {
+	color: white;
+    height:30px;
+    width:auto;
+    margin-right: 5px;
+    margin-left: 5px;
+    filter: grayscale(100%) brightness(1000%);
+    padding: 0px 10px;
+}
+
+
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    padding: 12px 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.nav-links a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.material-icons {
+    font-size: 25px !important;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.link-text,
+.brand-name {
+    opacity: 0;
+    max-width: 0;
+    overflow: hidden;
+    transition: opacity 1s ease, max-width 1s ease;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.sidebar.expanded .link-text,
+.sidebar.expanded .brand-name {
+    opacity: 1;
+    max-width: 200px; /* Set a max width large enough to fit your text */
+}
+
+
+
+.toggle-btn {
+    position: absolute;
+    bottom: 20px;
+    background-color: white;
+    color: #2062e4;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.dashboard-content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #ffffff;
+}
+
+.logout {
+    margin-top: auto;
+    color: #ffcdd2;
+}
+
+.logout:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}

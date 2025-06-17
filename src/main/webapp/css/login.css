@@ -58,7 +58,7 @@ body {
 	inset: 25px;
 }
 
-.box:hover .json-form {
+.box:hover .login-form {
 	transform: translateY(0px);
 }
 
@@ -79,7 +79,7 @@ body {
 	overflow: hidden;
 }
 
-.json-form {
+.login-form {
 	position: relative;
 	display: flex;
 	justify-content: center;

@@ -19,6 +19,10 @@ LocalDate minEligibleDate = today.minusYears(18);
 </head>
 
 <body>
+	<%
+		request.setAttribute("showLogin", true);
+		request.setAttribute("showHome", true);
+	%>
 	<%@ include file="/includes/header.jsp"%>
 	<div class="content">
 		<div class="left-half">
@@ -28,25 +32,10 @@ LocalDate minEligibleDate = today.minusYears(18);
 		</div>
 
 		<div class="right-half">
-			<form class="json-form" data-endpoint="${pageContext.request.contextPath}/MRNBank/signup" data-method="POST">
+			<form id="signupForm" class="signup-form">
 				<h2 class="form-header">USER REGISTRATION</h2>
 				
 				<input type="hidden" name="userCategory" value="0" data-type="int">
-
-				<!-- Name Section -->
-				<!-- <label class="form-label" for="title">Name <span class="required">*</span></label>
-				<div class="name-container">
-					<select class="form-input" id="title" name="title" required>
-						<option value="Mr">Mr</option>
-						<option value="Mrs">Mrs</option>
-						<option value="Ms">Ms</option>
-						<option value="Dr">Dr</option>
-					</select>
-					<input class="form-input" type="text" name="name"	placeholder="Name" 
-						pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus> 
-					<input class="form-input" type="text" name="last_name" placeholder="Last Name" 
-						pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*">
-				</div> -->
 
 				<div class="double-column">
 					<div class="part">
@@ -58,14 +47,6 @@ LocalDate minEligibleDate = today.minusYears(18);
 						<label class="form-label" for="dob">Date of Birth <span class="required">*</span></label> 
 						<input class="form-input" type="date" id="dob" name="dob" max="<%=minEligibleDate%>" required>
 					</div>
-					<!-- <div class="part">
-						<label class="form-label" for="account-type">Account Type <span class="required">*</span></label>
-						 <select class="form-input" name="account_type" required>
-							<option value="Savings">Savings</option>
-							<option value="Current">Current</option>
-							<option value="Fixed Deposit">Fixed Deposit</option>
-						</select>
-					</div> -->
 				</div>
 
 				<div class="gender">
@@ -113,16 +94,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 
 				<label class="form-label">Address <span class="required">*</span></label>
 				<input class="form-input" type="text" name="address" placeholder="Address" required> 
-				<!-- <input class="form-input" type="text" name="address_line2" placeholder="Address Line 2">
-				<div class="row-container">
-					<input class="form-input" type="text" name="district" placeholder="District" required> 
-					<input class="form-input" type="text" name="state" placeholder="State" required>
-				</div>
-				<div class="row-container">
-					<input class="form-input" type="text" name="country" placeholder="Country" required> 
-					<input class="form-input" type="text" name="pincode" maxlength="6" pattern="\d{6}" required>
-				</div> -->
-
+				
 				<div class="double-column">
 					<div class="part">
 						<label class="form-label" for="password">Set Password <span	class="required">*</span></label> 
@@ -142,33 +114,6 @@ LocalDate minEligibleDate = today.minusYears(18);
 				</div>
 				<span id="password-error" class="error-message"></span>
 
-				<script>
-					document.addEventListener("DOMContentLoaded", function () {
-					    const password = document.getElementById("password");
-					    const confirmPassword = document.getElementById("confirm-password");
-					    const showPasswordCheckbox = document.getElementById("show-password");
-					    const errorMessage = document.getElementById("password-error");
-					    const form = document.querySelector("form");
-					
-					    showPasswordCheckbox.addEventListener("change", function () {
-					        const type = this.checked ? "text" : "password";
-					        password.type = type;
-					        confirmPassword.type = type;
-					    });
-					
-					    form.addEventListener("submit", function (event) {
-					        if (password.value !== confirmPassword.value) {
-					            event.preventDefault(); // stops submission
-					            errorMessage.textContent = "Passwords do not match!";
-					            errorMessage.style.color = "red";
-					        } else {
-					            errorMessage.textContent = "";
-					        }
-					    });
-					});
-				</script>
-
-
 				<div class="buttons">
 					<button class="form-button" type="submit">Submit</button>
 					<button class="form-button" type="reset">Reset</button>
@@ -179,8 +124,65 @@ LocalDate minEligibleDate = today.minusYears(18);
 
 	<%@ include file="/includes/dialog-box.jsp"%>
 	<%@ include file="/includes/footer.jsp"%>
+	
+	<script>
+	    document.addEventListener("DOMContentLoaded", () => {
+	        const form =  document.getElementById("signupForm");
+	        const password = document.getElementById("password");
+	        const confirmPassword = document.getElementById("confirm-password");
+	        const showPasswordCheckbox = document.getElementById("show-password");
+	        const errorMessage = document.getElementById("password-error");
+	
+	        // Toggle password visibility
+	        showPasswordCheckbox.addEventListener("change", function () {
+	            const type = this.checked ? "text" : "password";
+	            password.type = type;
+	            confirmPassword.type = type;
+	        });
+	
+	        // Handle form submission
+	        form.addEventListener("submit", async function (event) {
+	            event.preventDefault();
+	
+	            if (password.value !== confirmPassword.value) {
+	                errorMessage.textContent = "Passwords do not match!";
+	                errorMessage.style.color = "red";
+	                return;
+	            } else {
+	                errorMessage.textContent = "";
+	            }
+	
+	            const formData = new FormData(form);
+	            const jsonBody = {};
+	
+	            for (const [key, value] of formData.entries()) {
+	                if (key === "userCategory") {
+	                    jsonBody[key] = parseInt(value);
+	                } else {
+	                    jsonBody[key] = value;
+	                }
+	            }
+	
+	            try {
+	                const response = await fetch(`${pageContext.request.contextPath}/MRNBank/signup`, {
+	                    method: "POST",
+	                    headers: {
+	                        "Content-Type": "application/json",
+                        	"Method": "POST"
+	                    },
+	                    body: JSON.stringify(jsonBody)
+	                });
+	
+	                const data = await response.json();
+	
+	                handleResponse(data, `${pageContext.request.contextPath}/login.jsp`);
+	            } catch (error) {
+	                handleResponse({ error: "An error occurred while submitting the form." });
+	            }
+	        });
+	    });
+	</script>
 
-	<!-- Inline or External Script -->
-	<script src="${pageContext.request.contextPath}/scripts/json-form-handler.js"></script>
+
 </body>
 </html>

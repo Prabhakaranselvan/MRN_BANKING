@@ -5,8 +5,8 @@
 	id="WebApp_ID" version="4.0">
 	<display-name>MRN_BANKING</display-name>
 	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
 		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
 		<welcome-file>index.htm</welcome-file>
 		<welcome-file>default.html</welcome-file>
 		<welcome-file>default.jsp</welcome-file>
@@ -17,7 +17,7 @@
 		<cookie-config>
 			<http-only>true</http-only>
 			<secure>true</secure>
-			<max-age>1800</max-age>
+			<max-age>1800</max-age> 
 		</cookie-config>
 	</session-config>
 
@@ -53,9 +53,5 @@
 		<servlet-name>BankingServlet</servlet-name>
 		<url-pattern>/MRNBank/*</url-pattern>
 	</servlet-mapping>
-
-	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
-	</welcome-file-list>
 
 </web-app>

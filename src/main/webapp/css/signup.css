@@ -10,13 +10,13 @@ body {
 	background-color: #FFFF;
 	display: flex;
 	flex-direction: column;
-	padding-top: 70px;
+	padding-top: 6.5vh;
 }
 
 .content {
 	flex-grow: 1;
 	display: flex;
-	height: calc(100vh - 70px);
+	height: 93.5vh;
 }
 
 .left-half {
@@ -56,7 +56,7 @@ body {
 	flex-direction: column;
 }
 
-.json-form {
+.signup-form {
 	width: 60%;
 	padding: 30px;
 	background: #ffffff;
@@ -91,19 +91,6 @@ body {
 .required {
 	color: red;
 	font-weight: bold;
-}
-
-.name-container {
-	display: flex;
-	gap: 15px;
-}
-
-.name-container select {
-	width: 12%;
-}
-
-.name-container input {
-	width: 50%;
 }
 
 .gender {

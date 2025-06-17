@@ -12,13 +12,17 @@
 </head>
 
 <body>
+	<%
+		request.setAttribute("showSignUp", true);
+		request.setAttribute("showHome", true);
+	%>
 	<%@ include file="/includes/header.jsp"%>
 
 	<div class="inner-body">
 		<div class="out-box">
 			<div class="box">
 				<div class="login">
-					<form class="json-form" data-endpoint="${pageContext.request.contextPath}/MRNBank/login" data-method="POST">
+					<form id="loginForm" class="login-form">
 
 						<h2>
 							<i class="fa-solid fa-right-to-bracket"></i> Login
@@ -41,7 +45,31 @@
 	<%@ include file="/includes/dialog-box.jsp"%>
 	<%@ include file="/includes/footer.jsp"%>
 
-	<!-- Inline or External Script -->
-	<script	src="${pageContext.request.contextPath}/scripts/json-form-handler.js"></script>
+	<script>
+	    document.getElementById("loginForm").addEventListener("submit", async function (event) {
+	        event.preventDefault(); // Prevent default form submission
+	
+	        const email = document.getElementById("email").value;
+	        const password = document.getElementById("password").value;
+	
+	        try {
+	            const response = await fetch("${pageContext.request.contextPath}/MRNBank/login", {
+	                method: "POST",
+	                headers: {
+	                    "Content-Type": "application/json",
+                    	"Method": "POST"
+	                },
+	                body: JSON.stringify({ email, password })
+	            });
+	
+	            const data = await response.json();
+	
+	            handleResponse(data, "${pageContext.request.contextPath}/dashboard.jsp"); // Display response in dialog
+	        } catch (error) {
+	            handleResponse({ error: "An error occurred while connecting to the server." });
+	        }
+	    });
+	</script>
+
 </body>
 </html>
