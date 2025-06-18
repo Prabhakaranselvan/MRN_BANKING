@@ -40,11 +40,9 @@
         </c:if>
         
         <c:if test="${showLogout eq true}">
-	    	<form action="${pageContext.request.contextPath}/MRNBank/logout" method="post" class="logout-form">
-		        <button type="submit" class="banner-button" title="Logout">
-		            <span class="material-symbols-outlined">logout</span>
-		        </button>
-	   	 	</form>
+	        <button type="button" class="banner-button" onclick="handleLogout()">
+			    <span class="material-icons">logout</span><span class="link-text">Sign Out</span>
+			</button>
 		</c:if>
         
     </div>

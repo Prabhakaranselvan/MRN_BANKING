@@ -6,13 +6,15 @@ body {
 	font-family: 'Segoe UI', sans-serif;
     background-color: #f9fbfd;
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	padding-top: 6.5vh;
 }
 
 .dashboard-wrapper {
     display: flex;
     min-height: 93.5vh;
+    flex-direction: column;
+    width: 100%;
 }
 
 /* Sidebar Styles */

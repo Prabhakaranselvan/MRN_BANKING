@@ -41,9 +41,9 @@
 		</div>
 		<img src="${pageContext.request.contextPath}/images/Login_Image.png" alt="Login_Image" class="login-image" />
 	</div>
-
-	<%@ include file="/includes/dialog-box.jsp"%>
+	
 	<%@ include file="/includes/footer.jsp"%>
+	<%@ include file="/includes/dialog-box.jsp"%>
 
 	<script>
 	    document.getElementById("loginForm").addEventListener("submit", async function (event) {
@@ -63,13 +63,13 @@
 	            });
 	
 	            const data = await response.json();
-	
 	            handleResponse(data, "${pageContext.request.contextPath}/dashboard.jsp"); // Display response in dialog
-	        } catch (error) {
+	        } 
+	        catch (error) {
 	            handleResponse({ error: "An error occurred while connecting to the server." });
 	        }
 	    });
 	</script>
-
+	
 </body>
 </html>

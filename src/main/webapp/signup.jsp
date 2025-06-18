@@ -122,11 +122,12 @@ LocalDate minEligibleDate = today.minusYears(18);
 		</div>
 	</div>
 
-	<%@ include file="/includes/dialog-box.jsp"%>
 	<%@ include file="/includes/footer.jsp"%>
-	
+	<%@ include file="/includes/dialog-box.jsp"%>
+
 	<script>
-	    document.addEventListener("DOMContentLoaded", () => {
+	    document.addEventListener("DOMContentLoaded", () => 
+	    {
 	        const form =  document.getElementById("signupForm");
 	        const password = document.getElementById("password");
 	        const confirmPassword = document.getElementById("confirm-password");
@@ -174,9 +175,9 @@ LocalDate minEligibleDate = today.minusYears(18);
 	                });
 	
 	                const data = await response.json();
-	
 	                handleResponse(data, `${pageContext.request.contextPath}/login.jsp`);
-	            } catch (error) {
+	            } 
+	            catch (error) {
 	                handleResponse({ error: "An error occurred while submitting the form." });
 	            }
 	        });
