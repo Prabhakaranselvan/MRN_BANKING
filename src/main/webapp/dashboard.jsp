@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-profile.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-accounts.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-statement.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-transaction.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 

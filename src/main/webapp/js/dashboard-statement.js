@@ -1,26 +1,42 @@
-// dashboard-statement.js
-
 function initStatementScript() {
     const form = document.getElementById("statementForm");
     const resultBox = document.getElementById("statementResult");
+    const accountSelect = document.getElementById("accountSelect");
     const userId = document.body.getAttribute("data-user-id");
 
-    if (!form || !resultBox) return;
+    // Load accounts for dropdown
+    fetch("/MRN_BANKING/MRNBank/accounts", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Method": "GET"
+        },
+        body: JSON.stringify({ clientId: parseInt(userId) })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (Array.isArray(data.Accounts)) {
+            data.Accounts.forEach(acc => {
+                const option = document.createElement("option");
+                option.value = acc.accountNo;
+                option.textContent = acc.accountNo;
+                accountSelect.appendChild(option);
+            });
+        }
+    });
 
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit", e => {
         e.preventDefault();
+        const fromDate = form.fromDate.value;
+        const toDate = form.toDate.value;
+        const selectedAcc = accountSelect.value;
 
-        const formData = new FormData(form);
-        const accountNo = formData.get("accountNo").trim();
-        const fromDate = formData.get("fromDate");
-        const toDate = formData.get("toDate");
+        const requestBody = {};
+        if (selectedAcc) requestBody.accountNo = selectedAcc;
+        else requestBody.clientId = parseInt(userId);
 
-        let body = {};
-        if (accountNo) body.accountNo = accountNo;
-        else body.clientId = parseInt(userId);
-
-        if (fromDate) body.fromDate = fromDate;
-        if (toDate) body.toDate = toDate;
+        if (fromDate) requestBody.fromDate = fromDate;
+        if (toDate) requestBody.toDate = toDate;
 
         fetch("/MRN_BANKING/MRNBank/accountstatement", {
             method: "POST",
@@ -28,33 +44,38 @@ function initStatementScript() {
                 "Content-Type": "application/json",
                 "Method": "GET"
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(requestBody)
         })
-            .then(res => res.json())
-            .then(data => displayStatement(data))
-            .catch(err => {
-                console.error("Error fetching statement:", err);
-                resultBox.innerHTML = `<p style="color:red;">Failed to load statement.</p>`;
-            });
+        .then(res => res.json())
+        .then(data => displayStatement(data))
+        .catch(err => {
+            console.error("Error:", err);
+            resultBox.innerHTML = `<p style="color:red;">Failed to load statement.</p>`;
+        });
     });
 }
 
 function displayStatement(data) {
     const container = document.getElementById("statementResult");
+    const transactions = data.Transactions || [];
 
-    if (!data || !data.transactions || data.transactions.length === 0) {
+    if (transactions.length === 0) {
         container.innerHTML = "<p>No transactions found.</p>";
         return;
     }
 
-    const rows = data.transactions.map(t => `
+    const txnTypeMap = ["DEPOSIT", "WITHDRAWAL", "CREDIT", "DEBIT"];
+    const txnStatusMap = ["FAILED", "SUCCESS", "PENDING"];
+
+    const rows = transactions.map(txn => `
         <tr>
-            <td>${t.date}</td>
-            <td>${t.accountNo}</td>
-            <td>${t.type}</td>
-            <td>${t.amount}</td>
-            <td>${t.description}</td>
-            <td>${t.balance}</td>
+            <td>${txn.txnRefNo}</td>
+            <td>${new Date(txn.txnTime * 1000).toLocaleString()}</td>
+            <td>${txnTypeMap[txn.txnType]}</td>
+            <td>${txn.peerAccNo}</td>
+            <td>${txn.amount}</td>
+            <td>${txn.closingBalance}</td>
+            <td>${txnStatusMap[txn.txnStatus]}</td>
         </tr>
     `).join("");
 
@@ -62,12 +83,13 @@ function displayStatement(data) {
         <table>
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Account No</th>
+                    <th>Txn Ref</th>
+                    <th>Time</th>
                     <th>Type</th>
+                    <th>Peer Acc No</th>
                     <th>Amount</th>
-                    <th>Description</th>
-                    <th>Balance</th>
+                    <th>Closing Balance</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -76,5 +98,6 @@ function displayStatement(data) {
         </table>
     `;
 }
+
 
 document.addEventListener("DOMContentLoaded", initStatementScript);

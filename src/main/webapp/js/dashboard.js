@@ -62,8 +62,10 @@ function loadContent(page) {
 			} else if (page === "dashboard-accounts.jsp") {
 			    loadScriptOnce("accountsScriptLoaded", "/js/dashboard-accounts.js", "initAccountScript");
 			} else if (page === "dashboard-statement.jsp") {
-						    loadScriptOnce("statementScriptLoaded", "/js/dashboard-statement.js", "initStatementScript");
-						}   
+			    loadScriptOnce("statementScriptLoaded", "/js/dashboard-statement.js", "initStatementScript");
+			} else if (page === "dashboard-transaction.jsp") {
+			    loadScriptOnce("transactionScriptLoaded", "/js/dashboard-transaction.js", "initTransactionScript");
+			}    
         })
         .catch(error => {
             console.error("Error loading content:", error);
