@@ -2,6 +2,7 @@ package com.mrn.accesscontrol;
 
 import com.mrn.enums.TxnType;
 import com.mrn.exception.InvalidException;
+import com.mrn.pojos.AccountDetails;
 import com.mrn.pojos.AccountStatement;
 import com.mrn.pojos.Accounts;
 import com.mrn.pojos.Client;
@@ -28,6 +29,14 @@ public class ClientAccessPolicy implements AccessPolicy
 		{
 			Accounts acc = (Accounts) resource;
 			if (acc.getClientId() != sessionUserId)
+			{
+				throw new InvalidException("Clients can only access their own Accounts");
+			}
+		}
+		else if (resource instanceof AccountDetails)
+		{
+			AccountDetails accDetail = (AccountDetails) resource;
+			if (accDetail.getAccount().getClientId() != sessionUserId)
 			{
 				throw new InvalidException("Clients can only access their own Accounts");
 			}

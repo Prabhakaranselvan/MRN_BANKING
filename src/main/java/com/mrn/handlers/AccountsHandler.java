@@ -1,6 +1,5 @@
 package com.mrn.handlers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +8,7 @@ import com.mrn.dao.AccountsDAO;
 import com.mrn.dao.UserDAO;
 import com.mrn.enums.Status;
 import com.mrn.exception.InvalidException;
+import com.mrn.pojos.AccountDetails;
 import com.mrn.pojos.Accounts;
 import com.mrn.utilshub.TransactionExecutor;
 import com.mrn.utilshub.Utility;
@@ -41,19 +41,21 @@ public class AccountsHandler
 			Long accountNo = account.getAccountNo(); // May be null
 			Long clientId = account.getClientId(); //May be null
 
-			List<Accounts> accounts = new ArrayList<>();
+			
 
 			if (accountNo == null)
 			{
-				accounts.addAll(accountsDAO.getAccountsByClientId(clientId));
+				AccessValidator.validateGet(account, session);
+				List<Accounts> accounts = accountsDAO.getAccountsByClientId(clientId);
+				return Utility.createResponse("Accounts fetched successfully", "Accounts", accounts);
 			}
 			else
 			{
-				Accounts dbAccount = accountsDAO.getAccountByAccountNo(accountNo);
-				AccessValidator.validateGet(dbAccount, session);
-				accounts.add(dbAccount);
+				AccountDetails accDetails = accountsDAO.getAccountByAccountNo(accountNo);
+				AccessValidator.validateGet(accDetails, session);
+				return Utility.createResponse("Account details fetched successfully", "Account", accDetails);
 			}
-			return Utility.createResponse("Account details fetched successfully", "Accounts", accounts);
+			
 		});
 	}
 

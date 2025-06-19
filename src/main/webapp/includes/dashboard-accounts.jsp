@@ -1,29 +1,35 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<h2>My Accounts</h2>
-<p>Here are the details of your linked accounts:</p>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false" %>
+<%@ include file="/includes/dashboard-sessionguard.jsp" %>
 
-<table border="1" cellpadding="10" cellspacing="0">
-    <thead>
-        <tr>
-            <th>Account Number</th>
-            <th>Account Type</th>
-            <th>Balance</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Replace with dynamic data -->
-        <tr>
-            <td>1234567890</td>
-            <td>Savings</td>
-            <td>₹50,000.00</td>
-            <td>Active</td>
-        </tr>
-        <tr>
-            <td>9876543210</td>
-            <td>Current</td>
-            <td>₹1,25,000.00</td>
-            <td>Active</td>
-        </tr>
-    </tbody>
-</table>
+<div class="account-container">
+    <h2 class="form-header">My Accounts</h2>
+
+    <table id="account-summary-table" class="account-table">
+        <thead>
+            <tr>
+                <th>Account No</th>
+                <th>Branch ID</th>
+                <th>Account Type</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Populated via JS -->
+        </tbody>
+    </table>
+
+    <div class="account-details">
+        <label for="accountSelect" class="select-label">Select Account for Details:</label>
+        <select id="accountSelect" class="select-dropdown">
+            <option value="">-- Select Account --</option>
+        </select>
+
+        <div id="accountInfo" class="account-info-box">
+            <p>Please select an account to view details.</p>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="${pageContext.request.contextPath}/js/dashboard-accounts.js"></script>

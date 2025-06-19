@@ -165,12 +165,18 @@ public class Validator
 
 	private static boolean checkEmpty(String field, String fieldName)
 	{
-		if (!checkNull(field, fieldName) && field.trim().isEmpty())
-		{
-			errorMsg.append(fieldName).append(" cannot be empty. Please provide a value<br/>");
-			return true;
-		}
-		return false;
+		 if (checkNull(field, fieldName))
+		    {
+		        return true; // Field is null, so treat as invalid and return
+		    }
+
+		    if (field.trim().isEmpty())
+		    {
+		        errorMsg.append(fieldName).append(" cannot be empty. Please provide a value<br/>");
+		        return true;
+		    }
+
+		    return false;
 	}
 
 	private static void checkField(String field, String fieldName)

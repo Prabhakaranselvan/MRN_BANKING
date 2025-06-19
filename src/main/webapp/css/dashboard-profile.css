@@ -1,59 +1,15 @@
 @charset "UTF-8";
 
-body {
-	margin: 0;
-	width: 100%;
-	background-color: #FFFF;
-	display: flex;
-	flex-direction: column;
-	padding-top: 6.5vh;
-}
-
-.content {
-	flex-grow: 1;
-	display: flex;
-	height: 93.5vh;
-}
-
-.left-half {
-	display: flex;
-	flex-direction: column-reverse;
-	width: 49%;
-}
-
-.grow-image {
-	height: 600px;
-	width: auto;
-	margin: 0 -55px -55px -60px;
-	margin-top: 10px;
-}
-
-.welcome-msg {
-	font-size: 56px;
-	font-family: C059, sans-serif;
-	margin-left: 30%;
-	margin-block-end: 5px;
-	margin-block-start: 5px;
-}
-
-.quote-msg {
-	font-size: 40px;
-	font-family: C059, sans-serif;
-	margin-left: 45%;
-	margin-block-start: 5px;
-	margin-block-end: 5px;
-}
-
-.right-half {
-	flex-grow: 1;
-	display: flex;
+.profile-container {
+	display:flex;
+	align-content: center;
 	justify-content: center;
-	align-items: center;
-	flex-direction: column;
+	height:100%;
+	flex-wrap: wrap;
 }
 
-.signup-form {
-	width: 60%;
+.profile-form {
+	width: 30%;
 	padding: 30px;
 	background: #ffffff;
 	border-radius: 20px;
@@ -123,30 +79,27 @@ body {
 	width: 45%;
 }
 
+.password-confirm
+{
+	flex-direction: column;
+}
+
 .buttons {
 	display: flex;
-	justify-content: space-between;
+	justify-content: center;
 	margin-top: 15px;
 }
 
-.form-button, .delete-button {
-	width: 45%;
+.form-button {
+	width: 20%;
 	padding: 12px;
 	background: #007BFF;
 	color: white;
 	border: none;
-	border-radius: 5px;
+	border-radius: 25px;
 	font-size: 16px;
 	cursor: pointer;
 	transition: background 0.3s;
-}
-
-.delete-button {
-	background-color: #E63946;
-}
-
-.delete-button:hover {
-	background-color: #A02730;
 }
 
 .form-button:hover {

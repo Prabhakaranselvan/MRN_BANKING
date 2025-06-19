@@ -48,10 +48,6 @@ public class AuthenticationFilter implements Filter
 		
 		HttpSession session = req.getSession(false);
 		String exclude = ".*/(login|signup)$";
-		System.out.println(session);
-		System.out.println(path);
-		System.out.println(path.matches(exclude));
-		System.out.println(session == null && path.matches(exclude));
 		if (session == null && path.matches(exclude)) 
 		{
 			chain.doFilter(request, response); // Allow login & signup requests
@@ -59,7 +55,6 @@ public class AuthenticationFilter implements Filter
 		}
 
 		// Block other requests without session
-		System.out.println(session.getAttribute("userId") == null);
 		if (session == null || session.getAttribute("userId") == null) 
 		{
 			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

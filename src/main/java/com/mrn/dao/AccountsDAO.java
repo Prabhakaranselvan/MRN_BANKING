@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mrn.exception.InvalidException;
+import com.mrn.pojos.AccountDetails;
 import com.mrn.pojos.Accounts;
 import com.mrn.utilshub.ConnectionManager;
 
@@ -186,37 +187,43 @@ public class AccountsDAO
 		return accounts;
 	}
 
-	public Accounts getAccountByAccountNo(long accountNo) throws InvalidException
-	{
-		String sql = "SELECT account_no, branch_id, client_id, account_type, status, balance FROM accounts WHERE account_no = ?";
+	public AccountDetails getAccountByAccountNo(long accountNo) throws InvalidException {
+	    String sql = "SELECT a.account_no, a.branch_id, a.client_id, a.account_type, a.status, a.balance, " +
+	                 "a.created_time, b.branch_name, b.ifsc_code " +
+	                 "FROM accounts a " +
+	                 "JOIN branch b ON a.branch_id = b.branch_id " +
+	                 "WHERE a.account_no = ?";
 
-		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
-		{
-			pstmt.setLong(1, accountNo);
-			try (ResultSet rs = pstmt.executeQuery())
-			{
-				if (rs.next())
-				{
-					Accounts account = new Accounts();
-					account.setAccountNo(rs.getLong("account_no"));
-					account.setBranchId(rs.getLong("branch_id"));
-					account.setClientId(rs.getLong("client_id"));
-					account.setAccountType(rs.getShort("account_type"));
-					account.setStatus(rs.getShort("status"));
-					account.setBalance(rs.getBigDecimal("balance"));
-					return account;
-				}
-				else
-				{
-					throw new InvalidException("Account not found for the Account No:" + accountNo);
-				}
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new InvalidException("Error fetching account by account number", e);
-		}
+	    try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql)) {
+	        pstmt.setLong(1, accountNo);
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                // Populate Accounts object
+	                Accounts account = new Accounts();
+	                account.setAccountNo(rs.getLong("account_no"));
+	                account.setBranchId(rs.getLong("branch_id"));
+	                account.setClientId(rs.getLong("client_id"));
+	                account.setAccountType(rs.getShort("account_type"));
+	                account.setStatus(rs.getShort("status"));
+	                account.setBalance(rs.getBigDecimal("balance"));
+	                account.setCreatedTime(rs.getLong("created_time")); // assumed in Accounts
+
+	                // Populate wrapper DTO
+	                AccountDetails details = new AccountDetails();
+	                details.setAccount(account);
+	                details.setBranchName(rs.getString("branch_name"));
+	                details.setIfscCode(rs.getString("ifsc_code"));
+
+	                return details;
+	            } else {
+	                throw new InvalidException("Account not found for the Account No: " + accountNo);
+	            }
+	        }
+	    } catch (SQLException e) {
+	        throw new InvalidException("Error fetching account by account number", e);
+	    }
 	}
+
 
 	public List<Accounts> getAccountsByClientId(long clientId) throws InvalidException
 	{
@@ -236,7 +243,6 @@ public class AccountsDAO
 					account.setClientId(rs.getLong("client_id"));
 					account.setAccountType(rs.getShort("account_type"));
 					account.setStatus(rs.getShort("status"));
-					account.setBalance(rs.getBigDecimal("balance"));
 					accounts.add(account);
 				}
 			}
@@ -305,27 +311,5 @@ public class AccountsDAO
 		return accountNumbers;
 	}
 
-	public List<Long> getAccountsNoOfClientInBranch(long clientId, long branchId) throws InvalidException
-	{
-		String sql = "SELECT account_no FROM accounts WHERE client_id = ? AND branch_id = ?";
-		List<Long> accountNumbers = new ArrayList<>();
-
-		try (PreparedStatement stmt = ConnectionManager.getConnection().prepareStatement(sql))
-		{
-			stmt.setLong(1, clientId);
-			stmt.setLong(2, branchId);
-			ResultSet rs = stmt.executeQuery();
-			while (rs.next())
-			{
-				accountNumbers.add(rs.getLong("account_no"));
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new InvalidException("Failed to fetch accounts for client ID and branch", e);
-		}
-
-		return accountNumbers;
-	}
 
 }

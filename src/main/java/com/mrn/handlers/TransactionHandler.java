@@ -31,6 +31,16 @@ public class TransactionHandler
 			AccountStatement input = (AccountStatement) pojoInstance;
 			Long accountNo = input.getAccountNo();
 			Long clientId = input.getClientId();
+			if (clientId == null) {
+			    if (accountNo == null) {
+			        throw new InvalidException("Either Client ID or Account Number must be provided.");
+			    }
+
+			    Long resolvedClientId = accountsDAO.getClientIdFromAccount(accountNo);
+			    input.setClientId(resolvedClientId);
+			}
+
+			AccessValidator.validateGet(input, session);
 			String fromDateStr = input.getFromDate();
 			String toDateStr = input.getToDate();
 

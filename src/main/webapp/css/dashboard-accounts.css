@@ -1,0 +1,124 @@
+@charset "UTF-8";
+
+.account-container {
+    padding: 30px;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    max-width: 960px;
+    margin: 0 auto;
+    background-color: #fff;
+}
+
+.form-header {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #2c3e50;
+    border-bottom: 2px solid #dedede;
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.account-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.account-table th {
+    background-color: #f3f6f9;
+    padding: 14px;
+    font-size: 16px;
+    color: #34495e;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+}
+
+.account-table td {
+    padding: 12px;
+    font-size: 15px;
+    color: #333;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.account-table th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.account-table th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.account-details {
+    margin-top: 25px;
+}
+
+.select-label {
+    font-weight: 500;
+    margin-bottom: 10px;
+    display: block;
+    color: #2d3436;
+}
+
+.select-dropdown {
+    padding: 10px;
+    font-size: 15px;
+    width: 100%;
+    max-width: 320px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fdfdfd;
+    transition: border-color 0.2s;
+}
+
+.select-dropdown:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.account-info-box {
+    margin-top: 25px;
+    padding: 25px;
+    background-color: #f8f9fa;
+    border-left: 5px solid #3498db;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.account-info-box h3 {
+    font-size: 20px;
+    color: #2c3e50;
+    margin-bottom: 16px;
+}
+
+.account-info-box p {
+    margin: 8px 0;
+    font-size: 16px;
+    color: #34495e;
+}
+
+.account-info-box p strong {
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .account-container {
+        padding: 15px;
+    }
+
+    .account-table th, .account-table td {
+        font-size: 13px;
+        padding: 10px;
+    }
+
+    .select-dropdown {
+        width: 100%;
+    }
+
+    .account-info-box {
+        padding: 15px;
+    }
+}

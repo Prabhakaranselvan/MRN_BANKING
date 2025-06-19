@@ -80,6 +80,7 @@ public class ClientHandler
 		return TransactionExecutor.execute(() ->
 		{
 			Client updatedClient = (Client) pojoInstance;
+			Utility.checkError(Validator.checkSelfUpdate(updatedClient));
 			AccessValidator.validatePut(pojoInstance, session);
 			short sessionRole = (short) session.get("userCategory");
 			

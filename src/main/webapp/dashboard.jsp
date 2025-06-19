@@ -1,4 +1,14 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false" %>
+<%
+    HttpSession session = request.getSession(false); // Do not create a new session
+
+    // Redirect to login if session is missing
+    if (session == null || session.getAttribute("userId") == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,10 +17,12 @@
 
     <%@ include file="/includes/head-resources.jsp" %>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-profile.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-accounts.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
-<body>
+<body  data-user-id="<%= session.getAttribute("userId") %>">
     <%
         request.setAttribute("showLogout", true);
         request.setAttribute("showNotifications", true);
@@ -66,101 +78,13 @@
         <%@ include file="/includes/footer.jsp" %>
       	<%@ include file="/includes/dialog-box.jsp"%>
       	
-    </div>  
+    </div> 
     <script>
-	    function handleLogout() {
-	    	fetch("${pageContext.request.contextPath}/MRNBank/logout", {
-	    		method: "POST",
-	    		headers: {
-	    			"Content-Type": "application/json",
-	    			"Method": "POST"
-	    		}
-	    	})
-	    		.then(response => {
-	    			// Since we're redirecting from the backend, we just follow it
-	    			if (response.redirected) {
-	    				window.location.href = response.url;
-	    			} else {
-	    				// fallback if not redirected
-	    				window.location.href = "${pageContext.request.contextPath}/logout.jsp";
-	    			}
-	    		})
-	    		.catch(error => {
-	    			console.error("Logout failed", error);
-	    			alert("Logout failed. Please try again.");
-	    		});
-	    }
-	
-	    function toggleSidebar() {
-	                const sidebar = document.getElementById("sidebar");
-	                const icon = document.getElementById("toggle-icon");
-	                sidebar.classList.toggle("expanded");
-	                icon.textContent = sidebar.classList.contains("expanded") ? "close" : "menu";
-	            }
-	    		
-	
-	    function loadContent(page) {
-	        const container = document.getElementById("main-content");
-	        container.innerHTML = "<p>Loading...</p>";
-	        
-	        fetch(`includes/` + page)
-	            .then(response => {
-	                if (!response.ok) throw new Error("Network error");
-	                return response.text();
-	            })
-	            .then(html => {
-	                container.innerHTML = html;
-	
-	                // Trigger any needed JS based on page
-	                if (page === "dashboard-profile.jsp") {
-	                    fetchProfileData();
-	                }
-	            })
-	            .catch(error => {
-	                console.error("Error loading content:", error);
-	                container.innerHTML = "<p>Failed to load content.</p>";
-	            });
-	    }
-	
-	     function fetchProfileData() {
-	        const userId = <%= session.getAttribute("userId") %>;
-	        console.log("UserID: " + userId);
-	
-	        fetch("http://localhost:8080/MRN_BANKING/MRNBank/client", {
-	            method: "POST",
-	            headers: {
-	                "Content-Type": "application/json",
-	                "Method": "GET" // Custom header
-	            },
-	            body: JSON.stringify({ userId })
-	        })
-	        .then(response => {
-	            if (!response.ok) throw new Error("Failed to fetch profile");
-	            return response.json();
-	        })
-	        .then(data => {
-	            const client = data.clients;
-	            const container = document.getElementById("profile-details");
-	
-	            container.innerHTML =
-	                "<p><strong>Name:</strong> " + client.name + "</p>" +
-	                "<p><strong>Email:</strong> " + client.email + "</p>" +
-	                "<p><strong>Phone:</strong> " + client.phoneNo + "</p>" +
-	                "<p><strong>DOB:</strong> " + client.dob + "</p>" +
-	                "<p><strong>Gender:</strong> " + client.gender + "</p>" +
-	                "<p><strong>Aadhar:</strong> " + client.aadhar + "</p>" +
-	                "<p><strong>PAN:</strong> " + client.pan + "</p>" +
-	                "<p><strong>Address:</strong> " + client.address + "</p>" +
-	                "<p><strong>Status:</strong> " + (client.status == 1 ? 'Active' : 'Inactive') + "</p>" +
-	                "<p><strong>User ID:</strong> " + client.userId + "</p>";
-	
-	        })
-	        .catch(error => {
-	            document.getElementById("profile-details").innerHTML = "<p>Error loading profile.</p>";
-	            console.error(error);
-	        });
-	    } 
-    </script>
+	    window.appContext = "${pageContext.request.contextPath}";
+	</script> 
+    <script src="${pageContext.request.contextPath}/js/dashboard.js"></script>
+   
+    
 
 </body>
 </html>
