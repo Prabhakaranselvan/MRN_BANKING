@@ -24,7 +24,7 @@ public class TransactionDAO
 			pstmt.setLong(1, txn.getClientId());
 			pstmt.setLong(2, txn.getAccountNo());
 			Short txnType = txn.getTxnType();
-			if ( txnType == TxnType.DEBIT.getValue())
+			if (txnType == TxnType.DEBIT.getValue() || txnType == TxnType.CREDIT.getValue())
 			{
 				pstmt.setLong(3, txn.getPeerAccNo());
 			}

@@ -133,7 +133,7 @@ public class Validator
 		checkLongField(txn.getAccountNo(), "Account Number");
 		checkDecimalField(txn.getAmount(), "Transaction Amount");
 		validateEnum(() -> TxnType.fromValue(txn.getTxnType()));
-		if (txn.getTxnType() == TxnType.DEBIT.getValue())
+		if (txn.getTxnType() == TxnType.DEBIT.getValue() || txn.getTxnType() == TxnType.CREDIT.getValue())
 		{
 			checkLongField(txn.getPeerAccNo(), "Peer Account Number");
 		}

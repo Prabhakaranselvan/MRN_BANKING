@@ -83,6 +83,16 @@
     </div> 
     <script>
 	    window.appContext = "${pageContext.request.contextPath}";
+	    document.addEventListener("DOMContentLoaded", function () {
+	        // Mark Dashboard link as active on initial load
+	        const dashboardLink = [...document.querySelectorAll('.nav-links a')].find(a =>
+	            a.getAttribute('onclick')?.includes('dashboard-main.jsp')
+	        );
+	        if (dashboardLink) {
+	            dashboardLink.classList.add('active');
+	        }
+	    });
+
 	</script> 
     <script src="${pageContext.request.contextPath}/js/dashboard.js"></script>
    

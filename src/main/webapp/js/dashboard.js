@@ -56,6 +56,22 @@ function loadContent(page) {
         })
         .then(html => {
             container.innerHTML = html;
+			
+			// Remove 'active' class from all sidebar links
+			document.querySelectorAll('.nav-links a').forEach(function(link) {
+			    link.classList.remove('active');
+			});
+
+			// Find the clicked link by checking if its onclick attribute contains the page name
+			var clickedLink = Array.from(document.querySelectorAll('.nav-links a')).find(function(a) {
+			    var onclickAttr = a.getAttribute('onclick');
+			    return onclickAttr && onclickAttr.indexOf(page) !== -1;
+			});
+
+			// Add 'active' class to the matching link
+			if (clickedLink) {
+			    clickedLink.classList.add('active');
+			}
 
 			if (page === "dashboard-profile.jsp") {
 			    loadScriptOnce("profileScriptLoaded", "/js/dashboard-profile.js", "initProfileScript");

@@ -45,16 +45,16 @@ body {
 	border-radius: 20px;
 }
 
-.box:hover {
+.box.expanded {
 	width: 450px;
 	height: 500px;
 }
 
-.box:hover .login {
+.box.expanded .login {
 	inset: 25px;
 }
 
-.box:hover .login-form {
+.box.expanded .login-form {
 	transform: translateY(0px);
 }
 

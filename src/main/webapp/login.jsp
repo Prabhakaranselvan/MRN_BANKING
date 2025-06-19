@@ -52,6 +52,18 @@
 	<%@ include file="/includes/dialog-box.jsp"%>
 
 	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			const box = document.querySelector(".box");
+			let hasExpanded = false;
+	
+			box.addEventListener("mouseenter", () => {
+				if (!hasExpanded) {
+					box.classList.add("expanded");
+					hasExpanded = true;
+				}
+			});
+		});
+	 
 	    document.getElementById("loginForm").addEventListener("submit", async function (event) {
 	        event.preventDefault(); // Prevent default form submission
 	

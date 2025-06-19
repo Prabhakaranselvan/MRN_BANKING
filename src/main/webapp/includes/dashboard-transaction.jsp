@@ -2,7 +2,7 @@
 <%@ include file="/includes/dashboard-sessionguard.jsp" %>
 
 <div class="transaction-container">
-    <h2 class="form-header">↔ Fund Transfer</h2>
+    <h2 class="form-header">FUND TRANSFER</h2>
 
     <form id="transferForm" class="transfer-form">
         <div class="form-group">
@@ -31,81 +31,6 @@
             <button type="submit" class="btn-submit">➤ Transfer</button>
         </div>
     </form>
-
-    <div id="transferResult" class="transfer-result"></div>
 </div>
-
-<style>
-.transaction-container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 30px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    font-family: 'Segoe UI', sans-serif;
-}
-.form-header {
-    font-size: 26px;
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 25px;
-}
-.transfer-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: space-between;
-}
-.form-group {
-    flex: 1;
-    min-width: 240px;
-    display: flex;
-    flex-direction: column;
-}
-.form-group.full-width {
-    flex: 1 1 100%;
-    display: flex;
-    justify-content: center;
-}
-label {
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: #34495e;
-}
-input, select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 15px;
-    background-color: #fdfdfd;
-}
-input:focus, select:focus {
-    border-color: #3498db;
-    outline: none;
-}
-.btn-submit {
-    padding: 12px 24px;
-    background-color: #27ae60;
-    color: white;
-    font-size: 16px;
-    font-weight: 500;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-.btn-submit:hover {
-    background-color: #1e8449;
-}
-.transfer-result {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 500;
-}
-.transfer-result.success { color: #2ecc71; }
-.transfer-result.error { color: #e74c3c; }
-</style>
 
 <script src="${pageContext.request.contextPath}/js/dashboard-transaction.js"></script>

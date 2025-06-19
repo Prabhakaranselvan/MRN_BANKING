@@ -50,8 +50,7 @@ function initTransactionScript() {
         .then(res => res.json())
         .then(data => {
             console.log("Transaction response:", data);
-            resultBox.textContent = data.message || "Transfer complete.";
-            resultBox.className = "transfer-result success";
+            handleResponse(data);
             form.reset();
         })
         .catch(err => {

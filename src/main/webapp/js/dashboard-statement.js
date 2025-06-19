@@ -47,7 +47,10 @@ function initStatementScript() {
             body: JSON.stringify(requestBody)
         })
         .then(res => res.json())
-        .then(data => displayStatement(data))
+        .then(data => {
+			handleResponse(data);
+			displayStatement(data);
+		})
         .catch(err => {
             console.error("Error:", err);
             resultBox.innerHTML = `<p style="color:red;">Failed to load statement.</p>`;

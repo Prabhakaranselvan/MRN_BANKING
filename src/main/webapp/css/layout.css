@@ -92,11 +92,19 @@ a.banner-text-button:hover {
     border: none;
     padding: 0;
     border-radius: 8px;
-    width: 320px;
+    width: 350px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     font-family: 'Poppins', sans-serif;
     overflow: hidden;
     animation: slideIn 0.4s ease-out;
+}
+
+.custom-toast.toast-success {
+    z-index: 9999;
+    position: fixed;
+    top: 10vh;
+    left: 4.5%;
+    margin: 0;
 }
 
 .toast-content {
