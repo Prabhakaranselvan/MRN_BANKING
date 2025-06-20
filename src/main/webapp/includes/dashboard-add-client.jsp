@@ -1,38 +1,15 @@
-
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8" session="false"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
+	session="false"%>
+<%@ include file="/includes/dashboard-sessionguard.jsp"%>
 <%@ page import="java.time.LocalDate"%>
 
 <%
 LocalDate today = LocalDate.now();
 LocalDate minEligibleDate = today.minusYears(18);
 %>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Signup</title>
 
-<%@ include file="/includes/head-resources.jsp"%>
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/signup.css">
-</head>
-
-<body>
-	<%
-		request.setAttribute("showLogin", true);
-		request.setAttribute("showHome", true);
-	%>
-	<%@ include file="/includes/header.jsp"%>
-	<div class="content">
-		<div class="left-half">
-			<img src="images/grow.jpg" alt="Rise with Us" class="grow-image">
-			<h3 class="quote-msg">Stay, Grow, Conquer!</h3>
-			<h2 class="welcome-msg">Welcome Aboard!</h2>
-		</div>
-
-		<div class="right-half">
-			<form id="signupForm" class="signup-form">
+<div class="container">
+	<form id="signupForm" class="signup-form">
 				<h2 class="form-header">USER REGISTRATION</h2>
 				
 				<input type="hidden" name="userCategory" value="0" data-type="int">
@@ -119,79 +96,6 @@ LocalDate minEligibleDate = today.minusYears(18);
 					<button class="form-button" type="reset">Reset</button>
 				</div>
 			</form>
-		</div>
-	</div>
+</div>
 
-	<%@ include file="/includes/footer.jsp"%>
-	<%@ include file="/includes/dialog-box.jsp"%>
-
-	<script>
-	    document.addEventListener("DOMContentLoaded", () => 
-	    {
-	        const form =  document.getElementById("signupForm");
-	        const password = document.getElementById("password");
-	        const confirmPassword = document.getElementById("confirm-password");
-	        const showPasswordCheckbox = document.getElementById("show-password");
-	        const errorMessage = document.getElementById("password-error");
-	
-	     // Enforce numeric-only input
-	        const numberInputs = document.querySelectorAll("#phone, #aadhar");
-	        numberInputs.forEach(input => {
-	            input.addEventListener("input", function () {
-	                this.value = this.value.replace(/\D/g, ''); // Remove non-digits
-	            });
-	        });
-
-	        // Toggle password visibility
-	        showPasswordCheckbox.addEventListener("change", function () {
-	            const type = this.checked ? "text" : "password";
-	            password.type = type;
-	            confirmPassword.type = type;
-	        });
-	
-	        // Handle form submission
-	        form.addEventListener("submit", async function (event) {
-	            event.preventDefault();
-	
-	            if (password.value !== confirmPassword.value) {
-	                errorMessage.textContent = "Passwords do not match!";
-	                errorMessage.style.color = "red";
-	                return;
-	            } else {
-	                errorMessage.textContent = "";
-	            }
-	
-	            const formData = new FormData(form);
-	            const jsonBody = {};
-	
-	            for (const [key, value] of formData.entries()) {
-	                if (key === "userCategory") {
-	                    jsonBody[key] = parseInt(value);
-	                } else {
-	                    jsonBody[key] = value;
-	                }
-	            }
-	
-	            try {
-	                const response = await fetch(`${pageContext.request.contextPath}/MRNBank/signup`, {
-	                    method: "POST",
-	                    headers: {
-	                        "Content-Type": "application/json",
-                        	"Method": "POST"
-	                    },
-	                    body: JSON.stringify(jsonBody)
-	                });
-	
-	                const data = await response.json();
-	                handleResponse(data, `${pageContext.request.contextPath}/login.jsp`);
-	            } 
-	            catch (error) {
-	                handleResponse({ error: "An error occurred while submitting the form." });
-	            }
-	        });
-	    });
-	</script>
-
-
-</body>
-</html>
+<script src="${pageContext.request.contextPath}/js/dashboard-clients.js"></script>

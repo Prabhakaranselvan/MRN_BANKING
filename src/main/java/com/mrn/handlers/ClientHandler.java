@@ -28,7 +28,7 @@ public class ClientHandler
 	{
 		return TransactionExecutor.execute(() ->
 		{
-			List<User> clients = userDAO.getUsersByCategory((short) UserCategory.CLIENT.ordinal());
+			List<User> clients = userDAO.getUsersByCategory((short) UserCategory.CLIENT.getValue());
 			return Utility.createResponse("Clients List fetched successfully", "clients", clients);
 		});
 	}
@@ -40,7 +40,11 @@ public class ClientHandler
 		return TransactionExecutor.execute(() ->
 		{
 			Client client = (Client) pojoInstance;
-			AccessValidator.validateGet(pojoInstance, session);
+			short userRole = (short) session.get("userCategory");
+			if( userRole == (short)UserCategory.CLIENT.getValue())
+			{
+				AccessValidator.validateGet(pojoInstance, session);
+			}
 			clientDAO.getClientById(client);
 			return Utility.createResponse("Client Details Fetched Successfully", "clients", client);
 		});
@@ -81,7 +85,11 @@ public class ClientHandler
 		{
 			Client updatedClient = (Client) pojoInstance;
 			Utility.checkError(Validator.checkSelfUpdate(updatedClient));
-			AccessValidator.validatePut(pojoInstance, session);
+			short userRole = (short) session.get("userCategory");
+			if( userRole == (short)UserCategory.CLIENT.getValue())
+			{
+				AccessValidator.validateGet(pojoInstance, session);
+			}
 			short sessionRole = (short) session.get("userCategory");
 			
 			UpdateStrategy strategy = ClientUpdateStrategyFactory.getStrategy(sessionRole);

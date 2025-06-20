@@ -1,4 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%>
+<%@ page import="java.time.LocalDate"%>
+
 <%@ include file="/includes/dashboard-sessionguard.jsp" %>
 
 <div class=profile-container>
@@ -7,12 +9,17 @@
         <div class="double-column">
             <div class="part">
                 <label class="form-label" for="name">Name</label>
-                <input class="form-input" type="text" id="name" name="name" disabled required>
+                <input class="form-input" type="text" id="name" name="name" placeholder="Name" 
+					pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" disabled required>
             </div>
             
             <div class="part">
+				<%
+				LocalDate today = LocalDate.now();
+				LocalDate minEligibleDate = today.minusYears(18);
+				%>
                 <label class="form-label" for="dob">Date of Birth</label>
-                <input class="form-input" type="date" id="dob" name="dob" disabled required>
+                <input class="form-input" type="date" id="dob" name="dob" max="<%=minEligibleDate%>" disabled required>
             </div>
         </div>
 
@@ -48,16 +55,17 @@
         <div class="double-column">
             <div class="part">
                 <label class="form-label" for="aadhar">Aadhar</label>
-                <input class="form-input" type="text" id="aadhar" name="aadhar" disabled required>
+                <input class="form-input" type="text" id="aadhar" name="aadhar" maxlength="12" pattern="\d{12}" disabled required>
             </div>
             <div class="part">
                 <label class="form-label" for="pan">PAN</label>
-                <input class="form-input" type="text" id="pan" name="pan" disabled required>
+                <input class="form-input" type="text" id="pan" name="pan" maxlength="10" pattern="[A-Z]{5}\d{4}[A-Z]"
+					oninput="this.value = this.value.toUpperCase();" disabled required>
             </div>
         </div>
 
         <label class="form-label" for="address">Address</label>
-        <input class="form-input" type="text" id="address" name="address" disabled required>
+        <input class="form-input" type="text" id="address" name="address" placeholder="Address" disabled required>
         
         <div class="double-column">
 			<div class="part">

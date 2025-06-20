@@ -3,6 +3,35 @@ function initTransactionScript() {
     const form = document.getElementById("transferForm");
     const fromAccount = document.getElementById("fromAccount");
     const resultBox = document.getElementById("transferResult");
+	
+	// Input field restrictions
+    const peerAccNoInput = document.getElementById("peerAccNo");
+    const amountInput = document.getElementById("amount");
+    const descriptionInput = document.getElementById("description");
+
+    // Allow only digits in receiver account number
+    peerAccNoInput.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, ''); // Remove non-digits
+    });
+
+	// Allow only valid amount (digits and max 2 decimal places), and max 100000
+	    amountInput.addEventListener("input", function () {
+	        let value = this.value
+	            .replace(/[^0-9.]/g, '')           // Remove non-digit/non-dot
+	            .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimals
+
+	        const parts = value.split('.');
+	        if (parts.length > 2) {
+	            value = parts[0] + '.' + parts[1]; // Remove extra dots
+	        }
+
+	        const floatVal = parseFloat(value);
+	        if (!isNaN(floatVal) && floatVal > 100000) {
+	            value = '100000';
+	        }
+
+	        this.value = value;
+	    });
 
     // Load user's accounts into the fromAccount dropdown
     fetch("/MRN_BANKING/MRNBank/accounts", {
@@ -60,5 +89,3 @@ function initTransactionScript() {
         });
     });
 }
-
-document.addEventListener("DOMContentLoaded", initTransactionScript);

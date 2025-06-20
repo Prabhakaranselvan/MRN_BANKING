@@ -5,7 +5,13 @@ function initProfileScript() {
     const editBtn = document.getElementById("edit-btn");
     const saveBtn = document.getElementById("save-btn");
     const passwordField = document.querySelector(".password-confirm");
-    const userId = document.body.getAttribute("data-user-id");
+	const clientId = document.body.getAttribute("data-client-id");
+	const userId = clientId || document.body.getAttribute("data-user-id");
+	const userRole = parseInt(document.body.getAttribute("data-user-role")); // 0 = Client, 1 = Employee, etc.
+
+	const isPrivilegedRole = [1, 2, 3].includes(userRole);
+	const isPrivilegedEditingClient = isPrivilegedRole && !!clientId;
+
 
     let isEditMode = false;
 
@@ -13,15 +19,23 @@ function initProfileScript() {
         console.warn("Missing required DOM elements.");
         return;
     }
+	
+	if (isPrivilegedEditingClient) {
+	        editBtn.style.display = "inline-block"; // Show edit button for employees editing clients
+	    }
 
     // Enable edit mode
     editBtn.addEventListener("click", () => {
         isEditMode = true;
-
-        // Enable only selected fields
-        form.email.disabled = false;
-        form.phoneNo.disabled = false;
-        form.address.disabled = false;
+		
+		// Enable all fields if employee is editing a client
+       if (isPrivilegedEditingClient) {
+           Array.from(form.elements).forEach(input => input.disabled = false);
+       } else {
+           form.email.disabled = false;
+           form.phoneNo.disabled = false;
+           form.address.disabled = false;
+       }
 
         // Show save button and password field
         editBtn.style.display = "none";
@@ -46,6 +60,19 @@ function initProfileScript() {
             address: formData.get("address"),
             password: formData.get("password") // Include password for confirmation
         };
+		
+		if (isPrivilegedEditingClient) {
+		            // If EMPLOYEE, include all fields in update
+		            Object.assign(jsonBody, {
+		                name: formData.get("name"),
+		                dob: formData.get("dob"),
+		                gender: formData.get("gender"),
+		                aadhar: formData.get("aadhar"),
+		                pan: formData.get("pan"),
+						userCategory: 0,
+						status: 1
+		            });
+		        }
 
         fetch("/MRN_BANKING/MRNBank/client", {
             method: "POST",
@@ -61,8 +88,12 @@ function initProfileScript() {
                 handleResponse(data);
                 isEditMode = false;
 
-                // Reload just the profile section
-                loadContent("dashboard-profile.jsp");
+				if (isPrivilegedEditingClient) {
+					loadContent("dashboard-profile.jsp?clientId=" + clientId);
+				} else {
+					loadContent("dashboard-profile.jsp");
+				}
+
             })
             .catch(err => {
                 console.error("Error updating profile:", err);

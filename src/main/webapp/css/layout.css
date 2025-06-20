@@ -102,8 +102,8 @@ a.banner-text-button:hover {
 .custom-toast.toast-success {
     z-index: 9999;
     position: fixed;
-    top: 10vh;
-    left: 4.5%;
+    top: 90vh;
+    left: 79.5%;
     margin: 0;
 }
 

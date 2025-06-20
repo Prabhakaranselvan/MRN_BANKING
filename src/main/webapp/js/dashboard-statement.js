@@ -3,6 +3,7 @@ function initStatementScript() {
     const resultBox = document.getElementById("statementResult");
     const accountSelect = document.getElementById("accountSelect");
     const userId = document.body.getAttribute("data-user-id");
+	
 
     // Load accounts for dropdown
     fetch("/MRN_BANKING/MRNBank/accounts", {
@@ -102,5 +103,3 @@ function displayStatement(data) {
     `;
 }
 
-
-document.addEventListener("DOMContentLoaded", initStatementScript);

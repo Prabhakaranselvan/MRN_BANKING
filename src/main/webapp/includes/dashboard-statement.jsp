@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false" %>
 <%@ include file="/includes/dashboard-sessionguard.jsp" %>
+<%@ page import="java.time.LocalDate"%>
 
 <div class="statement-container">
     <h2 class="form-header">ACCOUNT STATEMENT</h2>
@@ -12,15 +13,22 @@
             </select>
         </div>
 
-        <div class="form-group">
-            <label for="fromDate">From Date</label>
-            <input type="date" id="fromDate" name="fromDate">
-        </div>
-
-        <div class="form-group">
-            <label for="toDate">To Date</label>
-            <input type="date" id="toDate" name="toDate">
-        </div>
+	  	<%
+		    LocalDate today = LocalDate.now();
+		    LocalDate sixMonthsAgo = today.minusMonths(6);
+		%>
+		
+		<div class="form-group">
+		    <label for="fromDate">From Date</label>
+		    <input type="date" id="fromDate" name="fromDate"
+		           min="<%= sixMonthsAgo %>" max="<%= today %>">
+		</div>
+		
+		<div class="form-group">
+		    <label for="toDate">To Date</label>
+		    <input type="date" id="toDate" name="toDate"
+		           max="<%= today %>">
+		</div>
 
         <div class="form-group full-width">
             <button type="submit" class="btn-submit">Fetch Statement</button>

@@ -17,14 +17,10 @@
 
     <%@ include file="/includes/head-resources.jsp" %>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-profile.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-accounts.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-statement.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-transaction.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
-<body  data-user-id="<%= session.getAttribute("userId") %>">
+<body  data-user-id="<%= session.getAttribute("userId") %>" data-user-role="<%= session.getAttribute("userCategory") %>">
     <%
         request.setAttribute("showLogout", true);
         request.setAttribute("showNotifications", true);
@@ -48,6 +44,21 @@
             	<span class="material-icons">person</span>
             	<span class="link-text">My Profile</span>
            	</a>
+           	<%
+			    Short userRole = (Short) session.getAttribute("userCategory");
+           		if (userRole != null && (userRole == 1 || userRole == 2 || userRole == 3)) {
+			%>
+			 <a href="#" onclick="loadContent('dashboard-add-client.jsp'); return false;">
+		        <span class="material-icons">person_add</span>
+		        <span class="link-text">Add Client</span>
+		    </a>
+		    <a href="#" onclick="loadContent('dashboard-clients.jsp'); return false;">
+		        <span class="material-icons">group</span>
+		        <span class="link-text">Clients</span>
+		    </a>
+			<%
+			    }
+			%>
             <a href="#" onclick="loadContent('dashboard-accounts.jsp'); return false;">
 			    <span class="material-icons">account_balance</span>
 			    <span class="link-text">My Accounts</span>
@@ -61,7 +72,7 @@
 			    <span class="link-text">Money Transfer</span>
 			</a>
             <a href="#"><span class="material-icons">help</span><span class="link-text">Help</span></a>
-            <a href="#"><span class="material-icons">settings</span><span class="link-text">Settings</span></a>
+           <!--  <a href="#"><span class="material-icons">settings</span><span class="link-text">Settings</span></a> -->
             <a href="#"><span class="material-icons">lock</span><span class="link-text">Password</span></a>
         </nav>
 
