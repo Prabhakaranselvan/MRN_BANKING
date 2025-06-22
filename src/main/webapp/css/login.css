@@ -18,13 +18,13 @@ body {
 }
 
 .login-image {
-	width: auto;
-	height: 700px;
-	padding-right: 300px;
+	width: 36.5%;
+	height: auto;
+	padding-right: 15.5%;
 }
 
 .out-box {
-	width: 450px;
+	width: 23.5%;
 	height: 100%;
 	display: flex;
 	align-items: center;
@@ -144,3 +144,33 @@ input[type="submit"]:hover {
 	color: #0078D7;
 	font-weight: 600;
 }
+
+.password-wrapper {
+	position: relative;
+	width: 115.715%;
+	display: flex;
+}
+
+.password-wrapper input[type="password"],
+.password-wrapper input[type="text"] {
+	width: 100%;
+	padding-right: 40px; /* Space for icon */
+	box-sizing: border-box;
+}
+
+.toggle-icon {
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	cursor: pointer;
+	color: #666;
+	user-select: none;
+	font-size: 20px;
+	transition: color 0.2s;
+}
+
+.toggle-icon:hover {
+	color: #2062e4;
+}
+

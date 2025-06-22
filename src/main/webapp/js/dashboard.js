@@ -27,14 +27,19 @@ function toggleSidebar() {
 
 function loadContent(page) {
     const container = document.getElementById("main-content");
-    container.innerHTML = "<p>Loading...</p>";
+    container.innerHTML = 	`
+	  <div class="loading-spinner">
+	    <span class="material-icons">hourglass_top</span> Loading...
+	  </div>
+	`;
 	
 	const [basePage, queryString] = page.split("?");
-	    const queryParams = new URLSearchParams(queryString);
+	    const queryParams = new URLSearchParams(queryString || "");
 
-	    // Optional: store query params in body so script can access it
-	    document.body.setAttribute("data-client-id", queryParams.get("clientId") || "");
-
+	    // Store targetId and userCategory in body for script use
+	    document.body.setAttribute("data-target-id", queryParams.get("targetId") || "");
+	    document.body.setAttribute("data-target-role", queryParams.get("targetRole") || "");
+		
 	    fetch("includes/" + basePage + (queryString ? "?" + queryString : ""))
 	.then(response => {
 	            if (response.status === 401) {
@@ -48,7 +53,7 @@ function loadContent(page) {
 
 	                    setTimeout(() => {
 	                        window.location.href = `${window.appContext}/login.jsp`;
-	                    }, 1500);
+	                    }, 1000);
 
 	                    throw new Error("Unauthorized - session expired");
 	                });
@@ -99,9 +104,8 @@ function loadContent(page) {
 			    loadScriptOnce("clientsScriptLoaded", "/js/dashboard-clients.js", "initClientsScript");
 			} else if (page === "dashboard-add-client.jsp") {
 				loadCssOnce("addClientCss", "/css/dashboard-add-client.css");
-	                loadScriptOnce("addClientScriptLoaded", "/js/dashboard-add-client.js", "initAddClientScript");
-	            }
-   
+                loadScriptOnce("addClientScriptLoaded", "/js/dashboard-add-client.js", "initAddClientScript");
+			}
         })
         .catch(error => {
             console.error("Error loading content:", error);

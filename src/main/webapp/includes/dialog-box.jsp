@@ -37,7 +37,7 @@
             dialog.showModal();
             setTimeout(() => {
                 dialog.close();
-            }, 2000);
+            }, 1000);
             
         } else if (responseJson.error) {
             title.textContent = "Error";

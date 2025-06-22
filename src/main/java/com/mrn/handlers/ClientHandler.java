@@ -24,14 +24,23 @@ public class ClientHandler
 
 	// GET|GET /client
 	// 1,2,3
-	public Map<String, Object> handleGet(Map<String, Object> session) throws InvalidException
-	{
-		return TransactionExecutor.execute(() ->
-		{
-			List<User> clients = userDAO.getUsersByCategory((short) UserCategory.CLIENT.getValue());
+	public Map<String, Object> handleGet(Map<String, String> queryParams, Map<String, Object> session) throws InvalidException {
+		return TransactionExecutor.execute(() -> {
+			int page = 1;
+			int limit = 10;
+
+			if (queryParams.containsKey("page")) {
+				page = Integer.parseInt(queryParams.get("page"));
+			}
+			if (queryParams.containsKey("limit")) {
+				limit = Integer.parseInt(queryParams.get("limit"));
+			}
+
+			List<User> clients = userDAO.getUsersByCategory((short) UserCategory.CLIENT.getValue(), page, limit);
 			return Utility.createResponse("Clients List fetched successfully", "clients", clients);
 		});
 	}
+
 
 	// GET|POST /client
 	// 0,1,2,3

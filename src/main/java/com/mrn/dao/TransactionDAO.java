@@ -8,16 +8,19 @@ import java.util.List;
 
 import com.mrn.enums.TxnType;
 import com.mrn.exception.InvalidException;
+import com.mrn.pojos.AccountStatement;
 import com.mrn.pojos.Transaction;
 import com.mrn.utilshub.ConnectionManager;
+import com.mrn.utilshub.Utility;
 
 public class TransactionDAO
 {
 
 	public void addTransaction(Transaction txn) throws InvalidException
 	{
-		String sql = "INSERT INTO transaction (client_id, account_no, peer_acc_no, amount, txn_type, txn_time, txn_status, txn_ref_No, closing_balance, done_by) "
-				+ "VALUES (?, ?, ?, ?, ?, UNIX_TIMESTAMP(), ?, ?, ?, ?)";
+		String sql = "INSERT INTO transaction (client_id, account_no, peer_acc_no, amount, txn_type, txn_time, txn_status, "
+				+ "txn_ref_No, closing_balance, description, done_by) "
+				+ "VALUES (?, ?, ?, ?, ?, UNIX_TIMESTAMP(), ?, ?, ?, ?, ?)";
 
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{
@@ -37,7 +40,16 @@ public class TransactionDAO
 			pstmt.setShort(6, txn.getTxnStatus());
 			pstmt.setLong(7, txn.getTxnRefNo());
 			pstmt.setBigDecimal(8, txn.getClosingBalance());
-			pstmt.setLong(9, txn.getDoneBy());
+
+			if (txn.getDescription() != null && !txn.getDescription().trim().isEmpty())
+			{
+				pstmt.setString(9, txn.getDescription().trim());
+			}
+			else
+			{
+				pstmt.setNull(9, java.sql.Types.VARCHAR);
+			}
+			pstmt.setLong(10, txn.getDoneBy());
 
 			if (pstmt.executeUpdate() <= 0)
 			{
@@ -50,33 +62,54 @@ public class TransactionDAO
 		}
 	}
 
-	public List<Transaction> getTransactionsByAccount(long accountNo, long fromEpoch, long toEpoch)
+	public List<Transaction> getTransactionsByAccount(AccountStatement input, boolean hasDateRange)
 			throws InvalidException
 	{
-		return getTransactionsBy("account_no", accountNo, fromEpoch, toEpoch);
+		return getTransactionsBy("account_no", input.getAccountNo(), input, hasDateRange);
 	}
 
-	public List<Transaction> getTransactionsByClientId(long clientId, long fromEpoch, long toEpoch)
+	public List<Transaction> getTransactionsByClientId(AccountStatement input, boolean hasDateRange)
 			throws InvalidException
 	{
-		System.out.print(fromEpoch);
-		System.out.print(toEpoch);
-		return getTransactionsBy("client_id", clientId, fromEpoch, toEpoch);
+		return getTransactionsBy("client_id", input.getClientId(), input, hasDateRange);
 	}
 
-	private List<Transaction> getTransactionsBy(String fieldName, long value, long fromEpoch, long toEpoch)
-			throws InvalidException
+	private List<Transaction> getTransactionsBy(String fieldName, Long fieldValue, AccountStatement input,
+			boolean hasDateRange) throws InvalidException
 	{
 
-		String sql = "SELECT * FROM transaction WHERE " + fieldName
-				+ " = ? AND txn_time BETWEEN ? AND ? ORDER BY txn_time DESC";
+		StringBuilder sql = new StringBuilder("SELECT * FROM transaction WHERE " + fieldName + " = ?");
+
+		List<Object> params = new ArrayList<>();
+		params.add(fieldValue);
+
+		Long fromEpoch = null, toEpoch = null;
+		if (hasDateRange)
+		{
+			fromEpoch = Utility.convertDateToEpoch(input.getFromDate());
+			toEpoch = Utility.convertDateToEpoch(input.getToDate()) + (24 * 60 * 60) - 1;
+			sql.append(" AND txn_time BETWEEN ? AND ?");
+			params.add(fromEpoch);
+			params.add(toEpoch);
+		}
+
+		sql.append(" ORDER BY txn_time DESC LIMIT ? OFFSET ?");
+		int limit = (input.getLimit() != null) ? input.getLimit() : 10;
+		int page = (input.getPage() != null && input.getPage() > 0) ? input.getPage() : 1;
+		int offset = (page - 1) * limit;
+
+		params.add(limit);
+		params.add(offset);
+
 		List<Transaction> transactions = new ArrayList<>();
 
-		try (PreparedStatement stmt = ConnectionManager.getConnection().prepareStatement(sql))
+		try (PreparedStatement stmt = ConnectionManager.getConnection().prepareStatement(sql.toString()))
 		{
-			stmt.setLong(1, value);
-			stmt.setLong(2, fromEpoch);
-			stmt.setLong(3, toEpoch);
+			for (int i = 0; i < params.size(); i++)
+			{
+				stmt.setObject(i + 1, params.get(i));
+			}
+
 			try (ResultSet rs = stmt.executeQuery())
 			{
 				while (rs.next())
@@ -84,44 +117,11 @@ public class TransactionDAO
 					transactions.add(mapRowToTransaction(rs));
 				}
 			}
+
 		}
 		catch (SQLException e)
 		{
-			throw new InvalidException("Failed to fetch transactions by " + fieldName + ": " + value, e);
-		}
-
-		return transactions;
-	}
-
-	public List<Transaction> getLastNTransactionsByAccount(long accountNo, int limit) throws InvalidException
-	{
-		return getLastNTransactionsBy("account_no", accountNo, limit);
-	}
-
-	public List<Transaction> getLastNTransactionsByClientId(long clientId, int limit) throws InvalidException
-	{
-		return getLastNTransactionsBy("client_id", clientId, limit);
-	}
-
-	private List<Transaction> getLastNTransactionsBy(String fieldName, long value, int limit) throws InvalidException
-	{
-
-		String sql = "SELECT * FROM transaction WHERE " + fieldName + " = ? ORDER BY txn_time DESC LIMIT ?";
-		List<Transaction> transactions = new ArrayList<>();
-
-		try (PreparedStatement stmt = ConnectionManager.getConnection().prepareStatement(sql))
-		{
-			stmt.setLong(1, value);
-			stmt.setInt(2, limit);
-			ResultSet rs = stmt.executeQuery();
-			while (rs.next())
-			{
-				transactions.add(mapRowToTransaction(rs));
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new InvalidException("Failed to fetch last " + limit + " transactions for " + fieldName + " = " + value, e);
+			throw new InvalidException("Failed to fetch transactions by " + fieldName + ": " + fieldValue, e);
 		}
 
 		return transactions;

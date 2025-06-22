@@ -16,6 +16,8 @@ public class Transaction
 	private BigDecimal closingBalance;
 	private String description;
 	private Long doneBy;
+	
+	private String Password;
 
 	public Long getTxnId()
 	{
@@ -136,5 +138,17 @@ public class Transaction
 	{
 		this.doneBy = doneBy;
 	}
+
+	public String getPassword()
+	{
+		return Password;
+	}
+
+	public void setPassword(String password)
+	{
+		Password = password;
+	}
+	
+	
 
 }

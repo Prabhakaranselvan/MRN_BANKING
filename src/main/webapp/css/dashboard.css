@@ -3,7 +3,11 @@
 body {
 	margin: 0;
 	width: 100%;
-	background-color: #f9fbfd;
+  background-image: url('./background.svg');
+  background-size: cover;           /* Scales image to cover the entire background */
+  background-repeat: no-repeat;     /* Prevents repeating */
+  background-position: center;  
+
 	display: flex;
 	flex-direction: row;
 	padding-top: 6.5vh;
@@ -129,9 +133,16 @@ body {
 	left: 50%;
 	transform: translateX(-50%);
 }
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #666;
+}
+
 
 .dashboard-content {
 	padding: 40px;
-	background-color: #ffffff;
 	height: 88.5vh;
 }

@@ -54,7 +54,7 @@ public class EmployeeDAO
 		List<Employee> employees = new ArrayList<>();
 
 		StringBuilder sql = new StringBuilder(
-				"SELECT u.user_id, u.name, u.email, u.status FROM user u JOIN employee e ON u.user_id = e.employee_id "
+				"SELECT u.user_id, u.user_category, u.name, u.email, u.status FROM user u JOIN employee e ON u.user_id = e.employee_id "
 						+ "WHERE 1=1");
 
 		if (branchId != null)
@@ -74,6 +74,7 @@ public class EmployeeDAO
 				{
 					Employee employee = new Employee();
 					employee.setUserId(rs.getLong("user_id"));
+					employee.setUserCategory(rs.getShort("user_category"));
 					employee.setName(rs.getString("name"));
 					employee.setEmail(rs.getString("email"));
 					employee.setStatus(rs.getShort("status"));

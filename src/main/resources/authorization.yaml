@@ -27,7 +27,7 @@ authorization:
       - 0
 
 #Get All Clients
-  - endpoint: /client
+  - endpoint: /client\\?.*
     header: GET
     method: GET
     roles:

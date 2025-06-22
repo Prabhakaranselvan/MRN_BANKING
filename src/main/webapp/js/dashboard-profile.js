@@ -1,17 +1,37 @@
-// dashboard-profile.js
-
 function initProfileScript() {
     const form = document.getElementById("profileForm");
     const editBtn = document.getElementById("edit-btn");
     const saveBtn = document.getElementById("save-btn");
     const passwordField = document.querySelector(".password-confirm");
-	const clientId = document.body.getAttribute("data-client-id");
-	const userId = clientId || document.body.getAttribute("data-user-id");
-	const userRole = parseInt(document.body.getAttribute("data-user-role")); // 0 = Client, 1 = Employee, etc.
+	
+	const targetId = document.body.getAttribute("data-target-id");
+	const targetRole = parseInt(document.body.getAttribute("data-target-role"), 10);
 
-	const isPrivilegedRole = [1, 2, 3].includes(userRole);
-	const isPrivilegedEditingClient = isPrivilegedRole && !!clientId;
+    const userId = targetId || document.body.getAttribute("data-user-id");
+    const userRole = parseInt(document.body.getAttribute("data-user-role"));
+	
+	const isSelfEdit = !targetId;
+	const isEditingClient = targetRole === 0 || userRole === 0;
+	
+	let isPrivilegedEditing = false;
 
+	if (!isSelfEdit) {
+	    isPrivilegedEditing = targetRole < userRole;
+	}
+	console.log(targetRole);
+	console.log(userRole);
+	console.log(isSelfEdit);
+	console.log(isEditingClient);
+	console.log(isPrivilegedEditing);
+
+
+    const clientOnlyFields = document.getElementById("client-only-fields");
+    // Show/Hide Aadhar, PAN, Address only for clients
+    if (clientOnlyFields) {
+        if (!isEditingClient) {
+            clientOnlyFields.style.display = "none";
+        }
+    }
 
     let isEditMode = false;
 
@@ -19,31 +39,32 @@ function initProfileScript() {
         console.warn("Missing required DOM elements.");
         return;
     }
-	
-	if (isPrivilegedEditingClient) {
-	        editBtn.style.display = "inline-block"; // Show edit button for employees editing clients
-	    }
 
-    // Enable edit mode
+    // Show edit button if it's a self edit or privileged edit
+    if (isSelfEdit || isPrivilegedEditing) {
+        editBtn.style.display = "inline-block";
+    }
+
     editBtn.addEventListener("click", () => {
         isEditMode = true;
-		
-		// Enable all fields if employee is editing a client
-       if (isPrivilegedEditingClient) {
-           Array.from(form.elements).forEach(input => input.disabled = false);
-       } else {
-           form.email.disabled = false;
-           form.phoneNo.disabled = false;
-           form.address.disabled = false;
-       }
 
-        // Show save button and password field
+        // Enable editable fields
+        if (isPrivilegedEditing) {
+            Array.from(form.elements).forEach(input => input.disabled = false);
+        } else if (userRole === 0) { // Client editing self
+            form.email.disabled = false;
+            form.phoneNo.disabled = false;
+            form.address.disabled = false;
+        } else if ([1, 2].includes(userRole)) { // Employee/Manager editing self
+            form.email.disabled = false;
+            form.phoneNo.disabled = false;
+        }
+
         editBtn.style.display = "none";
         saveBtn.style.display = "inline-block";
         passwordField.style.display = "flex";
     });
 
-    // Handle form submission
     form.addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -57,24 +78,27 @@ function initProfileScript() {
             userId: userId,
             email: formData.get("email"),
             phoneNo: formData.get("phoneNo"),
-            address: formData.get("address"),
-            password: formData.get("password") // Include password for confirmation
+			address: formData.get("address"),
+            password: formData.get("password")
         };
-		
-		if (isPrivilegedEditingClient) {
-		            // If EMPLOYEE, include all fields in update
-		            Object.assign(jsonBody, {
-		                name: formData.get("name"),
-		                dob: formData.get("dob"),
-		                gender: formData.get("gender"),
-		                aadhar: formData.get("aadhar"),
-		                pan: formData.get("pan"),
-						userCategory: 0,
-						status: 1
-		            });
-		        }
 
-        fetch("/MRN_BANKING/MRNBank/client", {
+        if (isPrivilegedEditing) {
+            Object.assign(jsonBody, {
+                name: formData.get("name"),
+                dob: formData.get("dob"),
+                gender: formData.get("gender"),
+                aadhar: formData.get("aadhar"),
+                pan: formData.get("pan"),
+                address: formData.get("address"),
+                userCategory: formData.get("userCategory"),
+                status: formData.get("status")
+            });
+        }
+
+		
+        const endpoint = isEditingClient ? "/MRN_BANKING/MRNBank/client" : "/MRN_BANKING/MRNBank/employee";
+
+        fetch(endpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -82,65 +106,61 @@ function initProfileScript() {
             },
             body: JSON.stringify(jsonBody)
         })
-            .then(res => res.json())
-            .then(data => {
-                console.log("Update profile response:", data);
-                handleResponse(data);
-                isEditMode = false;
+        .then(res => res.json())
+        .then(data => {
+            console.log("Update profile response:", data);
+            handleResponse(data);
+            isEditMode = false;
 
-				if (isPrivilegedEditingClient) {
-					loadContent("dashboard-profile.jsp?clientId=" + clientId);
-				} else {
-					loadContent("dashboard-profile.jsp");
-				}
-
-            })
-            .catch(err => {
-                console.error("Error updating profile:", err);
-                handleResponse({ error: "Failed to update profile. Try again." });
-            });
+            if (isPrivilegedEditing) {
+                loadContent("dashboard-profile.jsp?targetId=" + targetId +"&targetRole=" + targetRole);
+            } else {
+                loadContent("dashboard-profile.jsp");
+            }
+        })
+        .catch(err => {
+            console.error("Error updating profile:", err);
+            handleResponse({ error: "Failed to update profile. Try again." });
+        });
     });
 
-    fetchProfileData(form, userId);
+    fetchProfileData(form, userId, isEditingClient);
 }
 
+function fetchProfileData(form, userId, isEditingClient) {
+    const endpoint = isEditingClient ? "/MRN_BANKING/MRNBank/client" : "/MRN_BANKING/MRNBank/employee";
 
-function fetchProfileData(form, userId) {
-    fetch("/MRN_BANKING/MRNBank/client", {
-        method: "POST", // Or GET, depending on your actual servlet config
+    fetch(endpoint, {
+        method: "POST",
         headers: {
             "Content-Type": "application/json",
-			"Method": "GET"
+            "Method": "GET"
         },
         body: JSON.stringify({ userId })
     })
-	.then(response =>
-	     response.json().then(data => {
-	         if (!response.ok) {
-	             // Still handle error (HTTP status) by throwing parsed JSON
-	             throw data;
-	         }
-	         return data;
-	     })
-	 )
-	 .then(data => {
-	     console.log("Fetch profile response:", data);
+    .then(response => response.json().then(data => {
+        if (!response.ok) throw data;
+        return data;
+    }))
+    .then(data => {
+        console.log("Fetch profile response:", data);
+        const user = data.clients || data.Employee;
 
-	     if (data.clients) {
-	         const c = data.clients;
-	         form.name.value = c.name;
-	         form.dob.value = c.dob;
-	         [...form.gender].forEach(r => r.checked = r.value === c.gender);
-	         form.email.value = c.email;
-	         form.phoneNo.value = c.phoneNo;
-	         form.aadhar.value = c.aadhar;
-	         form.pan.value = c.pan;
-	         form.address.value = c.address;
-	     }
-	 })
+        if (user) {
+            form.name.value = user.name;
+            form.dob.value = user.dob || "";
+            [...form.gender].forEach(r => r.checked = r.value === user.gender);
+            form.email.value = user.email;
+            form.phoneNo.value = user.phoneNo;
+            form.aadhar.value = user.aadhar || "";
+            form.pan.value = user.pan || "";
+            form.address.value = user.address || "";
+            form.userCategory.value = user.userCategory;
+            form.status.value = user.status;
+        }
+    })
     .catch(err => {
         console.error("Network or JSON error in fetchProfileData:", err);
         handleResponse(err);
     });
 }
-

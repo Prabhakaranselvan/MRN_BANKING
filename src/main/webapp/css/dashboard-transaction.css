@@ -1,5 +1,6 @@
 @charset "UTF-8";
 
+/* Container Styling */
 .transaction-container {
     max-width: 800px;
     margin: 40px auto;
@@ -9,45 +10,69 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     font-family: 'Segoe UI', sans-serif;
 }
+
+/* Header Styling */
 .form-header {
     font-size: 26px;
     text-align: center;
     color: #2c3e50;
     margin-bottom: 25px;
 }
+
+/* Form Layout */
 .transfer-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Row group for field alignment */
+.form-row {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: space-between;
 }
+
+/* Default field styling */
 .form-group {
     flex: 1;
     min-width: 240px;
     display: flex;
     flex-direction: column;
 }
+
+/* Full width for single field rows */
 .form-group.full-width {
     flex: 1 1 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
 }
+
+/* Label styling */
 label {
     font-weight: 500;
     margin-bottom: 6px;
     color: #34495e;
 }
-input, select {
+
+/* Input and select styling */
+input,
+select {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 15px;
     background-color: #fdfdfd;
 }
-input:focus, select:focus {
+
+input:focus,
+select:focus {
     border-color: #3498db;
     outline: none;
 }
+
+/* Submit Button */
 .btn-submit {
     padding: 12px 24px;
     background-color: #27ae60;
@@ -59,14 +84,65 @@ input:focus, select:focus {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
 .btn-submit:hover {
     background-color: #1e8449;
 }
+
+/* Result Text Styles */
 .transfer-result {
     margin-top: 20px;
     text-align: center;
     font-size: 16px;
     font-weight: 500;
 }
-.transfer-result.success { color: #2ecc71; }
-.transfer-result.error { color: #e74c3c; }
+
+.transfer-result.success {
+    color: #2ecc71;
+}
+
+.transfer-result.error {
+    color: #e74c3c;
+}
+
+/* Peer group toggle for transfer type */
+.peer-group {
+    display: none;
+}
+
+.peer-group.show {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Password toggle wrapper */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Password field padding for icon */
+.password-wrapper input[type="password"],
+.password-wrapper input[type="text"] {
+    flex: 1;
+    padding-right: 40px;
+}
+
+/* Material icon button inside password */
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Material Icons';
+    font-size: 22px;
+    color: #888;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: #333;
+}

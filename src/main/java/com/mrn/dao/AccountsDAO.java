@@ -242,6 +242,7 @@ public class AccountsDAO
 					account.setBranchId(rs.getLong("branch_id"));
 					account.setClientId(rs.getLong("client_id"));
 					account.setAccountType(rs.getShort("account_type"));
+					account.setBalance(rs.getBigDecimal("balance"));
 					account.setStatus(rs.getShort("status"));
 					accounts.add(account);
 				}

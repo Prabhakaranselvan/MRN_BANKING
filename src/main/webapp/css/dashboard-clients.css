@@ -1,75 +1,177 @@
+/* General Layout */
 .container {
 	display: flex;
 	justify-content: center;
-	align-items: center;
+	height: 100%;
+	padding-top: 24px;
 }
 
 .clients-container {
-	width: 50%;
+	width: 100%;
+	max-width: 900px;
 	font-family: 'Segoe UI', sans-serif;
-	color: #333;
+	color: #2c3e50;
 }
 
+/* Header */
+.clients-header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-bottom: 20px;
+	justify-content: space-between;
+}
+
+.form-header {
+	width: 30%;
+	font-size: 24px;
+	font-weight: 600;
+	margin: 0;
+	color: #1a237e;
+}
+
+.clients-header-actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	gap: 20px;
+	flex-wrap: wrap;
+}
+
+
+
+
+/* Pagination */
+.pagination {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.page-btn, .add-client-btn {
+	background-color: #1976d2;
+	color: #fff;
+	border: none;
+	border-radius: 6px;
+	padding: 6px 10px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+	transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+	background-color: #0d47a1;
+	transform: translateY(-1px);
+}
+
+.page-btn:disabled {
+	background-color: #e0e0e0;
+	color: #aaa;
+	cursor: not-allowed;
+	box-shadow: none;
+}
+
+.page-btn:disabled .material-icons {
+	color: #aaa;
+}
+
+.page-btn .material-icons {
+	font-size: 20px;
+}
+
+/* Add Client Button */
+.add-client-btn {
+	background-color: #2e7d32;
+}
+
+.add-client-btn:hover {
+	background-color: #1b5e20;
+}
+
+#pageInfo {
+	font-size: 14px;
+	font-weight: 500;
+	color: #555;
+}
+
+/* Table Styling */
 .client-table {
-	border-radius: 8px;
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+	border-radius: 10px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 	overflow: hidden;
-	background-color: #fff;
+	background-color: #ffffff;
 }
 
 .client-header, .client-row {
 	display: grid;
-	grid-template-columns: 0.5fr 1.5fr 1.5fr 1fr 0.5fr;
+	grid-template-columns: 1fr 2fr 2fr 1fr 1fr;
 	align-items: center;
-	padding: 12px 16px;
+	padding: 14px 18px;
 }
 
 .client-header {
-	background-color: #f0f4f8;
-	font-weight: bold;
+	background-color: #eef1f7;
+	font-weight: 600;
 	font-size: 15px;
-	color: #333;
-	border-bottom: 1px solid #ddd;
+	color: #34495e;
+	border-bottom: 1px solid #dfe6ec;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
 }
 
 .client-row {
-	border-bottom: 1px solid #eee;
+	border-bottom: 1px solid #f0f0f0;
 	transition: background 0.2s ease;
 }
 
 .client-row:hover {
-	background-color: #f9f9f9;
+	background-color: #fafafa;
 }
 
+/* Columns */
 .client-id, .client-name, .client-email, .client-status {
 	font-size: 14px;
-	color: #333;
+	color: #2f3e4e;
+	word-break: break-word;
 }
 
+/* Status Tags */
 .client-status.active {
 	color: #2e7d32;
-	font-weight: 500;
+	font-weight: 600;
 }
 
 .client-status.inactive {
 	color: #ef6c00;
-	font-weight: 500;
+	font-weight: 600;
 }
 
 .client-status.closed {
 	color: #c62828;
-	font-weight: 500;
+	font-weight: 600;
 }
 
-.client-actions {
+ .client-status {
 	text-align: center;
+}
+
+.client-actions{
+    align-items: center;
+    justify-content: center;
+    display: flex;
 }
 
 .action-btn {
 	background: none;
 	border: none;
 	cursor: pointer;
-	padding: 4px;
+	padding: 6px;
+	border-radius: 50%;
+	transition: background 0.2s;
 }
 
 .action-btn .material-icons {
@@ -77,6 +179,17 @@
 	color: #1976d2;
 }
 
+.action-btn:hover {
+	background-color: rgba(25, 118, 210, 0.1);
+}
+
 .action-btn:hover .material-icons {
 	color: #0d47a1;
+}
+
+.client-row {
+	transition: background 0.2s ease, transform 0.1s ease;
+}
+.client-row:hover {
+	transform: scale(1.005);
 }

@@ -19,7 +19,6 @@
 
 <body>
 	<%
-		request.setAttribute("showSignUp", true);
 		request.setAttribute("showHome", true);
 	%>
 	<%@ include file="/includes/header.jsp"%>
@@ -34,12 +33,19 @@
 							<i class="fa-solid fa-right-to-bracket"></i> Login
 						</h2>
 						<input type="text" id="email" name="email" placeholder="Email"
-							pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" required /> 
-						<input type="password" id="password" name="password" maxlength="20"
-							pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" placeholder="Password" required /> 
+						pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" 
+						title="Please enter a valid email address (e.g. user@example.com)"required /> 
+						<div class="password-wrapper">
+						    <input type="password" id="password" name="password" maxlength="20"
+						        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" placeholder="Password" required
+						        title="Password must be 8–20 characters with uppercase, lowercase, number, and special character." />
+						    <span id="toggle-password" class="toggle-icon material-icons">visibility</span>
+						</div>
+
 						<input type="submit" value="Sign in" />
 						<div class="group">
-							<a href="#">Forgot Password</a> <a href="./signup.jsp">Sign up</a>
+							<a href="#">Forgot Password ?</a> 
+							<a href="${pageContext.request.contextPath}/signup.jsp">Sign up</a>
 						</div>
 					</form>
 				</div>
@@ -62,6 +68,19 @@
 					hasExpanded = true;
 				}
 			});
+		});
+		
+		document.getElementById("toggle-password").addEventListener("click", function () {
+		    const passwordInput = document.getElementById("password");
+		    const type = passwordInput.getAttribute("type");
+		    
+		    if (type === "password") {
+		        passwordInput.setAttribute("type", "text");
+		        this.textContent = "visibility_off";
+		    } else {
+		        passwordInput.setAttribute("type", "password");
+		        this.textContent = "visibility";
+		    }
 		});
 	 
 	    document.getElementById("loginForm").addEventListener("submit", async function (event) {

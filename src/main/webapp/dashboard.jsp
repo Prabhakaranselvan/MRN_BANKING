@@ -7,6 +7,17 @@
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
+    String userName = (String) session.getAttribute("name");
+    String userEmail = (String) session.getAttribute("email");
+    Long userId = (Long) session.getAttribute("userId");
+    Short userRole = (Short) session.getAttribute("userCategory");
+    
+    request.setAttribute("userId", userId);
+    request.setAttribute("userName", userName);
+    request.setAttribute("userRole", userRole);
+    request.setAttribute("userEmail", userEmail);
+    
+    request.setAttribute("showProfile", true);
 %>
 
 <!DOCTYPE html>
@@ -20,12 +31,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
-<body  data-user-id="<%= session.getAttribute("userId") %>" data-user-role="<%= session.getAttribute("userCategory") %>">
-    <%
-        request.setAttribute("showLogout", true);
-        request.setAttribute("showNotifications", true);
-        request.setAttribute("showHome", true);
-    %>
+<body  data-user-id="<%= userId %>" data-user-role="<%= userRole %>">
 
     <%@ include file="/includes/header.jsp" %>
 
@@ -45,13 +51,8 @@
             	<span class="link-text">My Profile</span>
            	</a>
            	<%
-			    Short userRole = (Short) session.getAttribute("userCategory");
            		if (userRole != null && (userRole == 1 || userRole == 2 || userRole == 3)) {
 			%>
-			 <a href="#" onclick="loadContent('dashboard-add-client.jsp'); return false;">
-		        <span class="material-icons">person_add</span>
-		        <span class="link-text">Add Client</span>
-		    </a>
 		    <a href="#" onclick="loadContent('dashboard-clients.jsp'); return false;">
 		        <span class="material-icons">group</span>
 		        <span class="link-text">Clients</span>
@@ -71,9 +72,9 @@
 			    <span class="material-icons">sync_alt</span>
 			    <span class="link-text">Money Transfer</span>
 			</a>
-            <a href="#"><span class="material-icons">help</span><span class="link-text">Help</span></a>
-           <!--  <a href="#"><span class="material-icons">settings</span><span class="link-text">Settings</span></a> -->
-            <a href="#"><span class="material-icons">lock</span><span class="link-text">Password</span></a>
+           <!--  <a href="#"><span class="material-icons">help</span><span class="link-text">Help</span></a>
+            <a href="#"><span class="material-icons">settings</span><span class="link-text">Settings</span></a>
+            <a href="#"><span class="material-icons">lock</span><span class="link-text">Password</span></a> -->
         </nav>
 
         <button class="toggle-btn" onclick="toggleSidebar()">
@@ -92,19 +93,57 @@
       	<%@ include file="/includes/dialog-box.jsp"%>
       	
     </div> 
-    <script>
-	    window.appContext = "${pageContext.request.contextPath}";
-	    document.addEventListener("DOMContentLoaded", function () {
-	        // Mark Dashboard link as active on initial load
-	        const dashboardLink = [...document.querySelectorAll('.nav-links a')].find(a =>
-	            a.getAttribute('onclick')?.includes('dashboard-main.jsp')
-	        );
-	        if (dashboardLink) {
-	            dashboardLink.classList.add('active');
-	        }
-	    });
+<script>
+    window.appContext = "${pageContext.request.contextPath}";
+    
+    function closeDropdown() {
+        const dropdown = document.querySelector(".zoho-style-dropdown");
+        dropdown?.classList.remove("show");
+    }
 
-	</script> 
+    document.addEventListener("DOMContentLoaded", function () {
+        // Mark Dashboard link as active on initial load
+        const dashboardLink = [...document.querySelectorAll('.nav-links a')].find(a =>
+            a.getAttribute('onclick')?.includes('dashboard-main.jsp')
+        );
+        if (dashboardLink) {
+            dashboardLink.classList.add('active');
+        }
+
+        // Profile dropdown toggle
+        const profileBtn = document.querySelector(".profile-icon-btn");
+        const dropdown = document.querySelector(".zoho-style-dropdown");
+        const closeBtn = document.querySelector(".close-btn");
+
+        function toggleDropdown() {
+            dropdown.classList.toggle("show");
+        }
+
+        function closeDropdown() {
+            dropdown.classList.remove("show");
+        }
+
+        // Toggle on button click
+        profileBtn?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+
+        // Close on outside click
+        document.addEventListener("click", (e) => {
+            if (!dropdown.contains(e.target) && !profileBtn.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        // Close on ✕ button
+        closeBtn?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            closeDropdown();
+        });
+    });
+</script>
+
     <script src="${pageContext.request.contextPath}/js/dashboard.js"></script>
    
     

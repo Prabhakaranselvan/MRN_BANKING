@@ -137,6 +137,7 @@ public class Validator
 		{
 			checkLongField(txn.getPeerAccNo(), "Peer Account Number");
 		}
+		checkField(txn.getPassword(), "Password");
 		return errorMsg;
 	}
 

@@ -6,6 +6,8 @@ public class AccountStatement
 	private Long accountNo; // Can be 0 to indicate all accounts
 	private String fromDate; // Format: yyyy-MM-dd
 	private String toDate; // Format: yyyy-MM-dd
+	private Integer page;
+	private Integer limit;
 
 	public Long getClientId()
 	{
@@ -45,6 +47,26 @@ public class AccountStatement
 	public void setToDate(String toDate)
 	{
 		this.toDate = toDate;
+	}
+
+	public Integer getPage()
+	{
+		return page;
+	}
+
+	public void setPage(Integer page)
+	{
+		this.page = page;
+	}
+
+	public Integer getLimit()
+	{
+		return limit;
+	}
+
+	public void setLimit(Integer limit)
+	{
+		this.limit = limit;
 	}
 
 }

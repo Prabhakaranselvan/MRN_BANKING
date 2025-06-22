@@ -4,6 +4,7 @@ import com.mrn.dao.AccountsDAO;
 import com.mrn.enums.UserCategory;
 import com.mrn.exception.InvalidException;
 import com.mrn.pojos.AccountRequest;
+import com.mrn.pojos.AccountStatement;
 import com.mrn.pojos.Accounts;
 import com.mrn.pojos.Employee;
 import com.mrn.pojos.Transaction;
@@ -44,6 +45,14 @@ public class ManagerAccessPolicy implements AccessPolicy
 			if (acc.getBranchId() != sessionBranchId)
 			{
 				throw new InvalidException("Access denied to this account");
+			}
+		}
+		else if (resource instanceof AccountStatement) // GET|POST /accountstatement
+		{
+			AccountStatement accStatement = (AccountStatement) resource;
+			if (accountsDAO.getBranchIdFromAccount(accStatement.getAccountNo()) != sessionBranchId)
+			{
+				throw new InvalidException("You can only access on accounts from your branch.");
 			}
 		}
 		else

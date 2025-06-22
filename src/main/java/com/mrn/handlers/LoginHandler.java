@@ -46,6 +46,8 @@ public class LoginHandler
 			responseMap.put("message", "Login successful");
 			responseMap.put("userId", userId);
 			responseMap.put("userCategory", userCategory);
+			responseMap.put("email", user.getEmail());
+			responseMap.put("name", user.getName());
 
 			UserCategory category = UserCategory.fromValue(userCategory);
 			if (category == UserCategory.EMPLOYEE || category == UserCategory.MANAGER)

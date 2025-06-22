@@ -1,7 +1,6 @@
 package com.mrn.handlers;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +9,7 @@ import java.util.Random;
 import com.mrn.accesscontrol.AccessValidator;
 import com.mrn.dao.AccountsDAO;
 import com.mrn.dao.TransactionDAO;
+import com.mrn.dao.UserDAO;
 import com.mrn.enums.TxnStatus;
 import com.mrn.enums.TxnType;
 import com.mrn.exception.InvalidException;
@@ -21,54 +21,35 @@ import com.mrn.utilshub.Validator;
 
 public class TransactionHandler
 {
+	private final UserDAO userDAO = new UserDAO();
 	private final AccountsDAO accountsDAO = new AccountsDAO();
 	private final TransactionDAO txnDAO = new TransactionDAO();
 
-	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException
-	{
-		return TransactionExecutor.execute(() ->
-		{
-			AccountStatement input = (AccountStatement) pojoInstance;
-			Long accountNo = input.getAccountNo();
-			Long clientId = input.getClientId();
-			if (clientId == null) {
-			    if (accountNo == null) {
-			        throw new InvalidException("Either Client ID or Account Number must be provided.");
-			    }
+	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException {
+	    return TransactionExecutor.execute(() -> {
+	        AccountStatement input = (AccountStatement) pojoInstance;
 
-			    Long resolvedClientId = accountsDAO.getClientIdFromAccount(accountNo);
-			    input.setClientId(resolvedClientId);
-			}
+	        Long accountNo = input.getAccountNo();
+	        Long clientId = input.getClientId();
 
-			AccessValidator.validateGet(input, session);
-			String fromDateStr = input.getFromDate();
-			String toDateStr = input.getToDate();
+	        if (clientId == null) {
+	            if (accountNo == null) {
+	                throw new InvalidException("Either Client ID or Account Number must be provided.");
+	            }
+	            clientId = accountsDAO.getClientIdFromAccount(accountNo);
+	            input.setClientId(clientId);
+	        }
+	        
+	        AccessValidator.validateGet(pojoInstance, session);
+			
+	        boolean hasDateRange = input.getFromDate() != null && input.getToDate() != null;
 
-			// Convert dates if provided
-			Long fromEpoch = null, toEpoch = null;
-			boolean hasDateRange = fromDateStr != null && toDateStr != null;
-			if (hasDateRange)
-			{
-				fromEpoch = Utility.convertDateToEpoch(fromDateStr);
-				toEpoch = Utility.convertDateToEpoch(toDateStr) + (24 * 60 * 60) - 1;
-			}
-			// Collect eligible account numbers
-			List<Transaction> txnList = new ArrayList<>();
-			if (accountNo == null)
-			{
-				List<Transaction> txns = hasDateRange ? txnDAO.getTransactionsByClientId(clientId, fromEpoch, toEpoch)
-						: txnDAO.getLastNTransactionsByClientId(clientId, 10);
-				txnList.addAll(txns);
-			}
-			else
-			{
-				List<Transaction> txns = hasDateRange ? txnDAO.getTransactionsByAccount(accountNo, fromEpoch, toEpoch)
-						: txnDAO.getLastNTransactionsByAccount(accountNo, 10);
-				txnList.addAll(txns);
-			}
+	        List<Transaction> txnList = (accountNo != null)
+	            ? txnDAO.getTransactionsByAccount(input, hasDateRange)
+	            : txnDAO.getTransactionsByClientId(input, hasDateRange);
 
-			return Utility.createResponse("Transaction list fetched successfully", "Transactions", txnList);
-		});
+	        return Utility.createResponse("Transaction list fetched successfully", "Transactions", txnList);
+	    });
 	}
 
 	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException
@@ -102,6 +83,7 @@ public class TransactionHandler
 		long clientId = accountsDAO.getClientIdFromAccount(txn.getAccountNo());
 		txn.setClientId(clientId);
 		AccessValidator.validatePost(txn, session);
+		Utility.validatePassword(txn.getPassword(), userDAO.getPasswordByUserId(userId));
 		txn.setTxnRefNo(generateTxnRefNo());
 		txn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
 		txn.setDoneBy(userId);
@@ -164,6 +146,10 @@ public class TransactionHandler
 
 	private Map<Long, BigDecimal> lockAccountsInOrder(long acc1, long acc2) throws InvalidException
 	{
+		if(acc1==acc2)
+		{
+			throw new InvalidException("Sender and Receiver Accounts are the Same");
+		}
 		long first = Math.min(acc1, acc2);
 		long second = Math.max(acc1, acc2);
 
@@ -188,6 +174,7 @@ public class TransactionHandler
 		txn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
 		txn.setTxnRefNo(senderTxn.getTxnRefNo());
 		txn.setClosingBalance(newBalance);
+		txn.setDescription(senderTxn.getDescription());
 		txn.setDoneBy(userId);
 		return txn;
 	}

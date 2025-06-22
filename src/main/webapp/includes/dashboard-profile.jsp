@@ -22,6 +22,8 @@
                 <input class="form-input" type="date" id="dob" name="dob" max="<%=minEligibleDate%>" disabled required>
             </div>
         </div>
+        
+        <input type="hidden" id="userCategory" name="userCategory" value="0">
 
         <div class="gender">
             <label class="form-label">Gender</label>
@@ -51,7 +53,7 @@
 					title="Phone number must be 10 digits" disabled required>
             </div>
         </div>
-
+		<div id="client-only-fields">
         <div class="double-column">
             <div class="part">
                 <label class="form-label" for="aadhar">Aadhar</label>
@@ -66,11 +68,20 @@
 
         <label class="form-label" for="address">Address</label>
         <input class="form-input" type="text" id="address" name="address" placeholder="Address" disabled required>
-        
+        </div>
         <div class="double-column">
+        	<div class="part">
+			    <label class="form-label" for="status">Status</label>
+			    <select class="form-input" id="status" name="status" disabled required>
+			        <option value="1" selected>Active</option>
+			        <option value="0">Inactive</option>
+			        <option value="2">Closed</option>
+			    </select>
+			</div>
+
 			<div class="part">
 				 <div class="password-confirm" style="display: none;">
-				    <label class="form-label" for="password">Confirm With Password<span	class="required">*</span></label>
+				    <label class="form-label" for="password">Password<span	class="required">*</span></label>
 					<input class="form-input" type="password" id="password" name="password" maxlength="20"
 						pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required>
 				</div>	

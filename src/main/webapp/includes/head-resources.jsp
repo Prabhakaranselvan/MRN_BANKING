@@ -8,6 +8,8 @@
 
 <!-- Google Material Symbols -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
 
 <!-- Common Layout CSS -->
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/layout.css" />

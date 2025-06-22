@@ -136,7 +136,7 @@ public class BankingServlet extends HttpServlet
 		HttpSession newSession = request.getSession(true);
 
 		// Define keys you want to set as session attributes
-		List<String> sessionKeys = new ArrayList<>(Arrays.asList("userId", "userCategory", "branchId"));
+		List<String> sessionKeys = new ArrayList<>(Arrays.asList("userId", "userCategory", "branchId", "name", "email"));
 
 		// Loop through and set attributes
 		for (String key : sessionKeys)
