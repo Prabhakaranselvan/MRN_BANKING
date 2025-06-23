@@ -45,4 +45,3 @@
     <div id="statementResult" class="statement-result"></div>
 </div>
 
-<script src="${pageContext.request.contextPath}/js/dashboard-statement.js"></script>

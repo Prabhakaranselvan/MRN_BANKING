@@ -126,7 +126,7 @@ function initStatementScript() {
             } else if (accVal) {
                 requestBody.accountNo = accVal;
             } else if (clientVal) {
-                requestBody.clientId = clientVal;
+				requestBody.clientId = clientVal;
             } else {
                 handleResponse({ error: "Please enter either Account No or Client ID." });
                 return;
@@ -136,10 +136,13 @@ function initStatementScript() {
             // Client (dropdown)
             const selectedAcc = accountSelect.value;
             if (!selectedAcc) {
-                handleResponse({ error: "Please select an account number." });
-                return;
+                requestBody.clientId = userId;
             }
-            requestBody.accountNo = selectedAcc;
+			else
+			{
+				requestBody.accountNo = selectedAcc;
+			}
+            
         }
 
         if (fromDate) requestBody.fromDate = fromDate;

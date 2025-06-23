@@ -1,7 +1,9 @@
 function initProfileScript() {
-    const form = document.getElementById("profileForm");
+    const form = document.getElementById("MRN-Form");
     const editBtn = document.getElementById("edit-btn");
     const saveBtn = document.getElementById("save-btn");
+	const cancelBtn = document.getElementById("cancel-btn");
+
     const passwordField = document.querySelector(".password-confirm");
 	
 	const targetId = document.body.getAttribute("data-target-id");
@@ -10,13 +12,20 @@ function initProfileScript() {
     const userId = targetId || document.body.getAttribute("data-user-id");
     const userRole = parseInt(document.body.getAttribute("data-user-role"));
 	
-	const isSelfEdit = !targetId;
+	const isSelfEdit = !targetId && userRole!==3;
 	const isEditingClient = targetRole === 0 || userRole === 0;
 	
 	let isPrivilegedEditing = false;
 
 	if (!isSelfEdit) {
-	    isPrivilegedEditing = targetRole < userRole;
+		if (userRole ===3)
+			{
+				isPrivilegedEditing = true;
+			}
+			else
+			{
+				isPrivilegedEditing = targetRole < userRole;
+			}
 	}
 	console.log(targetRole);
 	console.log(userRole);
@@ -26,12 +35,18 @@ function initProfileScript() {
 
 
     const clientOnlyFields = document.getElementById("client-only-fields");
-    // Show/Hide Aadhar, PAN, Address only for clients
+	const dobWrapper = document.getElementById("dob-wrapper");
+    // Show/Hide DOB, Aadhar, PAN, Address only for clients
     if (clientOnlyFields) {
         if (!isEditingClient) {
             clientOnlyFields.style.display = "none";
         }
     }
+	if (dobWrapper) {
+	    if (!isEditingClient) {
+	        dobWrapper.style.display = "none";
+	    }
+	}
 
     let isEditMode = false;
 
@@ -43,15 +58,27 @@ function initProfileScript() {
     // Show edit button if it's a self edit or privileged edit
     if (isSelfEdit || isPrivilegedEditing) {
         editBtn.style.display = "inline-block";
+		
+
     }
 
     editBtn.addEventListener("click", () => {
         isEditMode = true;
 
         // Enable editable fields
-        if (isPrivilegedEditing) {
-            Array.from(form.elements).forEach(input => input.disabled = false);
-        } else if (userRole === 0) { // Client editing self
+		if (isPrivilegedEditing) {
+		    if (targetRole === 0) {
+		        // Editing a client — enable all fields
+		        Array.from(form.elements).forEach(input => input.disabled = false);
+		    } else {
+		        // Editing an employee/manager — only enable specific fields
+				form.name.disabled = false;
+		        form.email.disabled = false;
+		        form.phoneNo.disabled = false;
+		        [...form.gender].forEach(radio => radio.disabled = false);
+		        form.status.disabled = false;
+		    }
+		} else if (userRole === 0) { // Client editing self
             form.email.disabled = false;
             form.phoneNo.disabled = false;
             form.address.disabled = false;
@@ -62,8 +89,20 @@ function initProfileScript() {
 
         editBtn.style.display = "none";
         saveBtn.style.display = "inline-block";
+		cancelBtn.style.display = "inline-block";
         passwordField.style.display = "flex";
     });
+	
+
+	cancelBtn.addEventListener("click", () => {
+	    isEditMode = false;
+
+		if (isPrivilegedEditing) {
+            loadContent("dashboard-profile.jsp?targetId=" + targetId +"&targetRole=" + targetRole);
+        } else {
+            loadContent("dashboard-profile.jsp");
+        }
+	});
 
     form.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -94,7 +133,6 @@ function initProfileScript() {
                 status: formData.get("status")
             });
         }
-
 		
         const endpoint = isEditingClient ? "/MRN_BANKING/MRNBank/client" : "/MRN_BANKING/MRNBank/employee";
 

@@ -54,5 +54,3 @@
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-<script src="${pageContext.request.contextPath}/js/dashboard-main.js"></script>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-main.css">

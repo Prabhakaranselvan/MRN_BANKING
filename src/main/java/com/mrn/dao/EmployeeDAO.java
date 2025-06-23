@@ -49,23 +49,47 @@ public class EmployeeDAO
 		}
 	}
 
-	public List<Employee> getAllEmployees(Long branchId) throws InvalidException
+	public List<Employee> getAllEmployeesFiltered(Short role, Long branchId, int limit, int offset) throws InvalidException
 	{
 		List<Employee> employees = new ArrayList<>();
+		StringBuilder sql = new StringBuilder("SELECT u.user_id, u.user_category, u.name, u.email, u.status FROM user u "
+				+ "JOIN employee e ON u.user_id = e.employee_id WHERE 1=1");
 
-		StringBuilder sql = new StringBuilder(
-				"SELECT u.user_id, u.user_category, u.name, u.email, u.status FROM user u JOIN employee e ON u.user_id = e.employee_id "
-						+ "WHERE 1=1");
+		List<Object> params = new ArrayList<>();
 
 		if (branchId != null)
 		{
-			sql.append(" AND e.branch_id = ? AND u.user_category = 1");
+			sql.append(" AND e.branch_id = ?");
+			params.add(branchId);
 		}
+
+		if (role != null)
+		{
+			sql.append(" AND u.user_category = ?");
+			params.add(role);
+		}
+
+		sql.append(" ORDER BY e.employee_id ASC LIMIT ? OFFSET ?");
+		params.add(limit);
+		params.add(offset);
+
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql.toString()))
 		{
-			if (branchId != null)
+			for (int i = 0; i < params.size(); i++)
 			{
-				pstmt.setLong(1, branchId);
+				Object param = params.get(i);
+				if (param instanceof Long)
+				{
+					pstmt.setLong(i + 1, (Long) param);
+				}
+				else if (param instanceof Short)
+				{
+					pstmt.setShort(i + 1, (Short) param);
+				}
+				else if (param instanceof Integer)
+				{
+					pstmt.setInt(i + 1, (Integer) param);
+				}
 			}
 
 			try (ResultSet rs = pstmt.executeQuery())
@@ -81,69 +105,10 @@ public class EmployeeDAO
 					employees.add(employee);
 				}
 			}
-
 		}
 		catch (SQLException e)
 		{
-			throw new InvalidException("Error fetching employees by branch.", e);
-		}
-
-		return employees;
-	}
-
-	public List<Employee> getEmployeesFiltered(Short role, Long branchId) throws InvalidException
-	{
-		List<Employee> employees = new ArrayList<>();
-
-		StringBuilder sql = new StringBuilder("SELECT u.user_id, u.name, u.email, u.status FROM user u "
-				+ "JOIN employee e ON u.user_id = e.employee_id WHERE 1=1");
-
-		// Use to track index for setting parameters
-		List<Object> params = new ArrayList<>();
-
-		if (branchId != null)
-		{
-			sql.append(" AND e.branch_id = ?");
-			params.add(branchId);
-		}
-
-		if (role != null)
-		{
-			sql.append(" AND u.user_category = ?");
-			params.add(role);
-		}
-
-		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql.toString()))
-		{
-			for (int i = 0; i < params.size(); i++)
-			{
-				Object param = params.get(i);
-				if (param instanceof Long)
-				{
-					pstmt.setLong(i + 1, (Long) param);
-				}
-				else if (param instanceof Short)
-				{
-					pstmt.setShort(i + 1, (Short) param);
-				}
-			}
-
-			try (ResultSet rs = pstmt.executeQuery())
-			{
-				while (rs.next())
-				{
-					Employee employee = new Employee();
-					employee.setUserId(rs.getLong("user_id"));
-					employee.setName(rs.getString("name"));
-					employee.setEmail(rs.getString("email"));
-					employee.setStatus(rs.getShort("status"));
-					employees.add(employee);
-				}
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new InvalidException("Error fetching filtered employees.", e);
+			throw new InvalidException("Error fetching filtered employees with pagination.", e);
 		}
 		return employees;
 	}

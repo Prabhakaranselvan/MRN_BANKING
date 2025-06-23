@@ -90,22 +90,35 @@ function loadContent(page) {
 			if (page.startsWith("dashboard-profile.jsp")) {
 				loadCssOnce("profileCss", "/css/dashboard-profile.css");
 			    loadScriptOnce("profileScriptLoaded", "/js/dashboard-profile.js", "initProfileScript");
-			} else if (page === "dashboard-accounts.jsp") {
+			} 
+			else if (page === "dashboard-accounts.jsp") {
 				loadCssOnce("accountsCss", "/css/dashboard-accounts.css");
 			    loadScriptOnce("accountsScriptLoaded", "/js/dashboard-accounts.js", "initAccountScript");
-			} else if (page === "dashboard-statement.jsp") {
+			} 
+			else if (page === "dashboard-statement.jsp") {
 				loadCssOnce("statementCss", "/css/dashboard-statement.css");
 			    loadScriptOnce("statementScriptLoaded", "/js/dashboard-statement.js", "initStatementScript");
-			} else if (page === "dashboard-transaction.jsp") {
+			} 
+			else if (page === "dashboard-transaction.jsp") {
 				loadCssOnce("transactionCss", "/css/dashboard-transaction.css");
 			    loadScriptOnce("transactionScriptLoaded", "/js/dashboard-transaction.js", "initTransactionScript");
-			} else if (page === "dashboard-clients.jsp") {
+			} 
+			else if (page === "dashboard-clients.jsp") {
 				loadCssOnce("clientsCss", "/css/dashboard-clients.css");
 			    loadScriptOnce("clientsScriptLoaded", "/js/dashboard-clients.js", "initClientsScript");
-			} else if (page === "dashboard-add-client.jsp") {
-				loadCssOnce("addClientCss", "/css/dashboard-add-client.css");
-                loadScriptOnce("addClientScriptLoaded", "/js/dashboard-add-client.js", "initAddClientScript");
-			}
+			} 
+			else if (page.startsWith("dashboard-addUser.jsp")) {
+				loadCssOnce("addUserCss", "/css/dashboard-addUser.css");
+                loadScriptOnce("addUserScriptLoaded", "/js/dashboard-addUser.js", "initAddUserScript");
+			} 
+			else if (page === "dashboard-main.jsp") {
+				loadCssOnce("mainCss", "/css/dashboard-main.css");
+                loadScriptOnce("mainScriptLoaded", "/js/dashboard-main.js", "initMainScript");
+			} 
+			else if (page === "dashboard-employee.jsp") {
+		        loadCssOnce("employeeCss", "/css/dashboard-employee.css");
+		        loadScriptOnce("employeeScriptLoaded", "/js/dashboard-employee.js", "initEmployeesScript");
+	      	}
         })
         .catch(error => {
             console.error("Error loading content:", error);

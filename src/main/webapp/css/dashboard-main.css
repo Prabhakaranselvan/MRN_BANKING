@@ -11,7 +11,7 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 26px;
+  margin-bottom: 29px;
   background: #fff;
   padding: 20px;
   border-radius: 12px;
@@ -58,7 +58,7 @@
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 30px;
-   margin-bottom: 26px;
+   margin-bottom: 29px;
 }
 
 .section-box {

@@ -1,6 +1,6 @@
 function initAccountScript() {
     const userId = document.body.getAttribute("data-user-id");
-    const tableBody = document.querySelector("#account-summary-table tbody");
+    const cardsContainer = document.getElementById("accountCardsContainer");
     const accountSelect = document.getElementById("accountSelect");
     const accountInfo = document.getElementById("accountInfo");
 
@@ -22,15 +22,21 @@ function initAccountScript() {
     .then(data => {
         const accounts = data.Accounts || [];
         accounts.forEach(account => {
-            // Table row
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${account.accountNo}</td>
-                <td>${account.branchId}</td>
-                <td>${getAccountTypeName(account.accountType)}</td>
-                <td>${account.status === 1 ? "Active" : "Inactive"}</td>
-            `;
-            tableBody.appendChild(row);
+			// Card
+			const card = document.createElement("div");
+			card.className = "account-card";
+			card.dataset.accountNo = account.accountNo;
+			card.style.cursor = "pointer";
+			card.innerHTML = `
+			  <h4>Account No: ${account.accountNo}</h4>
+			  <div class="account-type">${getAccountTypeName(account.accountType)} - Branch ${account.branchId}</div>
+			  <div class="status ${account.status === 1 ? '' : 'inactive'}">${account.status === 1 ? 'Active' : 'Inactive'}</div>
+			`;
+			card.addEventListener("click", () => {
+			  accountSelect.value = account.accountNo;
+			  accountSelect.dispatchEvent(new Event("change"));
+			});
+			cardsContainer.appendChild(card);
 
             // Dropdown
             const option = document.createElement("option");

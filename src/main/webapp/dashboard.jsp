@@ -11,6 +11,7 @@
     String userEmail = (String) session.getAttribute("email");
     Long userId = (Long) session.getAttribute("userId");
     Short userRole = (Short) session.getAttribute("userCategory");
+    Long branchId =(Long) session.getAttribute("branchId");
     
     request.setAttribute("userId", userId);
     request.setAttribute("userName", userName);
@@ -31,7 +32,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
-<body  data-user-id="<%= userId %>" data-user-role="<%= userRole %>">
+<body  data-user-id="<%= userId %>" data-user-role="<%= userRole %>" data-branch-id="<%= branchId %>">
 
     <%@ include file="/includes/header.jsp" %>
 
@@ -59,11 +60,23 @@
 		    </a>
 			<%
 			    }
+           		if (userRole != null && (userRole == 0)) {
 			%>
             <a href="#" onclick="loadContent('dashboard-accounts.jsp'); return false;">
 			    <span class="material-icons">account_balance</span>
 			    <span class="link-text">My Accounts</span>
 			</a>
+			<%
+			    }
+			    if (userRole != null && (userRole == 2 || userRole == 3)) {
+			%>
+			    <a href="#" onclick="loadContent('dashboard-employee.jsp'); return false;" class="employee-link">
+			        <span class="material-icons">engineering</span>
+			        <span class="link-text">Employees</span>
+			    </a>
+			<%
+			    }
+			%>
 			<a href="#" onclick="loadContent('dashboard-statement.jsp'); return false;">
 			    <span class="material-icons">receipt_long</span>
 			    <span class="link-text">Account Statement</span>
@@ -102,13 +115,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        // Mark Dashboard link as active on initial load
-        const dashboardLink = [...document.querySelectorAll('.nav-links a')].find(a =>
-            a.getAttribute('onclick')?.includes('dashboard-main.jsp')
-        );
-        if (dashboardLink) {
-            dashboardLink.classList.add('active');
-        }
+    	 loadContent("dashboard-main.jsp");
 
         // Profile dropdown toggle
         const profileBtn = document.querySelector(".profile-icon-btn");

@@ -21,33 +21,37 @@ public class EmployeeHandler
 	private final UserDAO userDAO = new UserDAO();
 	private final EmployeeDAO employeeDAO = new EmployeeDAO();
 
-	// GET|GET /employee
-	// 2,3
-	public Map<String, Object> handleGet(Map<String, Object> session) throws InvalidException
-	{
-		return TransactionExecutor.execute(() ->
-		{
-			Long sessionBranchId = (Long) session.get("branchId");
-			List<Employee> employees = employeeDAO.getAllEmployees(sessionBranchId);
-			return Utility.createResponse("Employees List Fetched Successfully", "Employees", employees);
-		});
+	// GET|GET /employee(?:\\?.*)?
+	// Roles: Manager (2), GM (3)
+	public Map<String, Object> handleGet(Map<String, String> queryParams, Map<String, Object> session) throws InvalidException {
+	    return TransactionExecutor.execute(() -> {
+	        Long sessionBranchId = (Long) session.get("branchId");
+	        Short sessionRole = (Short) session.get("userCategory");
+
+	        // Parse filters
+	        String roleParam = queryParams.get("role");
+	        String branchIdParam = queryParams.get("branchId");
+	        String pageParam = queryParams.get("page");
+	        String limitParam = queryParams.get("limit");
+
+	        Short filterRole = (roleParam != null) ? (short) UserCategory.valueOf(roleParam).getValue() : null;
+	        Long filterBranchId = (branchIdParam != null) ? Long.parseLong(branchIdParam) : null;
+
+	        // Pagination
+	        int pageNo = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
+	        int limit = (limitParam != null) ? Integer.parseInt(limitParam) : 10;
+	        int offset = (pageNo - 1) * limit;
+
+	        // Branch access restriction
+	        Short effectiveRole = (sessionRole == 2) ? Short.valueOf((short) 1) : filterRole;  // Manager = only Employees
+	        Long effectiveBranchId = (sessionRole == 2) ? sessionBranchId : filterBranchId; // Manager = only own branch
+
+	        List<Employee> employees = employeeDAO.getAllEmployeesFiltered(effectiveRole, effectiveBranchId, limit, offset);
+
+	        return Utility.createResponse("Employee list fetched successfully", "employees", employees);
+	    });
 	}
-	
-	// GET|GET /employee\\?.*
-	// 3
-	public Map<String, Object> handleGet(Map<String, String> queryParams, Map<String, Object> session) throws InvalidException
-	{
-		return TransactionExecutor.execute(() ->
-		{
-			String roleParam = queryParams.get("role");
-			String branchIdParam = queryParams.get("branchId");
-	
-			Short role = (roleParam != null) ? (short) UserCategory.valueOf(roleParam).getValue() : null;
-			Long branchId = (branchIdParam != null) ? Long.parseLong(branchIdParam) : null;
-			List<Employee> employees = employeeDAO.getEmployeesFiltered(role, branchId);
-			return Utility.createResponse("Filtered employee list fetched successfully", "employees", employees);
-		});
-	}
+
 
 	// GET|POST /employee 
 	// 1,2,3

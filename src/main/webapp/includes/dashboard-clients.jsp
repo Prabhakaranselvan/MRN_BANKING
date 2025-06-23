@@ -7,7 +7,7 @@
 		<div class="clients-header">
 			<h2 class="form-header">CLIENTS LIST</h2>			
 				<div class="pagination">
-					<button id="addClientBtn" class="add-client-btn" onclick="loadContent('dashboard-add-client.jsp')">
+					<button id="addClientBtn" class="add-user-btn" onclick="loadContent('dashboard-addUser.jsp?targetRole=0')">
 						<span class="material-icons">person_add</span>
 					</button>
 					<button id="prevPage" class="page-btn" title="Previous">
@@ -24,7 +24,3 @@
 			</div>
 		</div>
 	</div>
-
-
-	<script
-		src="${pageContext.request.contextPath}/js/dashboard-clients.js"></script>

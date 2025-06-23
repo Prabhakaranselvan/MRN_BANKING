@@ -3,8 +3,8 @@
 
 <%@ include file="/includes/dashboard-sessionguard.jsp" %>
 
-<div class=profile-container>
-    <form id="profileForm" class="profile-form">
+<div class=form-container>
+    <form id="MRN-Form" class="mrn-form">
     <h2 class="form-header">USER PROFILE</h2>
         <div class="double-column">
             <div class="part">
@@ -13,7 +13,7 @@
 					pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" disabled required>
             </div>
             
-            <div class="part">
+            <div class="part"  id="dob-wrapper">
 				<%
 				LocalDate today = LocalDate.now();
 				LocalDate minEligibleDate = today.minusYears(18);
@@ -92,8 +92,7 @@
         <div class="buttons">
             <button class="form-button" type="button" id="edit-btn">Edit</button>
             <button class="form-button" type="submit" id="save-btn" style="display: none;">Save</button>
+            <button class="form-button" type="button" id="cancel-btn" style="display: none;">Cancel</button>
         </div>
     </form>
 </div>    
-    
-     <script src="${pageContext.request.contextPath}/js/dashboard-profile.js"></script>

@@ -1,4 +1,4 @@
-(function () {
+function initMainScript() {
   const userId = +document.body.dataset.userId;
 
   const totalBalEl = document.getElementById('totalBalance');
@@ -21,7 +21,7 @@
     accounts.forEach((account, i) => {
       const { accountNo, balance, accountType, status } = account;
       totalBalance += balance;
-      labels.push(`Acct ${accountNo}`);
+      labels.push(`${accountNo}`);
       balances.push(balance);
       colors.push(colorPalette[i % colorPalette.length]);
 
@@ -68,7 +68,12 @@
           },
           legend: {
             position: 'bottom',
-            labels: { usePointStyle: true }
+            labels: { usePointStyle: true,
+				font: {
+				      weight: 'bold' // <- add this
+				    },
+				color: '#000'
+			 }
           }
         }
       }
@@ -145,4 +150,4 @@
   // === INIT ===
   fetchAccounts();
   fetchTransactions();
-})();
+}

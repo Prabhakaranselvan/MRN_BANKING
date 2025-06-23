@@ -64,18 +64,12 @@ authorization:
       - 2
       - 3
 
-#Get All Employee
-  - endpoint: /employee
-    header: GET
-    method: GET
-    roles:
-      - 2
-
-# Filtered /employee with any query — GMs only
+# Filtered Get all Emploees /employee with any query 
   - endpoint: /employee\\?.*
     header: GET
     method: GET
     roles:
+      - 2
       - 3
 
 #Get Single Employee or Manager profile By ID
