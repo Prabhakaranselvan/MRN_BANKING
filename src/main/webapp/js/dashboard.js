@@ -119,6 +119,10 @@ function loadContent(page) {
 		        loadCssOnce("employeeCss", "/css/dashboard-employee.css");
 		        loadScriptOnce("employeeScriptLoaded", "/js/dashboard-employee.js", "initEmployeesScript");
 	      	}
+			else if (page === "dashboard-branch.jsp") {
+		        loadCssOnce("branchCss", "/css/dashboard-branch.css");
+		        loadScriptOnce("branchScriptLoaded", "/js/dashboard-branch.js", "initBranchScript");
+	      	}
         })
         .catch(error => {
             console.error("Error loading content:", error);

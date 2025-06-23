@@ -29,8 +29,9 @@ function initAccountScript() {
 			card.style.cursor = "pointer";
 			card.innerHTML = `
 			  <h4>Account No: ${account.accountNo}</h4>
-			  <div class="account-type">${getAccountTypeName(account.accountType)} - Branch ${account.branchId}</div>
+			  <div class="account-type">Type: ${getAccountTypeName(account.accountType)}</div>
 			  <div class="status ${account.status === 1 ? '' : 'inactive'}">${account.status === 1 ? 'Active' : 'Inactive'}</div>
+			  <div class="account-balance">₹${account.balance.toFixed(2)}</div>
 			`;
 			card.addEventListener("click", () => {
 			  accountSelect.value = account.accountNo;

@@ -52,23 +52,30 @@
             	<span class="link-text">My Profile</span>
            	</a>
            	<%
-           		if (userRole != null && (userRole == 1 || userRole == 2 || userRole == 3)) {
+           		if (userRole == 1 || userRole == 2 || userRole == 3) {
 			%>
 		    <a href="#" onclick="loadContent('dashboard-clients.jsp'); return false;">
 		        <span class="material-icons">group</span>
 		        <span class="link-text">Clients</span>
 		    </a>
 			<%
-			    }
-           		if (userRole != null && (userRole == 0)) {
+			    } 
+           		if (userRole == 0) {
 			%>
-            <a href="#" onclick="loadContent('dashboard-accounts.jsp'); return false;">
+            <a href="#" onclick="loadContent('dashboard-client-accounts.jsp'); return false;">
 			    <span class="material-icons">account_balance</span>
 			    <span class="link-text">My Accounts</span>
 			</a>
 			<%
-			    }
-			    if (userRole != null && (userRole == 2 || userRole == 3)) {
+			    } else {
+    		%>
+    		    <a href="#" onclick="loadContent('dashboard-accounts.jsp'); return false;">
+				    <span class="material-icons">account_balance</span>
+				    <span class="link-text">Accounts</span>
+				</a>
+   			<%
+    			}
+			    if (userRole == 2 || userRole == 3) {
 			%>
 			    <a href="#" onclick="loadContent('dashboard-employee.jsp'); return false;" class="employee-link">
 			        <span class="material-icons">engineering</span>
@@ -85,6 +92,11 @@
 			    <span class="material-icons">sync_alt</span>
 			    <span class="link-text">Money Transfer</span>
 			</a>
+			<a href="#" onclick="loadContent('dashboard-branch.jsp'); return false;">
+			  <span class="material-icons">business</span>
+			  <span class="link-text">Branch Directory</span>
+			</a>
+			
            <!--  <a href="#"><span class="material-icons">help</span><span class="link-text">Help</span></a>
             <a href="#"><span class="material-icons">settings</span><span class="link-text">Settings</span></a>
             <a href="#"><span class="material-icons">lock</span><span class="link-text">Password</span></a> -->
