@@ -56,6 +56,11 @@
             </a>
         </c:if>
         
+         <!-- Conditionally show Login -->
+        <c:if test="${showLogin eq true}">
+            <a href="${pageContext.request.contextPath}/login.jsp" class="banner-text-button">Login</a>
+        </c:if>
+        
     </div>
 </header>
 

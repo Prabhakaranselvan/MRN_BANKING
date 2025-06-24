@@ -1,56 +1,72 @@
-/* General Layout */
+/* ====== Layout ====== */
 .container {
 	display: flex;
 	justify-content: center;
 	height: 100%;
 	padding-top: 24px;
+	box-sizing: border-box;
 }
 
-.clients-container {
+.account-requests-container {
 	width: 100%;
-	max-width: 900px;
+	max-width: 1000px;
 	font-family: 'Segoe UI', sans-serif;
 	color: #2c3e50;
 }
 
-/* Header */
-.clients-header {
+/* ====== Header Section ====== */
+.account-requests-header {
 	display: flex;
-	flex-direction: row;
-	align-items: center;
+	flex-direction: column;
+	gap: 12px;
 	margin-bottom: 20px;
-	justify-content: space-between;
 }
 
 .form-header {
-	width: 30%;
 	font-size: 26px;
 	font-weight: 700;
-	margin: 0;
 	color: #1a237e;
+	margin: 0;
 }
 
-.clients-header-actions {
+.account-requests-header-actions {
 	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	width: 100%;
-	gap: 20px;
 	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
 }
 
+/* ====== Filters ====== */
+.filters {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
 
+.filters select {
+	padding: 6px 12px;
+	border-radius: 6px;
+	border: 1px solid #ccc;
+	background-color: #fff;
+	font-size: 14px;
+	color: #333;
+	transition: border-color 0.2s ease;
+}
 
+.filters select:focus {
+	border-color: #1976d2;
+	outline: none;
+}
 
-/* ====== Pagination & Add Button ====== */
+/* ====== Pagination ====== */
 .pagination {
 	display: flex;
 	align-items: center;
 	gap: 10px;
 }
 
-.page-btn,
-.add-user-btn {
+.page-btn {
 	background-color: #1976d2;
 	color: #fff;
 	border: none;
@@ -64,8 +80,7 @@
 	transition: background 0.2s ease, transform 0.1s ease;
 }
 
-.page-btn:hover:not(:disabled),
-.add-user-btn:hover {
+.page-btn:hover:not(:disabled) {
 	background-color: #0d47a1;
 	transform: translateY(-1px);
 }
@@ -81,41 +96,32 @@
 	color: #aaa;
 }
 
-.page-btn .material-icons,
-.add-user-btn .material-icons {
+.page-btn .material-icons {
 	font-size: 20px;
 }
 
-/* Add User Button Override */
-.add-user-btn {
-	background-color: #2e7d32;
-}
-.add-user-btn:hover {
-	background-color: #1b5e20;
+/* ====== Request Table/List ====== */
+.account-request-list {
+	margin-top: 10px;
 }
 
-#pageInfo {
-	font-size: 14px;
-	font-weight: 500;
-	color: #555;
-}
-
-/* Table Styling */
-.client-table {
+/* Optional table style if used */
+.request-table {
 	border-radius: 10px;
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 	overflow: hidden;
 	background-color: #ffffff;
+	margin-top: 10px;
 }
 
-.client-header, .client-row {
+.request-header, .request-row {
 	display: grid;
-	grid-template-columns: 1fr 2fr 2fr 1fr 1fr;
+	grid-template-columns: 0.8fr 1fr 1fr 1.2fr 1fr 1fr;
 	align-items: center;
 	padding: 13px 18px;
 }
 
-.client-header {
+.request-header {
 	background-color: #eef1f7;
 	font-weight: 600;
 	font-size: 15px;
@@ -125,46 +131,48 @@
 	letter-spacing: 0.5px;
 }
 
-.client-row {
+.request-row {
 	border-bottom: 1px solid #f0f0f0;
-	transition: background 0.2s ease;
+	transition: background 0.2s ease, transform 0.1s ease;
 }
 
-.client-row:hover {
+.request-row:hover {
 	background-color: #fafafa;
+	transform: scale(1.005);
 }
 
-/* Columns */
-.client-id, .client-name, .client-email, .client-status {
+/* Text Columns */
+.request-id, .request-client, .request-type, .request-status,
+	.request-dates {
 	font-size: 14px;
 	color: #2f3e4e;
 	word-break: break-word;
 }
 
-/* Status Tags */
-.client-status.active {
-	color: #2e7d32;
-	font-weight: 600;
-}
-
-.client-status.inactive {
-	color: #ef6c00;
-	font-weight: 600;
-}
-
-.client-status.closed {
-	color: #c62828;
-	font-weight: 600;
-}
-
- .client-status {
+/* Status Color Coding */
+.request-status {
 	text-align: center;
+	font-weight: 600;
 }
 
-.client-actions{
-    align-items: center;
-    justify-content: center;
-    display: flex;
+.request-status.pending {
+	color: #ef6c00;
+}
+
+.request-status.approved {
+	color: #2e7d32;
+}
+
+.request-status.rejected {
+	color: #c62828;
+}
+
+/* ====== Action Buttons ====== */
+.request-actions {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
 }
 
 .action-btn {
@@ -187,11 +195,4 @@
 
 .action-btn:hover .material-icons {
 	color: #0d47a1;
-}
-
-.client-row {
-	transition: background 0.2s ease, transform 0.1s ease;
-}
-.client-row:hover {
-	transform: scale(1.005);
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import com.mrn.accesscontrol.AccessValidator;
 import com.mrn.dao.AccountsDAO;
 import com.mrn.dao.UserDAO;
+import com.mrn.enums.AccountType;
 import com.mrn.enums.Status;
 import com.mrn.exception.InvalidException;
 import com.mrn.pojos.AccountDetails;
@@ -19,19 +20,38 @@ public class AccountsHandler
 
 	private final AccountsDAO accountsDAO = new AccountsDAO();
 	private final UserDAO userDAO = new UserDAO();
-
-	// GET|GET /accounts
+	
+	// GET|GET /accounts(?:\\?.*)?
 	// 1,2,3
-	public Map<String, Object> handleGet(Map<String, Object> session) throws InvalidException
-	{
-		return TransactionExecutor.execute(() ->
-		{
-			Long sessionBranchId = (Long) session.get("branchId");
-			List<Accounts> accounts = accountsDAO.getAllAccounts(sessionBranchId);
-			return Utility.createResponse("Accounts List Fetched Successfully", "Accounts", accounts);
-		});
+	public Map<String, Object> handleGet(Map<String, String> queryParams, Map<String, Object> session) throws InvalidException {
+	    return TransactionExecutor.execute(() -> {
+	        Long sessionBranchId = (Long) session.get("branchId");
+	        Short sessionRole = (Short) session.get("userCategory");
+
+	        // Parse filters
+	        String typeParam = queryParams.get("type");
+	        String branchIdParam = queryParams.get("branchId");
+	        String pageParam = queryParams.get("page");
+	        String limitParam = queryParams.get("limit");
+
+	        Short filterType = (typeParam != null) ? (short) AccountType.valueOf(typeParam).getValue() : null;
+	        Long filterBranchId = (branchIdParam != null) ? Long.parseLong(branchIdParam) : null;
+
+	        // Pagination
+	        int pageNo = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
+	        int limit = (limitParam != null) ? Integer.parseInt(limitParam) : 10;
+	        int offset = (pageNo - 1) * limit;
+
+	        // Branch access restriction
+	        Long effectiveBranchId = (sessionRole == 3) ? filterBranchId : sessionBranchId ;
+
+	        List<Accounts> accounts = accountsDAO.getAllAccountsFiltered(filterType, effectiveBranchId, limit, offset);
+	        return Utility.createResponse("Accounts List Fetched Successfully", "Accounts", accounts);
+	    });
 	}
 
+	// GET|POST /accounts
+	// 0,1,2,3
 	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException
 	{
 		return TransactionExecutor.execute(() ->
@@ -39,9 +59,7 @@ public class AccountsHandler
 			Accounts account = (Accounts) pojoInstance;
 			
 			Long accountNo = account.getAccountNo(); // May be null
-			Long clientId = account.getClientId(); //May be null
-
-			
+			Long clientId = account.getClientId(); //May be null			
 
 			if (accountNo == null)
 			{

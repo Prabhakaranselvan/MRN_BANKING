@@ -1,4 +1,4 @@
-function initAccountScript() {
+function initClientAccountsScript() {
     const userId = document.body.getAttribute("data-user-id");
     const cardsContainer = document.getElementById("accountCardsContainer");
     const accountSelect = document.getElementById("accountSelect");

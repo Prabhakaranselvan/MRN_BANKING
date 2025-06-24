@@ -4,7 +4,6 @@ function initEmployeesScript() {
   const nextBtn = document.getElementById("nextPage");
   const roleFilter = document.getElementById("roleFilter");
   const branchFilter = document.getElementById("branchFilter");
-  const filterControls = document.getElementById("filterControls");
 
   let currentPage = 1;
   const limit = 10;

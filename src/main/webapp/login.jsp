@@ -18,9 +18,6 @@
 </head>
 
 <body>
-	<%
-		request.setAttribute("showHome", true);
-	%>
 	<%@ include file="/includes/header.jsp"%>
 
 	<div class="inner-body">

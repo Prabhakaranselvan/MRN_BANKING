@@ -93,7 +93,11 @@ function loadContent(page) {
 			} 
 			else if (page === "dashboard-accounts.jsp") {
 				loadCssOnce("accountsCss", "/css/dashboard-accounts.css");
-			    loadScriptOnce("accountsScriptLoaded", "/js/dashboard-accounts.js", "initAccountScript");
+			    loadScriptOnce("accountsScriptLoaded", "/js/dashboard-accounts.js", "initAccountsScript");
+			} 
+			else if (page === "dashboard-client-accounts.jsp") {
+				loadCssOnce("clientAccountsCss", "/css/dashboard-client-accounts.css");
+			    loadScriptOnce("clientAccountsScriptLoaded", "/js/dashboard-client-accounts.js", "initClientAccountsScript");
 			} 
 			else if (page === "dashboard-statement.jsp") {
 				loadCssOnce("statementCss", "/css/dashboard-statement.css");
@@ -122,6 +126,14 @@ function loadContent(page) {
 			else if (page === "dashboard-branch.jsp") {
 		        loadCssOnce("branchCss", "/css/dashboard-branch.css");
 		        loadScriptOnce("branchScriptLoaded", "/js/dashboard-branch.js", "initBranchScript");
+	      	}
+			else if (page === "dashboard-request.jsp") {
+		        loadCssOnce("requestCss", "/css/dashboard-request.css");
+		        loadScriptOnce("requestScriptLoaded", "/js/dashboard-request.js", "initRequestScript");
+	      	}
+			else if (page === "dashboard-admin.jsp") {
+		        loadCssOnce("adminCss", "/css/dashboard-admin.css");
+		        loadScriptOnce("adminScriptLoaded", "/js/dashboard-admin.js", "initAdminScript");
 	      	}
         })
         .catch(error => {
@@ -166,8 +178,8 @@ function loadCssOnce(cssId, cssPath) {
 
 function removeDynamicCss() {
     const dynamicCssIds = [
-        "profileCss", "accountsCss", "statementCss",
-        "transactionCss", "clientsCss", "addClientCss"
+        "profileCss", "accountsCss", "clientAccountsCss", "statementCss", 
+        "transactionCss", "clientsCss", "addUserCss", "employeeCss", "branchCss", "requestCss", "adminCss"
     ];
     dynamicCssIds.forEach(id => {
         const el = document.getElementById(id);

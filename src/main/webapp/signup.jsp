@@ -21,7 +21,6 @@ LocalDate minEligibleDate = today.minusYears(18);
 <body>
 	<%
 		request.setAttribute("showLogin", true);
-		request.setAttribute("showHome", true);
 	%>
 	<%@ include file="/includes/header.jsp"%>
 	<div class="content">

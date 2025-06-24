@@ -47,15 +47,13 @@
     </div>
 
     <div class="double-column">
-      <div class="part-with-icon">
+      <div class="part">
         <label class="form-label" for="email">Email <span class="required">*</span></label>
         <input class="form-input" type="email" id="email" name="email" required>
-        <span class="material-symbols-outlined">mail</span>
       </div>
-      <div class="part-with-icon">
+      <div class="part">
         <label class="form-label" for="phone">Phone Number <span class="required">*</span></label>
         <input class="form-input" type="text" id="phone" name="phoneNo" maxlength="10" pattern="\d{10}" title="Phone number must be 10 digits" required>
-        <span class="material-symbols-outlined">call</span>
       </div>
     </div>
 
@@ -70,14 +68,14 @@
       </div>
     </div>
 
-    <div class="part client-only">
+    <div class="address client-only">
       <label class="form-label" for="address">Address <span class="required">*</span></label>
       <input class="form-input" type="text" name="address" placeholder="Address">
     </div>
 
     <div class="part employee-only">
       <label class="form-label" for="branchId">Branch <span class="required">*</span></label>
-      <select class="form-input" name="branchId" id="branchId">
+      <select class="branch-input" name="branchId" id="branchId">
         <option value="">Select Branch</option>
       </select>
     </div>

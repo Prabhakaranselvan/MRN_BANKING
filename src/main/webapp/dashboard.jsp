@@ -47,10 +47,10 @@
             	<span class="material-icons">dashboard</span>
             	<span class="link-text">Dashboard</span>
            	</a>
-            <a href="#" onclick="loadContent('dashboard-profile.jsp'); return false;">
+           <!--  <a href="#" onclick="loadContent('dashboard-profile.jsp'); return false;">
             	<span class="material-icons">person</span>
             	<span class="link-text">My Profile</span>
-           	</a>
+           	</a> -->
            	<%
            		if (userRole == 1 || userRole == 2 || userRole == 3) {
 			%>
@@ -60,7 +60,19 @@
 		    </a>
 			<%
 			    } 
-           		if (userRole == 0) {
+           		if (userRole == 2 || userRole == 3) {
+   			%>
+   			    <a href="#" onclick="loadContent('dashboard-employee.jsp'); return false;" class="employee-link">
+   			        <span class="material-icons">engineering</span>
+   			        <span class="link-text">Employees</span>
+   			    </a>
+   			    <a href="#" onclick="loadContent('dashboard-request.jsp'); return false;" class="dashboard-btn">
+				  <span class="material-icons">assignment</span>
+				  <span class="link-text">Account Requests</span>
+				</a>
+   			<%
+   			    }
+          		if (userRole == 0) {
 			%>
             <a href="#" onclick="loadContent('dashboard-client-accounts.jsp'); return false;">
 			    <span class="material-icons">account_balance</span>
@@ -74,16 +86,9 @@
 				    <span class="link-text">Accounts</span>
 				</a>
    			<%
-    			}
-			    if (userRole == 2 || userRole == 3) {
-			%>
-			    <a href="#" onclick="loadContent('dashboard-employee.jsp'); return false;" class="employee-link">
-			        <span class="material-icons">engineering</span>
-			        <span class="link-text">Employees</span>
-			    </a>
-			<%
 			    }
 			%>
+			
 			<a href="#" onclick="loadContent('dashboard-statement.jsp'); return false;">
 			    <span class="material-icons">receipt_long</span>
 			    <span class="link-text">Account Statement</span>
@@ -126,8 +131,15 @@
         dropdown?.classList.remove("show");
     }
 
+    const userRole = parseInt(document.body.getAttribute("data-user-role"));
     document.addEventListener("DOMContentLoaded", function () {
-    	 loadContent("dashboard-main.jsp");
+    	if (userRole === 0) {
+   			 loadContent("dashboard-main.jsp");
+   		}
+    	else {
+    		loadContent("dashboard-admin.jsp");
+			}
+    	
 
         // Profile dropdown toggle
         const profileBtn = document.querySelector(".profile-icon-btn");

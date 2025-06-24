@@ -147,24 +147,50 @@ public class AccountsDAO
 			throw new InvalidException("Error occurred while checking account Existence.", e);
 		}
 	}
-
-	public List<Accounts> getAllAccounts(Long branchId) throws InvalidException
+	
+	public List<Accounts> getAllAccountsFiltered(Short type, Long branchId, int limit, int offset) throws InvalidException
 	{
 		List<Accounts> accounts = new ArrayList<>();
 		StringBuilder sql = new StringBuilder("SELECT account_no, branch_id, client_id, account_type, status, balance "
 				+ "FROM accounts WHERE 1=1");
+		
+		List<Object> params = new ArrayList<>();
 
 		if (branchId != null)
 		{
 			sql.append(" AND branch_id = ?");
+			params.add(branchId);
 		}
+
+		if (type != null)
+		{
+			sql.append(" AND account_type = ?");
+			params.add(type);
+		}
+
+		sql.append(" ORDER BY account_no ASC LIMIT ? OFFSET ?");
+		params.add(limit);
+		params.add(offset);
 
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql.toString()))
 		{
-			if (branchId != null)
+			for (int i = 0; i < params.size(); i++)
 			{
-				pstmt.setLong(1, branchId);
+				Object param = params.get(i);
+				if (param instanceof Long)
+				{
+					pstmt.setLong(i + 1, (Long) param);
+				}
+				else if (param instanceof Short)
+				{
+					pstmt.setShort(i + 1, (Short) param);
+				}
+				else if (param instanceof Integer)
+				{
+					pstmt.setInt(i + 1, (Integer) param);
+				}
 			}
+
 			try (ResultSet rs = pstmt.executeQuery())
 			{
 				while (rs.next())
@@ -181,7 +207,7 @@ public class AccountsDAO
 		}
 		catch (SQLException e)
 		{
-			throw new InvalidException("Error fetching accounts by branch ID", e);
+			throw new InvalidException("Error fetching accounts by Filter", e);
 		}
 
 		return accounts;

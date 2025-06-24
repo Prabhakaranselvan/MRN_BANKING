@@ -25,7 +25,7 @@
     <div class="section-box">
       <div class="section-header">
         <h4>Accounts</h4>
-        <span class="material-icons clickable" onclick="loadContent('dashboard-accounts.jsp')">open_in_new</span>
+        <span class="material-icons clickable" onclick="loadContent('dashboard-client-accounts.jsp')">open_in_new</span>
       </div>
       <div id="accountCards" class="card-container"></div>
     </div>

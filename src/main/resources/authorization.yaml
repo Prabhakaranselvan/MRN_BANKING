@@ -132,8 +132,8 @@ authorization:
     roles:
       - 3
 
-#Get All Accounts Of a Branch
-  - endpoint: /accounts
+#Get All Accounts Filtered
+  - endpoint: /accounts\\?.*
     header: GET
     method: GET
     roles:
@@ -186,8 +186,8 @@ authorization:
     roles:
       - 0
 
-#Get All Request To Create Account
-  - endpoint: /accountrequest
+#Get All Account Requests filtered 
+  - endpoint: /accountrequest\\?.*
     header: GET
     method: GET
     roles:
