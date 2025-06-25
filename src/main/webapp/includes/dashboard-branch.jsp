@@ -38,13 +38,14 @@
       <input type="hidden" id="branchId" />
 
       <label for="branchName">Branch Name</label>
-      <input type="text" id="branchName" required />
+      <input type="text" id="branchName" maxlength="30" required />
 
       <label for="branchLocation">Location</label>
-      <input type="text" id="branchLocation" required />
+      <input type="text" id="branchLocation" maxlength="30" required />
 
       <label for="contactNo">Contact Number</label>
-      <input type="tel" id="contactNo" pattern="\\d{10}" required />
+      <input type="text" id="contactNo" maxlength="10" pattern="\d{10}" title="Phone number must be 10 digits" 
+      	  oninput="this.value = this.value.replace(/\D/g, '')" required />
 
       <div class="modal-actions">
         <button type="submit" class="btn-submit">Save</button>

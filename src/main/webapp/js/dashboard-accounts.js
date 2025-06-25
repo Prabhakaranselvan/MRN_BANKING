@@ -138,7 +138,7 @@ function initAccountsScript() {
         <div class="account-status ${getStatusClass(a.status)}">${getStatusText(a.status)}</div>
         <div class="account-actions">
           <button onclick='editAccount(${JSON.stringify(a)})' class="action-btn" title="Edit Account">
-            <span class="material-icons">edit</span>
+            <span class="material-icons">edit_square</span>
           </button>
         </div>
       </div>

@@ -112,8 +112,8 @@ function initRequestScript() {
         </button>
         <button class="action-btn" onclick="approveRequest(${req.requestId}, 2)" title="Reject">
           <span class="material-icons">cancel</span>
-        </button>`
-        : `<span class="material-icons" style="color: #bbb;">lock</span>`;
+        </button >`
+        : `<span class="material-icons" style="color: #bbb;padding: 6px;">lock</span>`;
 
       return `
         <div class="request-row">
@@ -143,9 +143,9 @@ function initRequestScript() {
 
   function formatAccountType(type) {
     switch (type) {
-      case 0: return "Savings";
-      case 1: return "Current";
-      case 2: return "Salary";
+      case 1: return "Savings";
+      case 2: return "Current";
+      case 3: return "Fixed Deposit";
       default: return "Unknown";
     }
   }
@@ -161,12 +161,11 @@ function initRequestScript() {
     })
       .then(res => res.json())
       .then(data => {
-        alert(data.message || "Action completed.");
+        handleResponse(data);
         loadRequests(currentPage);
       })
       .catch(err => {
         console.error("Approval error:", err);
-        alert("Failed to update request.");
       });
   };
 

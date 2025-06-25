@@ -147,7 +147,7 @@ function initAccountRequestFeature() {
         const accountType = parseInt(document.getElementById("accountTypeSelect").value);
 
         if (!branchId || !accountType) {
-            alert("Please select both branch and account type.");
+             handleResponse({error:"Please select both branch and account type."});
             return;
         }
 
@@ -161,13 +161,12 @@ function initAccountRequestFeature() {
         })
         .then(res => res.json())
         .then(data => {
-            alert(data.message || "Account request submitted successfully.");
+             handleResponse(data);
             modal.style.display = "none";
             requestForm.reset();
         })
         .catch(err => {
             console.error("Request failed:", err);
-            alert("Failed to submit account request.");
         });
     });
 }

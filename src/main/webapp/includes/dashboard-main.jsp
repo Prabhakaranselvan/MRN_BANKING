@@ -5,7 +5,7 @@
   <!-- Welcome, Balance, and Transfer -->
   <div class="dashboard-header">
     <div class="header-left">
-      <h2>Welcome back, <c:out value="${userName}"/></h2>
+      <h2></h2>
       <div class="total-balance">
         <span class="material-icons balance-icon">account_balance_wallet</span>
         <span id="totalBalance">₹0.00</span>

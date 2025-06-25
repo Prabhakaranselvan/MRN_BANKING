@@ -30,19 +30,33 @@ function initTransactionScript() {
 
 	// Peer Account: only numbers, max 15 digits
 	peerAccNo.addEventListener("input", () => {
-		peerAccNo.value = peerAccNo.value.replace(/\D/g, '').slice(0, 15);
+		let cleaned = peerAccNo.value.replace(/\D/g, ''); // digits only
+		cleaned = cleaned.replace(/^0+/, ''); // remove leading zeros
+		peerAccNo.value = cleaned.slice(0, 15); // limit to 15 digits
 	});
 
 	// Amount: restrict to 2 decimals, max 100000
 	amountInput.addEventListener("input", () => {
 		let value = amountInput.value
-			.replace(/[^0-9.]/g, '')
-			.replace(/^(\d*\.\d{0,2}).*$/, '$1');
+			.replace(/[^0-9.]/g, '')              // allow only digits and dot
+			.replace(/^(\d*\.\d{0,2}).*$/, '$1'); // restrict to 2 decimals
 
-		const floatVal = parseFloat(value);
-		if (!isNaN(floatVal) && floatVal > 100000) value = '100000';
+		let floatVal = parseFloat(value);
+
+		if (!isNaN(floatVal)) {
+			if (floatVal > 100000) {
+				value = '100000';
+			} else if (floatVal < 1) {
+				value = '1';
+			}
+		} else {
+			amountInput.title = ""; // Clear title if input is empty or invalid
+		}
+
 		amountInput.value = value;
 	});
+
+
 
 	// Password visibility toggle
 	togglePasswordBtn.addEventListener("click", () => {

@@ -19,9 +19,6 @@ LocalDate minEligibleDate = today.minusYears(18);
 </head>
 
 <body>
-	<%
-		request.setAttribute("showLogin", true);
-	%>
 	<%@ include file="/includes/header.jsp"%>
 	<div class="content">
 		<div class="left-half">
@@ -39,27 +36,29 @@ LocalDate minEligibleDate = today.minusYears(18);
 				<div class="double-column">
 					<div class="part">
 						<label class="form-label" for="name">Name <span class="required">*</span></label>
-						<input class="form-input" type="text" name="name"	placeholder="Name" 
-							pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus> 
+						<input class="form-input" type="text" name="name" placeholder="Name" maxlength="30"
+							pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus
+							title="Name should contain only letters, spaces, hyphens or apostrophes."> 
 					</div>
 					<div class="part">
 						<label class="form-label" for="dob">Date of Birth <span class="required">*</span></label> 
-						<input class="form-input" type="date" id="dob" name="dob" max="<%=minEligibleDate%>" required>
+						<input class="form-input" type="date" id="dob" name="dob" max="<%=minEligibleDate%>"
+						 	title="You must be at least 18 years old." required>
 					</div>
 				</div>
 
 				<div class="gender">
 					<label class="form-label">Gender <span class="required">*</span></label>
 					<div class="options">
-						<input class="radio-input" type="radio" name="gender" value="Male" required> 
+						<input class="radio-input" type="radio" name="gender" value="Male" required title="Select your gender."> 
 						<label class="radio-label">Male</label>
 					</div>
 					<div class="options">
-						<input class="radio-input" type="radio" name="gender" value="Female" required>
+						<input class="radio-input" type="radio" name="gender" value="Female" required title="Select your gender.">
 						 <label class="radio-label">Female</label>
 					</div>
 					<div class="options">
-						<input class="radio-input" type="radio" name="gender" value="Other" required> 
+						<input class="radio-input" type="radio" name="gender" value="Other" required title="Select your gender."> 
 						<label class="radio-label">Other</label>
 					</div>
 				</div>
@@ -68,7 +67,8 @@ LocalDate minEligibleDate = today.minusYears(18);
 					<div class="part-with-icon">
 						<label class="form-label" for="email">Email <span class="required">*</span></label>
 						<input class="form-input" type="email" id="email" name="email"
-							pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" required> 
+							pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" 
+							title="Enter a valid email address (e.g., user@example.com)." required> 
 						<span class="material-symbols-outlined">mail</span>
 					</div>
 					<div class="part-with-icon">
@@ -82,28 +82,33 @@ LocalDate minEligibleDate = today.minusYears(18);
 				<div class="double-column">
 					<div class="part">
 						<label class="form-label" for="aadhar">Aadhar Number <span class="required">*</span></label> 
-						<input class="form-input" type="text" id="aadhar" name="aadhar" maxlength="12" pattern="\d{12}" required>
+						<input class="form-input" type="text" id="aadhar" name="aadhar" maxlength="12" pattern="\d{12}" 
+							title="Aadhar number must be exactly 12 digits." required>
 					</div>
 					<div class="part">
 						<label class="form-label" for="pan">PAN Number <span class="required">*</span></label> 
 						<input class="form-input" type="text" id="pan" name="pan" maxlength="10" pattern="[A-Z]{5}\d{4}[A-Z]"
-							oninput="this.value = this.value.toUpperCase();" required>
+							oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" required
+							title="PAN format: 5 uppercase letters, 4 digits, and 1 uppercase letter (e.g., ABCDE1234F).">
 					</div>
 				</div>
 
 				<label class="form-label">Address <span class="required">*</span></label>
-				<input class="form-input" type="text" name="address" placeholder="Address" required> 
+				<input class="form-input" type="text" name="address" placeholder="Address" maxlength="60" required
+					title="Enter your full address (max 60 characters)."> 
 				
 				<div class="double-column">
 					<div class="part">
 						<label class="form-label" for="password">Set Password <span	class="required">*</span></label> 
 						<input class="form-input" type="password" id="password" name="password" maxlength="20"
-							pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required>
+							pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
+							title="Password must be 8-20 characters, include uppercase, lowercase, number, and a special character.">
 					</div>
 					<div class="part">
 						<label class="form-label" for="confirm-password">Confirm Password <span class="required">*</span></label> 
 						<input class="form-input" type="password" id="confirm-password"	name="confirm_password" maxlength="20"
-							pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required>
+							pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
+							 title="Must match the password above.">
 					</div>
 				</div>
 
@@ -116,6 +121,11 @@ LocalDate minEligibleDate = today.minusYears(18);
 				<div class="buttons">
 					<button class="form-button" type="submit">Submit</button>
 					<button class="form-button" type="reset">Reset</button>
+				</div>
+				
+				<div class="group">
+					<p class="signup-text">Already an User?</p>  
+					<a href="${pageContext.request.contextPath}/login.jsp">Login</a>
 				</div>
 			</form>
 		</div>
@@ -133,13 +143,20 @@ LocalDate minEligibleDate = today.minusYears(18);
 	        const showPasswordCheckbox = document.getElementById("show-password");
 	        const errorMessage = document.getElementById("password-error");
 	
-	     // Enforce numeric-only input
+	        // Enforce numeric-only input
 	        const numberInputs = document.querySelectorAll("#phone, #aadhar");
 	        numberInputs.forEach(input => {
 	            input.addEventListener("input", function () {
 	                this.value = this.value.replace(/\D/g, ''); // Remove non-digits
 	            });
 	        });
+	        
+	        // Prevent numbers in the name field
+	        const nameInput = document.querySelector("input[name='name']");
+	        nameInput.addEventListener("input", function () {
+	            this.value = this.value.replace(/[0-9]/g, ''); // Remove any digits
+	        });
+
 
 	        // Toggle password visibility
 	        showPasswordCheckbox.addEventListener("change", function () {

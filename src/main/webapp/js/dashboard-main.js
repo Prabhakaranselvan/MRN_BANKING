@@ -5,6 +5,8 @@ function initMainScript() {
   const cardsContainer = document.getElementById('accountCards');
   const txnListContainer = document.getElementById('modernTxnList');
   const pieCtx = document.getElementById('balancePieChart');
+  const userName = document.body.dataset.userName;
+  document.querySelector(".header-left h2").textContent = `Welcome, ${userName}`;
 
   const typeMap = ['Deposit', 'Withdrawal', 'Credit', 'Debit'];
   const colorPalette = ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c', '#9b59b6', '#34495e'];
@@ -101,7 +103,7 @@ function initMainScript() {
               <span class="material-icons">sync_alt</span>
             </div>
             <div class="txn-labels">
-              <span class="txn-title">${label}</span>
+              <span class="txn-title">${label} (Acc: ${txn.accountNo})</span>
               <span class="txn-date">${dateStr}</span>
             </div>
           </div>

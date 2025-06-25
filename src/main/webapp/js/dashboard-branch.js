@@ -123,14 +123,13 @@ function initBranchScript() {
       })
         .then(res => res.json())
         .then(data => {
-          alert(data.message || "Branch saved.");
+          handleResponse(data);
           modal.style.display = "none";
           form.reset();
           fetchBranches();
         })
         .catch(err => {
           console.error("Save branch failed:", err);
-          alert("Failed to save branch.");
         });
     });
   }
@@ -174,7 +173,6 @@ function initBranchScript() {
       })
       .catch(err => {
         console.error("Failed to load branch for edit:", err);
-        alert("Unable to load branch for editing.");
       });
   }
 }

@@ -1,6 +1,7 @@
 package com.mrn.filters;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -14,7 +15,8 @@ import com.mrn.utilshub.YamlLoader;
 
 public class AuthorizationFilter implements Filter 
 {
-
+	private static final Pattern EXCLUDED_PATHS = Pattern.compile(".*/(login|signup|logout)$");
+	
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException 
 	{
@@ -26,15 +28,20 @@ public class AuthorizationFilter implements Filter
 		if (query != null) {
 		    path += "?" + query;  // Append query parameters to the path
 		}
-		String exclude = ".*/(login|signup|logout)$";
-		if (path != null && path.matches(exclude)) 
-		{
-			chain.doFilter(request, response); // Allow login signup and logout requests
-			return;
+		if (path != null && EXCLUDED_PATHS.matcher(path).matches()) {
+		    chain.doFilter(request, response); // Allow login signup and logout requests
+		    return;
 		}
 		
 		String method = req.getMethod();
 		String headerMethod = req.getHeader("Method");
+		if (headerMethod == null || headerMethod.isBlank()) 
+		{
+		    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		    res.getWriter().write("{\"error\": \"Missing required header: Method\"}");
+		    return;
+		}
+
 		short userRole = (short) req.getSession().getAttribute("userCategory");
 
 		// Authorization check using YamlLoader
@@ -43,7 +50,7 @@ public class AuthorizationFilter implements Filter
 		if (!authorized) 
 		{
 			res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			res.getWriter().write("{\"error\":\"Forbidden - Access denied for your role - " + userRole + "\"}");
+			res.getWriter().write("{\"error\":\"Access denied: Your role (" + userRole + ") is not permitted to access " + path + "\"}");
 			return;
 		}
 		

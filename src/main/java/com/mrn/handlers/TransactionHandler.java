@@ -24,6 +24,31 @@ public class TransactionHandler
 	private final UserDAO userDAO = new UserDAO();
 	private final AccountsDAO accountsDAO = new AccountsDAO();
 	private final TransactionDAO txnDAO = new TransactionDAO();
+	
+	public Map<String, Object> handleGet(Map<String, String> queryParams, Map<String, Object> session) throws InvalidException {
+	    return TransactionExecutor.execute(() -> {
+	        Short sessionRole = (Short) session.get("userCategory");
+	        Long sessionBranchId = (Long) session.get("branchId");
+	        
+	        String branchIdParam = queryParams.get("branchId");
+	        String pageParam = queryParams.get("page");
+	        String limitParam = queryParams.get("limit");
+
+	        Long filterBranchId = (branchIdParam != null) ? Long.parseLong(branchIdParam) : null;
+
+	        // Pagination
+	        int page = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
+	        int limit = (limitParam != null) ? Integer.parseInt(limitParam) : 10;
+	        int offset = (page - 1) * limit;
+	        
+	        Long effectiveBranchId = (sessionRole == 3) ? filterBranchId : sessionBranchId ;
+
+	        List<Transaction> transactions = txnDAO.getLatestTransactions(effectiveBranchId, limit, offset);
+
+	        return Utility.createResponse("Latest transactions fetched successfully", "Transactions", transactions);
+	    });
+	}
+
 
 	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException {
 	    return TransactionExecutor.execute(() -> {

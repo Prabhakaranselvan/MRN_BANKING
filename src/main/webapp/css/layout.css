@@ -42,68 +42,169 @@
 	gap: 20px;
 }
 
-.banner-button {
-	padding: 0;
-	background: #CD342E;
-	color: white;
-	border: none;
-	border-radius: 50%;
-	font-size: 24px;
-	width: 45px;
-	height: 45px;
-	cursor: pointer;
-	transition: background 0.3s;
+/* --- Dropdown Container --- */
+.zoho-style-dropdown {
+    display: none;
+    position: absolute;
+    top: 55px;
+    right: 10px;
+    width: 360px;
+    background-color: #fff;
+    color: #1c1c1c;
+    border-radius: 12px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 16px;
+    box-sizing: border-box;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* --- Header Section --- */
+.profile-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+}
+
+.profile-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background-color: #f1f1f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: #666;
+}
+
+.profile-info {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: #202124;
+}
+
+.user-email {
+    color: #5f6368;
+    margin: 2px 0;
+    font-size: 13px;
+}
+
+.user-id,
+.user-role {
+    color: #5f6368;
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.user-id {
 	display: flex;
-	align-items: center;
-	justify-content: center;
+	gap: 4px;
+} 
+
+
+.user-role strong {
+    color: #202124;
 }
 
-.banner-button .material-symbols-outlined {
-	font-size: 32px;
+.help-icon {
+    font-size: 15px;
+    vertical-align: middle;
+    cursor: pointer;
+    color: #aaa;
 }
 
-.banner-button:hover {
-	background-color: #007BFF;
+/* --- Close Button --- */
+.close-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #888;
+    cursor: pointer;
 }
 
-a.banner-button {
-	text-decoration: none
+.close-btn:hover {
+    color: #000;
 }
 
-a.banner-text-button {
-	background-color: #CD342E;
-	color: white;
-	border: none;
-	border-radius: 30px;
-	padding: 8px 16px;
-	font-size: 16px;
-	font-weight: bold;
-	cursor: pointer;
-	transition: background 0.3s;
-	text-decoration: none
+/* --- Divider --- */
+.divider {
+    margin: 16px 0 12px;
+    border: none;
+    border-top: 1px solid #e0e0e0;
 }
 
-a.banner-text-button:hover {
-	background-color: #007BFF;
+/* --- Footer Links --- */
+.profile-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
 }
 
+.profile-link {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.profile-link:hover {
+    text-decoration: underline;
+}
+
+.signout-link {
+    color: #d93025;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.signout-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Trigger Button --- */
+.profile-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.profile-icon-btn .material-symbols-outlined {
+    font-size: 40px;
+    color: white;
+    background: black;
+    border-radius: 50%;
+}
+
+/* --- Show dropdown (with fade) --- */
+.zoho-style-dropdown.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- Toast Message --- */
 .custom-toast {
     border: none;
     padding: 0;
     border-radius: 8px;
     width: 350px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    font-family: 'Poppins', sans-serif;
     overflow: hidden;
     animation: slideIn 0.4s ease-out;
-}
-
-.custom-toast.toast-success {
-    z-index: 9999;
-    position: fixed;
-    top: 90vh;
-    left: 79.5%;
-    margin: 0;
 }
 
 .toast-content {

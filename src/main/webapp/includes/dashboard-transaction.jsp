@@ -16,12 +16,14 @@
         <div class="form-row">
             <div class="form-group" id="fromAccountGroup">
                 <label for="fromAccount">From Account No</label>
-                <input type="text" id="fromAccount" name="accountNo" required maxlength="11" inputmode="numeric" pattern="\d{1,11}" placeholder="Enter Account No" />
+                <input type="text" id="fromAccount" name="accountNo" required maxlength="11" inputmode="numeric" 
+                pattern="\d{11}"  title="Account number must be exactly 11 digits" placeholder="Enter Account No" />
             </div>
 
             <div class="form-group peer-group" id="peerGroup">
                 <label for="peerAccNo">To Account No</label>
-                <input type="text" id="peerAccNo" name="peerAccNo" maxlength="15" inputmode="numeric" pattern="\d+" placeholder="Enter Receiver's Account No" />
+                <input type="text" id="peerAccNo" name="peerAccNo" maxlength="15" inputmode="numeric"  
+               pattern="[1-9]\d{4,14}"  title="Account number must be 5 to 15 digits" placeholder="Enter Receiver's Account No" />
             </div>
         </div>
 
@@ -29,7 +31,7 @@
         <div class="form-row">
             <div class="form-group">
                 <label for="amount">Amount</label>
-                <input type="text" id="amount" name="amount" required placeholder="Eg: 500.00" />
+                <input type="text" id="amount" name="amount" required placeholder=" ₹1–100K (max 2 decimals) | Eg: 500.00" />
             </div>
             <div class="form-group password-toggle-group">
                 <label for="txnPassword">Transaction Password</label>

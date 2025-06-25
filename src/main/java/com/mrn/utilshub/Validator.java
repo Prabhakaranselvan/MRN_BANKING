@@ -47,6 +47,14 @@ public class Validator
 
 		return errorMsg;
 	}
+	
+	public static StringBuilder checkUserId(Long userId)
+	{
+		errorMsg.setLength(0);
+		checkLongField(userId, "User ID");
+		return errorMsg;
+	}
+	
 
 	public static StringBuilder checkUser(User user)
 	{
@@ -54,7 +62,9 @@ public class Validator
 
 		try
 		{
-			UserCategory.fromValue(user.getUserCategory());
+			Short userCategory = user.getUserCategory();
+			if(!checkNull(userCategory, "UserCategory"))
+			UserCategory.fromValue(userCategory);
 		}
 		catch (InvalidException e)
 		{
@@ -85,6 +95,7 @@ public class Validator
 	{
 		errorMsg.setLength(0);
 
+		checkLongField(user.getUserId(), "User ID");
 		checkField(user.getEmail(), "Email Address");
 		checkField(user.getPhoneNo(), "Phone Number");
 		checkField(user.getPassword(), "Password");
@@ -95,6 +106,26 @@ public class Validator
 		}
 		return errorMsg;
 	}
+	
+	public static StringBuilder checkHigherAuthorityUpdate(User user)
+	{
+		errorMsg.setLength(0);
+
+		checkLongField(user.getUserId(), "User ID");
+		errorMsg.append(checkUser(user));
+		try
+		{
+			Short status = user.getStatus();
+			if(!checkNull(status, "UserCategory"))
+			Status.fromValue(status);
+		}
+		catch (InvalidException e)
+		{
+			errorMsg.append(e.getMessage());
+		}
+		return errorMsg;
+	}
+	
 
 	public static StringBuilder checkBranch(Branch branch)
 	{
@@ -130,12 +161,12 @@ public class Validator
 	{
 		errorMsg.setLength(0);
 
-		checkLongField(txn.getAccountNo(), "Account Number");
+		checkLongField(txn.getAccountNo(), "Account No");
 		checkDecimalField(txn.getAmount(), "Transaction Amount");
 		validateEnum(() -> TxnType.fromValue(txn.getTxnType()));
 		if (txn.getTxnType() == TxnType.DEBIT.getValue() || txn.getTxnType() == TxnType.CREDIT.getValue())
 		{
-			checkLongField(txn.getPeerAccNo(), "Peer Account Number");
+			checkLongField(txn.getPeerAccNo(), "Peer Acc No");
 		}
 		checkField(txn.getPassword(), "Password");
 		return errorMsg;
@@ -197,15 +228,15 @@ public class Validator
 	{
 		if (!checkNull(value, fieldName) && value < 1)
 		{
-			errorMsg.append(fieldName).append(" cannot be Zero or Negative.<br/>");
+			errorMsg.append(fieldName).append(" cannot be zero or negative.<br/>");
 		}
 	}
 
 	private static void checkDecimalField(BigDecimal value, String fieldName)
 	{
-		if (value == null || value.compareTo(BigDecimal.ZERO) < 0)
+		if (!checkNull(value, fieldName) && value.compareTo(BigDecimal.ZERO) <= 0)
 		{
-			errorMsg.append(fieldName).append(" cannot be null or negative.<br/>");
+			errorMsg.append(fieldName).append(" cannot be zero or negative.<br/>");
 		}
 	}
 

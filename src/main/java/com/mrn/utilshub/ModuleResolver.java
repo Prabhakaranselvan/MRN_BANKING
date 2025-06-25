@@ -26,6 +26,7 @@ public class ModuleResolver
 		POJO_MAP.put("accountapproval", com.mrn.pojos.AccountRequest.class);
 		POJO_MAP.put("transaction", com.mrn.pojos.Transaction.class);
 		POJO_MAP.put("accountstatement", com.mrn.pojos.AccountStatement.class);
+		POJO_MAP.put("report", com.mrn.pojos.AccountsReport.class);
 
 		// Populate Handler class mappings
 		HANDLER_MAP.put("login", com.mrn.handlers.LoginHandler.class);
@@ -38,6 +39,7 @@ public class ModuleResolver
 		HANDLER_MAP.put("accountapproval", com.mrn.handlers.AccountApprovalHandler.class);
 		HANDLER_MAP.put("transaction", com.mrn.handlers.TransactionHandler.class);
 		HANDLER_MAP.put("accountstatement", com.mrn.handlers.TransactionHandler.class);
+		HANDLER_MAP.put("report", com.mrn.handlers.ReportHandler.class);
 
 		// header method = GET, http method = GET
 		STRATEGIES.put("GET|GET", (handler, body, queryParams, session) ->

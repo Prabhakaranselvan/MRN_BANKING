@@ -53,11 +53,11 @@ body {
 }
 
 .signup-form {
-	width: 60%;
+	width: 550px;
 	padding: 30px;
 	background: #ffffff;
 	border-radius: 20px;
-	box-shadow: 7.5px 7.5px 12px #a3b1c6, -7.5px -7.5px 20px #e0e5ec;
+	box-shadow: 7.5px 7.5px 12px #e0e5ec, -7.5px -7.5px 20px #e0e5ec;
 	display: flex;
 	flex-direction: column;
 }
@@ -71,7 +71,7 @@ body {
 
 .form-label {
 	font-size: 16px;
-	font-weight: bold;
+	font-weight: 600;
 }
 
 .form-input {
@@ -80,7 +80,7 @@ body {
 	margin-bottom: 25px;
 	background: #ffffff;
 	border-radius: 20px;
-	box-shadow: 4px 4px 5px #a3b1c6;
+	box-shadow: 3px 3px 10px #b4c0d2;
 	font-size: 15px;
 }
 
@@ -178,6 +178,30 @@ body {
 	color: #000000;
 	font-size: 25px;
 	pointer-events: none;
+}
+
+.group {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items:center;
+	gap:7.5px;
+	margin-top:35px;
+}
+
+.group a {
+	color: #333;
+	text-decoration: none;
+	color: #0078D7;
+	font-weight: 600;
+	font-size:17px;
+}
+
+.signup-text{
+	margin-block-start: 0;
+	margin-block-end: 0;
+	font-weight: 550;
+	font-size:16px;
 }
 
 .error-message {

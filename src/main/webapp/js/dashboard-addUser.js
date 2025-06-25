@@ -24,6 +24,12 @@ function initAddUserScript() {
             this.value = this.value.replace(/\D/g, '');
         });
     });
+	
+	// Prevent numbers in the name field
+    const nameInput = document.querySelector("input[name='name']");
+    nameInput.addEventListener("input", function () {
+        this.value = this.value.replace(/[0-9]/g, ''); // Remove any digits
+    });
 
     // Toggle password visibility
     if (showPasswordCheckbox) {

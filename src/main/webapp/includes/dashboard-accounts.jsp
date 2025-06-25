@@ -49,7 +49,7 @@
       <select id="addBranch" class="branch-input" name="branchId" required></select>
 
       <label for="addClientId">Client ID</label>
-      <input type="number" id="addClientId" name="clientId" required />
+      <input type="number" id="addClientId" name="clientId" required min="1" step="1" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
 
       <label for="addAccountType">Account Type</label>
       <select id="addAccountType" name="accountType" required>
@@ -60,7 +60,7 @@
       </select>
 
       <label for="addBalance">Opening Balance</label>
-      <input type="number" id="addBalance" name="balance" step="0.01" required />
+      <input type="number" id="addBalance" name="balance" required min="0" step="0.01" oninput="this.value=this.value.replace(/[^0-9.]/g,'')" />
 
       <div class="modal-actions">
         <button type="submit" class="btn-submit">Create</button>

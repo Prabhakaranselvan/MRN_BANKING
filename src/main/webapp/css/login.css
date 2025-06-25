@@ -82,7 +82,7 @@ body {
 	align-items: center;
 	flex-direction: column;
 	gap: 20px;
-	width: 70%;
+	width: 72%;
 	transform: translateY(148px);
 	transition: 0.5s;
 }
@@ -104,12 +104,12 @@ input {
 	width: 100%;
 	padding: 10px 20px;
 	outline: none;
-	border: none;
 	font-size: 1em;
 	color: #333;
 	background: #f9f9f9;
 	border: 2px solid #ccc;
 	border-radius: 30px;
+	box-sizing: border-box;
 }
 
 input::placeholder {
@@ -123,6 +123,7 @@ input[type="submit"] {
 	color: #fff;
 	cursor: pointer;
 	transition: 0.5s;
+	width:50%;
 }
 
 input[type="submit"]:hover {
@@ -132,22 +133,25 @@ input[type="submit"]:hover {
 .group {
 	width: 100%;
 	display: flex;
-	justify-content: space-between;
+	justify-content: center;
+	gap:7.5px;
 }
 
 .group a {
 	color: #333;
 	text-decoration: none;
-}
-
-.group a:nth-child(2) {
 	color: #0078D7;
 	font-weight: 600;
 }
 
+.signup-text{
+	margin-block-start: 0;
+	margin-block-end: 0;
+}
+
 .password-wrapper {
 	position: relative;
-	width: 115.715%;
+	width: 100%;
 	display: flex;
 }
 

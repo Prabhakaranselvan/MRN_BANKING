@@ -26,17 +26,14 @@ public class ClientHandler
 	// 1,2,3
 	public Map<String, Object> handleGet(Map<String, String> queryParams, Map<String, Object> session) throws InvalidException {
 		return TransactionExecutor.execute(() -> {
-			int page = 1;
-			int limit = 10;
+			String pageParam = queryParams.get("page");
+	        String limitParam = queryParams.get("limit");
+	        
+	        int pageNo = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
+	        int limit = (limitParam != null) ? Integer.parseInt(limitParam) : 10;
+	        int offset = (pageNo - 1) * limit;
 
-			if (queryParams.containsKey("page")) {
-				page = Integer.parseInt(queryParams.get("page"));
-			}
-			if (queryParams.containsKey("limit")) {
-				limit = Integer.parseInt(queryParams.get("limit"));
-			}
-
-			List<User> clients = userDAO.getUsersByCategory((short) UserCategory.CLIENT.getValue(), page, limit);
+			List<User> clients = userDAO.getUsersByCategory((short) UserCategory.CLIENT.getValue(), limit, offset);
 			return Utility.createResponse("Clients List fetched successfully", "clients", clients);
 		});
 	}
@@ -49,6 +46,7 @@ public class ClientHandler
 		return TransactionExecutor.execute(() ->
 		{
 			Client client = (Client) pojoInstance;
+			Utility.checkError(Validator.checkUserId(client.getUserId()));
 			short userRole = (short) session.get("userCategory");
 			if( userRole == (short)UserCategory.CLIENT.getValue())
 			{
@@ -93,7 +91,6 @@ public class ClientHandler
 		return TransactionExecutor.execute(() ->
 		{
 			Client updatedClient = (Client) pojoInstance;
-			Utility.checkError(Validator.checkSelfUpdate(updatedClient));
 			short userRole = (short) session.get("userCategory");
 			if( userRole == (short)UserCategory.CLIENT.getValue())
 			{

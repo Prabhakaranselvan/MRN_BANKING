@@ -2,6 +2,7 @@ package com.mrn.filters;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -16,6 +17,8 @@ import com.mrn.utilshub.YamlLoader;
 
 public class AuthenticationFilter implements Filter 
 {
+	 private static final Pattern EXCLUDED_PATHS = Pattern.compile(".*/(login|signup)$");
+	 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException 
 	{
@@ -25,43 +28,49 @@ public class AuthenticationFilter implements Filter
         res.setCharacterEncoding("UTF-8");
 
         String path = req.getPathInfo();
-		String[] parts = (path != null) ? path.split("/") : new String[0];
-		
+        if (path == null || path.trim().isEmpty()) {
+            writeJsonError(res, HttpServletResponse.SC_BAD_REQUEST, "Missing request path.");
+            return;
+        }
+        
+        String[] parts = path.split("/");
 		String module = (parts.length >= 2) ? parts[1] : null;
 
-		if (module == null || module.isEmpty()) 
-		{
-		    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		    res.getWriter().write("{\"error\": \"Invalid URL path\"}");
-		    return;
-		}
+		if (module == null || module.isEmpty()) {
+            writeJsonError(res, HttpServletResponse.SC_BAD_REQUEST, "Invalid URL path.");
+            return;
+        }
 		
 		String endpoint = "/" + module;
 		List<String> validEndpoints = YamlLoader.loadEndpoints();
 
-		if (!validEndpoints.contains(endpoint)) 
-		{
-		    res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-		    res.getWriter().write("{\"error\": \"Invalid endpoint: " + endpoint +"\"}");
-		    return;
-		}
+		if (!validEndpoints.contains(endpoint)) {
+            writeJsonError(res, HttpServletResponse.SC_NOT_FOUND, "Invalid endpoint: " + endpoint);
+            return;
+        }
+
 		
 		HttpSession session = req.getSession(false);
-		String exclude = ".*/(login|signup)$";
-		if (session == null && path.matches(exclude)) 
-		{
-			chain.doFilter(request, response); // Allow login & signup requests
-			return;
-		}
+		if (EXCLUDED_PATHS.matcher(path).matches()) {
+            if (session == null) {
+                chain.doFilter(request, response); // Allow login/signup
+            } else {
+                writeJsonError(res, HttpServletResponse.SC_BAD_REQUEST, "Clear or logout the existing session to proceed.");
+            }
+            return;
+        }
 
 		// Block other requests without session
-		if (session == null || session.getAttribute("userId") == null) 
-		{
-			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			res.getWriter().write("{\"error\": \"User not logged in or session expired\"}");
-			return;
-		}
+		if (session == null || session.getAttribute("userId") == null) {
+            writeJsonError(res, HttpServletResponse.SC_UNAUTHORIZED, "User not logged in or session expired.");
+            return;
+        }
 
 		chain.doFilter(request, response); // continue if valid session
 	}
+	
+	private void writeJsonError(HttpServletResponse res, int status, String message) throws IOException {
+        res.setStatus(status);
+        res.getWriter().write("{\"error\": \"" + message + "\"}");
+    }
 }

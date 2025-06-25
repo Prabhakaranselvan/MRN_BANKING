@@ -145,4 +145,57 @@ public class TransactionDAO
 		return txn;
 	}
 
+	public List<Transaction> getLatestTransactions(Long branchId, int limit, int offset) throws InvalidException
+	{
+		List<Transaction> transactions = new ArrayList<>();
+		StringBuilder sql = new StringBuilder("SELECT t.* FROM transaction t");
+
+		List<Object> params = new ArrayList<>();
+
+		if (branchId != null)
+		{
+			sql.append(" JOIN accounts a ON t.account_no = a.account_no WHERE a.branch_id = ?");
+			params.add(branchId);
+		}
+		else
+		{
+			sql.append(" WHERE 1=1"); // To allow uniform appending of clauses
+		}
+
+		sql.append(" ORDER BY t.txn_time DESC LIMIT ? OFFSET ?");
+		params.add(limit);
+		params.add(offset);
+
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql.toString()))
+		{
+			for (int i = 0; i < params.size(); i++)
+			{
+				Object param = params.get(i);
+				if (param instanceof Long)
+				{
+					pstmt.setLong(i + 1, (Long) param);
+				}
+				else if (param instanceof Integer)
+				{
+					pstmt.setInt(i + 1, (Integer) param);
+				}
+			}
+
+			try (ResultSet rs = pstmt.executeQuery())
+			{
+				while (rs.next())
+				{
+					transactions.add(mapRowToTransaction(rs));
+				}
+			}
+
+		}
+		catch (SQLException e)
+		{
+			throw new InvalidException("Error fetching latest transactions"
+					+ (branchId != null ? " for branch ID: " + branchId : "") + ".", e);
+		}
+
+		return transactions;
+	}
 }

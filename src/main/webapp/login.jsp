@@ -41,7 +41,7 @@
 
 						<input type="submit" value="Sign in" />
 						<div class="group">
-							<a href="#">Forgot Password ?</a> 
+							<p class="signup-text">Not an User?</p>  
 							<a href="${pageContext.request.contextPath}/signup.jsp">Sign up</a>
 						</div>
 					</form>

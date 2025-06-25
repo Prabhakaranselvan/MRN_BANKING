@@ -46,7 +46,10 @@ function initStatementScript() {
             clientInput.placeholder = "Client ID";
             clientInput.className = "form-control";
             clientInput.style.flex = "1";
-
+			
+			clientInput.addEventListener("input", () => {
+	           clientInput.value = clientInput.value.replace(/\D/g, "").slice(0, 6);
+	       });
             clientInput.addEventListener("keydown", (e) => {
                 if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
             });
@@ -142,7 +145,6 @@ function initStatementScript() {
 			{
 				requestBody.accountNo = selectedAcc;
 			}
-            
         }
 
         if (fromDate) requestBody.fromDate = fromDate;
@@ -156,21 +158,24 @@ function initStatementScript() {
             body: JSON.stringify(requestBody)
         })
         .then(res => res.json())
-        .then(data => {
-            
-
-            if (data.Transactions && data.Transactions.length > 0) {
-				handleResponse(data);
-                displayStatement(data.Transactions);
-                paginationWrapper.style.display = "flex";
-                prevBtn.disabled = currentPage === 1;
-                nextBtn.disabled = data.Transactions.length < limit;
-            } else {
-                handleResponse(data);
-                resultBox.innerHTML = "";
-                paginationWrapper.style.display = "none";
-            }
-        })
+		.then(data => {
+		    handleResponse(data);
+		    if (data.Transactions && data.Transactions.length > 0) {
+		        displayStatement(data.Transactions);
+		        paginationWrapper.style.display = "flex";
+		        prevBtn.disabled = currentPage === 1;
+		        nextBtn.disabled = data.Transactions.length < limit;
+		    } else {
+		        resultBox.innerHTML = "No Records Found";
+		        if (currentPage === 1) {
+		            paginationWrapper.style.display = "none";
+		        } else {
+		            paginationWrapper.style.display = "flex";
+		            prevBtn.disabled = false;
+		            nextBtn.disabled = true;
+		        }
+		    }
+		})
         .catch(err => {
             console.error("Error:", err);
             handleResponse({ error: "Failed to load statement. Please try again." });

@@ -41,7 +41,7 @@
             
         } else if (responseJson.error) {
             title.textContent = "Error";
-            message.textContent = responseJson.error;
+            message.innerHTML = responseJson.error;
             dialog.classList.add("toast-error");
 
             dialog.showModal();

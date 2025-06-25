@@ -65,11 +65,10 @@ public class UserDAO
 		}
 	}
 
-	public List<User> getUsersByCategory(short category, int page, int limit) throws InvalidException
+	public List<User> getUsersByCategory(short category, int limit, int offset) throws InvalidException
 	{
 		List<User> users = new ArrayList<>();
 		String sql = "SELECT user_id, user_category, name, email, status FROM user WHERE user_category = ? LIMIT ? OFFSET ?";		
-		int offset = (page - 1) * limit;
 
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{

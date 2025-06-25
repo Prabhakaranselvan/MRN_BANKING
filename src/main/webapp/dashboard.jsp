@@ -32,7 +32,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
-<body  data-user-id="<%= userId %>" data-user-role="<%= userRole %>" data-branch-id="<%= branchId %>">
+<body  data-user-id="<%= userId %>" data-user-role="<%= userRole %>" data-branch-id="<%= branchId %>" data-user-name="<%= userName %>">
 
     <%@ include file="/includes/header.jsp" %>
 
@@ -43,15 +43,20 @@
             <span class="brand-name">MRN Bank</span>
         </div>
         <nav class="nav-links">
-            <a href="#" onclick="loadContent('dashboard-main.jsp'); return false;">
-            	<span class="material-icons">dashboard</span>
-            	<span class="link-text">Dashboard</span>
-           	</a>
+            <%
+            	if (userRole == 0 || userRole == 2 || userRole == 3) {
+			    String targetPage = (userRole == 0) ? "dashboard-main.jsp" : "dashboard-admin.jsp";
+			%>
+			<a href="#" onclick="loadContent('<%= targetPage %>'); return false;">
+			    <span class="material-icons">dashboard</span>
+			    <span class="link-text">Dashboard</span>
+			</a>
            <!--  <a href="#" onclick="loadContent('dashboard-profile.jsp'); return false;">
             	<span class="material-icons">person</span>
             	<span class="link-text">My Profile</span>
            	</a> -->
            	<%
+            	}
            		if (userRole == 1 || userRole == 2 || userRole == 3) {
 			%>
 		    <a href="#" onclick="loadContent('dashboard-clients.jsp'); return false;">
@@ -135,6 +140,9 @@
     document.addEventListener("DOMContentLoaded", function () {
     	if (userRole === 0) {
    			 loadContent("dashboard-main.jsp");
+   		}
+    	else if (userRole === 1) {
+   			loadContent("dashboard-accounts.jsp")
    		}
     	else {
     		loadContent("dashboard-admin.jsp");

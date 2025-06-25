@@ -212,6 +212,14 @@ authorization:
       - 2
       - 3
 
+#Get Latest Transactions of Branch or Bank
+  - endpoint: /accountstatement\\?.*
+    header: GET
+    method: GET
+    roles:
+      - 2
+      - 3
+
 #Do Transactions
   - endpoint: /transaction
     header: POST
@@ -230,6 +238,14 @@ authorization:
     roles:
       - 0
       - 1
+      - 2
+      - 3
+
+#Get Accounts Report
+  - endpoint: /report
+    header: GET
+    method: GET
+    roles:
       - 2
       - 3
 
