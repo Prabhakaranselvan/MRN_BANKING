@@ -73,13 +73,7 @@ public class BankingServlet extends HttpServlet
 			}
 			else
 			{
-				String headerMethod = request.getHeader("Method");
-				if (headerMethod == null)
-				{
-					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					writeJsonError(response, "Missing 'Method' header.");
-					return;
-				}
+				String headerMethod = request.getHeader("Method").toUpperCase();
 				String key = headerMethod + "|" + httpMethod;
 				RequestStrategy strategy = ModuleResolver.getStrategy(key);
 				Map<String, Object> sessionMap = getSessionAttributes(request);

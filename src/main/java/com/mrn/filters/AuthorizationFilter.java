@@ -15,7 +15,7 @@ import com.mrn.utilshub.YamlLoader;
 
 public class AuthorizationFilter implements Filter 
 {
-	private static final Pattern EXCLUDED_PATHS = Pattern.compile(".*/(login|signup|logout)$");
+	private static final Pattern EXCLUDED_PATHS = Pattern.compile("^/(login|signup|logout)$");
 	
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException 
@@ -29,6 +29,7 @@ public class AuthorizationFilter implements Filter
 		    path += "?" + query;  // Append query parameters to the path
 		}
 		if (path != null && EXCLUDED_PATHS.matcher(path).matches()) {
+			System.out.println("[AuthzFilter] " + path + " is excluded . Proceeding To Servlet.\n");
 		    chain.doFilter(request, response); // Allow login signup and logout requests
 		    return;
 		}
@@ -37,24 +38,32 @@ public class AuthorizationFilter implements Filter
 		String headerMethod = req.getHeader("Method");
 		if (headerMethod == null || headerMethod.isBlank()) 
 		{
-		    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		    res.getWriter().write("{\"error\": \"Missing required header: Method\"}");
+			writeJsonError(res, HttpServletResponse.SC_BAD_REQUEST, "Missing required header: Method");
 		    return;
 		}
 
 		short userRole = (short) req.getSession().getAttribute("userCategory");
 
 		// Authorization check using YamlLoader
+		System.out.println("[AuthzFilter] Checking access for path: " + path 
+                + ", headerMethod: " + headerMethod 
+                + ", method: " + method 
+                + ", role: " + userRole);
 		boolean authorized = YamlLoader.isAllowed(path, headerMethod, method, userRole);
 
 		if (!authorized) 
 		{
-			res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			res.getWriter().write("{\"error\":\"Access denied: Your role (" + userRole + ") is not permitted to access " + path + "\"}");
+			writeJsonError(res, HttpServletResponse.SC_FORBIDDEN, "Access denied: Your role (" + userRole + ") is not permitted to access " + path);
 			return;
 		}
 		
 		// Authorized, proceed with the request
+		System.out.println("[AuthzFilter] Proceeding to Servlet.\n");
 		chain.doFilter(request, response);
 	}
+	
+	private void writeJsonError(HttpServletResponse res, int status, String message) throws IOException {
+        res.setStatus(status);
+        res.getWriter().write("{\"error\": \"" + message + "\"}");
+    }
 }

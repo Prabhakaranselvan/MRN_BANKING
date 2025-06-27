@@ -4,11 +4,10 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.LoaderOptions;
 
 import com.mrn.config.AuthorizationConfig;
 import com.mrn.config.EndpointAuthorization;
@@ -48,16 +47,31 @@ public class YamlLoader
         {
         	return false;
     	}
+        boolean matchedRuleFound = false; 
         for (EndpointAuthorization rule : config.getAuthorization()) 
         {
+        	 
             if ( rule.getHeader().equals(headerMethod) && rule.getMethod().equals(method) && matchesPath(path, rule.getEndpoint())) 
             {
+            	matchedRuleFound = true;
+            	System.out.println("[YamlLoader] Matched Rule => " +
+            		    "Endpoint: " + rule.getEndpoint() +
+            		    ", Header: " + rule.getHeader() +
+            		    ", Method: " + rule.getMethod());
                 List<Short> roleMap = rule.getRoles();
                 if (roleMap.contains(role)) 
                 {
+                	System.out.println("[YamlLoader] Access GRANTED");
                 	return true;
                 }
+                else
+                {
+                	System.out.println("[YamlLoader] Access DENIED - Allowed Roles: " + roleMap);
+                }
             }
+        }
+        if (!matchedRuleFound) {
+            System.out.println("[YamlLoader] Access DENIED - No matching rule found");
         }
         return false;
     }
@@ -65,16 +79,8 @@ public class YamlLoader
     private static boolean matchesPath(String path, String rulePath) 
     {
     	Pattern pattern = Pattern.compile(rulePath);
+    	System.out.println("[DEBUG] Compiled regex: " + pattern.pattern());
     	Matcher matcher = pattern.matcher(path);
     	return matcher.matches();
     }
-    
-    public static List<String> loadEndpoints() 
-    {
-        return config.getAuthorization().stream()
-                .map(EndpointAuthorization::getEndpoint)
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
 }
