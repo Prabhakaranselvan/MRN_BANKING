@@ -15,7 +15,7 @@ public class ClientAccessPolicy implements AccessPolicy
 	public void validateGetAccess(AccessContext ctx) throws InvalidException
 	{
 		Object resource = ctx.getTargetResource();
-		long sessionUserId = ctx.getSessionUserId();
+		Long sessionUserId = ctx.getSessionUserId();
 
 		if (resource instanceof Client) // GET|POST /client
 		{
@@ -59,7 +59,7 @@ public class ClientAccessPolicy implements AccessPolicy
 	public void validatePostAccess(AccessContext ctx) throws InvalidException
 	{
 		Object resource = ctx.getTargetResource();
-		long sessionUserId = ctx.getSessionUserId();
+		Long sessionUserId = ctx.getSessionUserId();
 		
 		if (resource instanceof Transaction) // POST|POST /transaction
 		{
@@ -80,7 +80,7 @@ public class ClientAccessPolicy implements AccessPolicy
 	public void validatePutAccess(AccessContext ctx) throws InvalidException
 	{
 		Object resource = ctx.getTargetResource();
-		long sessionUserId = ctx.getSessionUserId();
+		Long sessionUserId = ctx.getSessionUserId();
 
 		if (resource instanceof Client) // PUT|POST /client
 		{

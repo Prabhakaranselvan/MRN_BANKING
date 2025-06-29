@@ -7,7 +7,6 @@ import com.mrn.accesscontrol.AccessValidator;
 import com.mrn.dao.EmployeeDAO;
 import com.mrn.dao.UserDAO;
 import com.mrn.enums.Status;
-import com.mrn.enums.UserCategory;
 import com.mrn.exception.InvalidException;
 import com.mrn.pojos.Employee;
 import com.mrn.strategies.UpdateStrategy;
@@ -23,43 +22,42 @@ public class EmployeeHandler
 
 	// GET|GET /employee(?:\\?.*)?
 	// Roles: Manager (2), GM (3)
-	public Map<String, Object> handleGet(Map<String, String> queryParams, Map<String, Object> session) throws InvalidException {
-	    return TransactionExecutor.execute(() -> {
-	        Long sessionBranchId = (Long) session.get("branchId");
-	        Short sessionRole = (Short) session.get("userCategory");
+	public Map<String, Object> handleGet(Map<String, String> queryParams, Map<String, Object> session) throws InvalidException
+	{
+		return TransactionExecutor.execute(() ->
+		{
+			Long sessionBranchId = (Long) session.get("branchId");
+			Short sessionRole = (Short) session.get("userCategory");
 
-	        // Parse filters
-	        String roleParam = queryParams.get("role");
-	        String branchIdParam = queryParams.get("branchId");
-	        String pageParam = queryParams.get("page");
-	        String limitParam = queryParams.get("limit");
+			// Validation
+			Utility.checkError(Validator.checkEmployeeFilterParams(queryParams));
 
-	        Short filterRole = (roleParam != null) ? (short) UserCategory.valueOf(roleParam).getValue() : null;
-	        Long filterBranchId = (branchIdParam != null) ? Long.parseLong(branchIdParam) : null;
+			// Safe parsing after validation
+			Short filterRole = queryParams.containsKey("role") ? Short.parseShort(queryParams.get("role")) : null;
+			Long filterBranchId = queryParams.containsKey("branchId") ? Long.parseLong(queryParams.get("branchId")) : null;
+			int pageNo = Integer.parseInt(queryParams.getOrDefault("page", "1"));
+			int limit = Integer.parseInt(queryParams.getOrDefault("limit", "10"));
+			int offset = (pageNo - 1) * limit;
 
-	        // Pagination
-	        int pageNo = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
-	        int limit = (limitParam != null) ? Integer.parseInt(limitParam) : 10;
-	        int offset = (pageNo - 1) * limit;
+			// Access Restriction
+			Short effectiveRole = (sessionRole == 2) ? (short) 1 : filterRole;
+			Long effectiveBranchId = (sessionRole == 2) ? sessionBranchId : filterBranchId;
 
-	        // Branch access restriction
-	        Short effectiveRole = (sessionRole == 2) ? Short.valueOf((short) 1) : filterRole;  // Manager = only Employees
-	        Long effectiveBranchId = (sessionRole == 2) ? sessionBranchId : filterBranchId; // Manager = only own branch
+			List<Employee> employees = employeeDAO.getAllEmployeesFiltered(effectiveRole, effectiveBranchId, limit, offset);
 
-	        List<Employee> employees = employeeDAO.getAllEmployeesFiltered(effectiveRole, effectiveBranchId, limit, offset);
-
-	        return Utility.createResponse("Employee list fetched successfully", "employees", employees);
-	    });
+			return Utility.createResponse("Employee list fetched successfully", "employees", employees);
+		});
 	}
 
 
-	// GET|POST /employee 
+	// GET|POST /employee
 	// 1,2,3
 	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException
 	{
 		return TransactionExecutor.execute(() ->
 		{
-			Employee employee = (Employee) pojoInstance;;
+			Employee employee = (Employee) pojoInstance;
+			Utility.checkError(Validator.checkUserId(employee.getUserId()));
 			employeeDAO.getEmployeeById(employee);
 			AccessValidator.validateGet(pojoInstance, session);
 			return Utility.createResponse("Employee Detail Fetched Successfully", "Employee", employee);
@@ -77,13 +75,12 @@ public class EmployeeHandler
 			AccessValidator.validatePost(pojoInstance, session);
 
 			employee.setPassword(Utility.hashPassword(employee.getPassword()));
-			employee.setStatus((short) Status.ACTIVE.getValue());
-			employee.setModifiedBy((long) session.get("userId"));
+			employee.setStatus(Status.ACTIVE.getValue());
+			employee.setModifiedBy((Long) session.get("userId"));
 
-			long userId = userDAO.addUser(employee);
-			employee.setUserId(userId);
+			employee.setUserId(userDAO.addUser(employee));
 			employeeDAO.addEmployee(employee);
-			return Utility.createResponse("Employee Added Successfully", "userId", userId);
+			return Utility.createResponse("Employee Added Successfully");
 		});
 	}
 
@@ -94,14 +91,15 @@ public class EmployeeHandler
 		return TransactionExecutor.execute(() ->
 		{
 			Employee updatedEmp = (Employee) pojoInstance;
-			long targetUserId = updatedEmp.getUserId();
+			Long targetUserId = updatedEmp.getUserId();
+			Utility.checkError(Validator.checkUserId(targetUserId));
 			short targetRole = userDAO.getUserCategoryById(targetUserId);
 			long targetBranchId = employeeDAO.getBranchIdByEmployeeId(targetUserId);
 			updatedEmp.setUserCategory(targetRole);
 			updatedEmp.setBranchId(targetBranchId);
 			AccessValidator.validatePut(updatedEmp, session);
-			short sessionRole = (short) session.get("userCategory");
-			
+			Short sessionRole = (Short) session.get("userCategory");
+
 			UpdateStrategy strategy = EmployeeUpdateStrategyFactory.getStrategy(sessionRole, targetRole);
 			strategy.update(updatedEmp, session);
 			return Utility.createResponse("Employee updated Successfully");

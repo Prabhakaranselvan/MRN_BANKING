@@ -26,18 +26,18 @@ public class AccessContext
 		return targetResource;
 	}
 
-	public long getSessionUserId()
+	public Long getSessionUserId()
 	{
-		return (long) session.get("userId");
+		return (Long) session.get("userId");
 	}
 
 	public UserCategory getSessionRole() throws InvalidException
 	{
-		return UserCategory.fromValue((short) session.get("userCategory"));
+		return UserCategory.fromValue((Short) session.get("userCategory"));
 	}
 
-	public long getSessionBranchId()
+	public Long getSessionBranchId()
 	{
-		return session.containsKey("branchId") ? (long) session.get("branchId") : -1;
+		return (Long) session.getOrDefault("branchId", null);
 	}
 }

@@ -192,5 +192,21 @@ public class BranchDAO
 			throw new InvalidException("Error updating branch details", e);
 		}
 	}
+	
+	public boolean exists(Long branchId) throws InvalidException 
+	{
+		String sql = "SELECT 1 FROM branch WHERE branch_id = ?";
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql)) 
+		{
+			pstmt.setLong(1, branchId);
+			try (ResultSet rs = pstmt.executeQuery()) 
+			{
+				return rs.next();
+			}
+		} catch (SQLException e) {
+			throw new InvalidException("Error validating branch existence", e);
+		}
+	}
+
 
 }

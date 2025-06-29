@@ -15,8 +15,8 @@ public class EmployeeAccessPolicy implements AccessPolicy
 	public void validateGetAccess(AccessContext ctx) throws InvalidException
 	{
 		Object resource = ctx.getTargetResource();
-		long sessionUserId = ctx.getSessionUserId();
-		long sessionBranchId = ctx.getSessionBranchId();
+		Long sessionUserId = ctx.getSessionUserId();
+		Long sessionBranchId = ctx.getSessionBranchId();
 
 		if (resource instanceof Employee) // GET|POST /employee
 		{
@@ -52,7 +52,7 @@ public class EmployeeAccessPolicy implements AccessPolicy
 	public void validatePostAccess(AccessContext ctx) throws InvalidException
 	{
 		Object resource = ctx.getTargetResource();
-		long sessionBranchId = ctx.getSessionBranchId();
+		Long sessionBranchId = ctx.getSessionBranchId();
 		
 		if (resource instanceof Accounts)
 		{
@@ -80,8 +80,8 @@ public class EmployeeAccessPolicy implements AccessPolicy
 	public void validatePutAccess(AccessContext ctx) throws InvalidException
 	{
 		Object resource = ctx.getTargetResource();
-		long sessionUserId = ctx.getSessionUserId();
-		long sessionBranchId = ctx.getSessionBranchId();
+		Long sessionUserId = ctx.getSessionUserId();
+		Long sessionBranchId = ctx.getSessionBranchId();
 		
 		if (resource instanceof Employee) // PUT|POST /client
 		{

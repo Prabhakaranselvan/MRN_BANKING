@@ -14,7 +14,7 @@ function initEmployeesScript() {
   if (isGM) {
       fetchBranches();
   } else {
-	  roleFilter.innerHTML = '<option value="EMPLOYEE">Employee</option>';
+	  roleFilter.innerHTML = '<option value="1">Employee</option>';
       roleFilter.disabled = true;
   	  fetchBranch();
   }

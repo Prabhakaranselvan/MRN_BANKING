@@ -9,9 +9,9 @@
         <div id="filterControls" class="filters">
           <select id="roleFilter">
             <option value="">All Roles</option>
-            <option value="EMPLOYEE">Employee</option>
-            <option value="MANAGER">Manager</option>
-            <option value="GENERAL_MANAGER">General Manager</option>
+            <option value="1">Employee</option>
+            <option value="2">Manager</option>
+            <option value="3">General Manager</option>
           </select>
           <select id="branchFilter">
             <option value="">All Branches</option>

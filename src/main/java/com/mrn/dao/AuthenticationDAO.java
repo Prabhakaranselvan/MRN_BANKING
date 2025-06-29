@@ -97,5 +97,4 @@ public class AuthenticationDAO
 	        throw new InvalidException("Error occurred while fetching branchID", e);
 	    }
 	}
-
 }

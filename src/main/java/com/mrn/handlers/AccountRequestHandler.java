@@ -9,6 +9,7 @@ import com.mrn.exception.InvalidException;
 import com.mrn.pojos.AccountRequest;
 import com.mrn.utilshub.TransactionExecutor;
 import com.mrn.utilshub.Utility;
+import com.mrn.utilshub.Validator;
 
 public class AccountRequestHandler
 {
@@ -17,33 +18,28 @@ public class AccountRequestHandler
 	// GET|GET /account-requests(?:\\?.*)?
 	// Roles: 2, 3
 	public Map<String, Object> handleGet(Map<String, String> queryParams, Map<String, Object> session)
-			throws InvalidException
+	        throws InvalidException
 	{
-		return TransactionExecutor.execute(() ->
-		{
-			Long sessionBranchId = (Long) session.get("branchId");
-			Short sessionRole = (Short) session.get("userCategory");
+	    return TransactionExecutor.execute(() ->
+	    {
+	        Long sessionBranchId = (Long) session.get("branchId");
+	        Short sessionRole = (Short) session.get("userCategory");
 
-			// Parse filters
-			String statusParam = queryParams.get("status"); // expects values like PENDING, APPROVED, REJECTED
-			String branchIdParam = queryParams.get("branchId");
-			String pageParam = queryParams.get("page");
-			String limitParam = queryParams.get("limit");
+	        // Validate and parse query parameters
+	        Utility.checkError(Validator.checkAccountRequestFilterParams(queryParams));
 
-		
-		    Short filterStatus = (statusParam != null) ? (short) RequestStatus.valueOf(statusParam).getValue() : null;
-			Long filterBranchId = (branchIdParam != null) ? Long.parseLong(branchIdParam) : null;
+	        // Safely parse after validation
+	        Short filterStatus = queryParams.containsKey("status") ? Short.parseShort(queryParams.get("status")) : null;
+	        Long filterBranchId = queryParams.containsKey("branchId") ? Long.parseLong(queryParams.get("branchId")) : null;
+	        int pageNo = Integer.parseInt(queryParams.getOrDefault("page", "1"));
+	        int limit = Integer.parseInt(queryParams.getOrDefault("limit", "10"));
+	        int offset = (pageNo - 1) * limit;
 
-			int pageNo = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
-			int limit = (limitParam != null) ? Integer.parseInt(limitParam) : 10;
-			int offset = (pageNo - 1) * limit;
+	        Long effectiveBranchId = (sessionRole == 3) ? filterBranchId : sessionBranchId;
 
-			Long effectiveBranchId = (sessionRole == 3) ? filterBranchId : sessionBranchId;
-
-			List<AccountRequest> requests = requestDAO.getAllAccountRequestsFiltered(filterStatus,
-					effectiveBranchId, limit, offset);
-			return Utility.createResponse("Account Requests Fetched Successfully", "AccountRequests", requests);
-		});
+	        List<AccountRequest> requests = requestDAO.getAllAccountRequestsFiltered(filterStatus, effectiveBranchId, limit, offset);
+	        return Utility.createResponse("Account Requests Fetched Successfully", "AccountRequests", requests);
+	    });
 	}
 
 	// POST|POST /accountrequest
@@ -53,10 +49,10 @@ public class AccountRequestHandler
 		return TransactionExecutor.execute(() ->
 		{
 			AccountRequest accountRequest = (AccountRequest) pojoInstance;
-			long userId = (long) session.get("userId");
-
+			Utility.checkError(Validator.checkAccountRequest(accountRequest));
+			Long userId = (Long) session.get("userId");
 			accountRequest.setClientId(userId);
-			accountRequest.setStatus((short) RequestStatus.PENDING.getValue());
+			accountRequest.setStatus(RequestStatus.PENDING.getValue());
 			accountRequest.setModifiedBy(userId);
 
 			requestDAO.addAccountRequest(accountRequest);

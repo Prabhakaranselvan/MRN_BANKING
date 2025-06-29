@@ -27,10 +27,8 @@ public class LoginHandler
 			String email = credentials.getEmail();
 			String phoneNo = credentials.getPhoneNo();
 			String password = credentials.getPassword();
-
-			
 			String storedPassword = auth.getPasswordByEmailOrPhone(email, phoneNo);
-
+			
 			Utility.validatePassword(password, storedPassword);
 
 			User user = auth.getUserByEmailOrPhone(email, phoneNo);
@@ -39,8 +37,8 @@ public class LoginHandler
 				throw new InvalidException("User profile is not active");
 			}
 
-			long userId = user.getUserId();
-			short userCategory = user.getUserCategory();
+			Long userId = user.getUserId();
+			Short userCategory = user.getUserCategory();
 
 			Map<String, Object> responseMap = new HashMap<>();
 			responseMap.put("message", "Login successful");
@@ -52,7 +50,7 @@ public class LoginHandler
 			UserCategory category = UserCategory.fromValue(userCategory);
 			if (category == UserCategory.EMPLOYEE || category == UserCategory.MANAGER)
 			{
-				long branchId = auth.getBranchID(userId);
+				Long branchId = auth.getBranchID(userId);
 				responseMap.put("branchId", branchId);
 			}
 			return responseMap;

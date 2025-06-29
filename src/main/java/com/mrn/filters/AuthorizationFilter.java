@@ -28,11 +28,6 @@ public class AuthorizationFilter implements Filter
 		if (query != null) {
 		    path += "?" + query;  // Append query parameters to the path
 		}
-		if (path != null && EXCLUDED_PATHS.matcher(path).matches()) {
-			System.out.println("[AuthzFilter] " + path + " is excluded . Proceeding To Servlet.\n");
-		    chain.doFilter(request, response); // Allow login signup and logout requests
-		    return;
-		}
 		
 		String method = req.getMethod();
 		String headerMethod = req.getHeader("Method");
@@ -41,6 +36,13 @@ public class AuthorizationFilter implements Filter
 			writeJsonError(res, HttpServletResponse.SC_BAD_REQUEST, "Missing required header: Method");
 		    return;
 		}
+		
+		if (path != null && EXCLUDED_PATHS.matcher(path).matches()) {
+			System.out.println("[AuthzFilter] " + path + " is excluded . Proceeding To Servlet.\n");
+		    chain.doFilter(request, response); // Allow login signup and logout requests
+		    return;
+		}
+		
 
 		short userRole = (short) req.getSession().getAttribute("userCategory");
 

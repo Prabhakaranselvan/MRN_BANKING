@@ -11,6 +11,7 @@ import com.mrn.pojos.AccountRequest;
 import com.mrn.pojos.Accounts;
 import com.mrn.utilshub.TransactionExecutor;
 import com.mrn.utilshub.Utility;
+import com.mrn.utilshub.Validator;
 
 public class AccountApprovalHandler
 {
@@ -24,8 +25,9 @@ public class AccountApprovalHandler
 		return TransactionExecutor.execute(() ->
 		{
 			AccountRequest requestReview = (AccountRequest) pojoInstance;
-
-			long requestId = requestReview.getRequestId();
+			Utility.checkError(Validator.checkAccountApproval(requestReview));
+			
+			Long requestId = requestReview.getRequestId();
 			Accounts accountRequest = requestDAO.getRequestAsAccount(requestId);
 			requestReview.setBranchId(accountRequest.getBranchId());
 			AccessValidator.validatePost(requestReview, session);
@@ -36,7 +38,7 @@ public class AccountApprovalHandler
 				throw new InvalidException("Request ID " + requestId + " has already been processed.");
 			}
 
-			long approverId = (long) session.get("userId");
+			Long approverId = (Long) session.get("userId");
 			short reviewStatusValue = requestReview.getStatus();
 			RequestStatus reviewStatus = RequestStatus.fromValue(reviewStatusValue);
 
@@ -44,7 +46,7 @@ public class AccountApprovalHandler
 
 			if (reviewStatus == RequestStatus.APPROVED)
 			{
-				accountRequest.setStatus((short) Status.ACTIVE.getValue());
+				accountRequest.setStatus(Status.ACTIVE.getValue());
 				accountRequest.setModifiedBy(approverId);
 				accountsDAO.addAccount(accountRequest);
 				return Utility.createResponse("Account approved and created successfully.");

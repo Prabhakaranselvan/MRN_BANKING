@@ -8,10 +8,10 @@
       <div class="account-requests-header-actions">
         <div id="filterControls" class="filters">
           <select id="statusFilter">
-            <option value="">All Statuses</option>
-            <option value="PENDING">Pending</option>
-            <option value="APPROVED">Approved</option>
-            <option value="REJECTED">Rejected</option>
+            <option value="">All Status</option>
+            <option value="0">Pending</option>
+            <option value="1">Approved</option>
+            <option value="2">Rejected</option>
           </select>
           <select id="branchFilter">
             <option value="">All Branches</option>

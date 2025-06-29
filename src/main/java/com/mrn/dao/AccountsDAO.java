@@ -8,6 +8,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mrn.enums.Status;
 import com.mrn.exception.InvalidException;
 import com.mrn.pojos.AccountDetails;
 import com.mrn.pojos.Accounts;
@@ -83,7 +84,7 @@ public class AccountsDAO
 			}
 			else
 			{
-				throw new InvalidException("Account not found.");
+				throw new InvalidException("Account not found for Account No: " + accNo);
 			}
 		}
 		catch (SQLException e)
@@ -92,25 +93,61 @@ public class AccountsDAO
 		}
 	}
 
-	public BigDecimal getBalanceWithLock(long accNo) throws InvalidException
+	public Short getAccountStatus(Long accountNo) throws InvalidException
 	{
-		String sql = "SELECT balance FROM accounts WHERE account_no = ? FOR UPDATE";
+		String sql = "SELECT status FROM accounts WHERE account_no = ?";
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{
-			pstmt.setLong(1, accNo);
-			ResultSet rs = pstmt.executeQuery();
-			if (rs.next())
+			pstmt.setLong(1, accountNo);
+			try (ResultSet rs = pstmt.executeQuery())
 			{
-				return rs.getBigDecimal("balance");
-			}
-			else
-			{
-				throw new InvalidException("Account not found for balance check.");
+				if (rs.next())
+				{
+					return rs.getShort("status");
+				}
+				else
+				{
+					throw new InvalidException("Account not found for Account No: " + accountNo);
+				}
 			}
 		}
 		catch (SQLException e)
 		{
-			throw new InvalidException("Error occurred while getting Balance.", e);
+			throw new InvalidException("Error checking account status", e);
+		}
+	}
+
+	public BigDecimal getAccountBalance(long accNo) throws InvalidException
+	{
+		return fetchBalance(accNo, false);
+	}
+
+	public BigDecimal getBalanceWithLock(long accNo) throws InvalidException
+	{
+		return fetchBalance(accNo, true);
+	}
+
+	private BigDecimal fetchBalance(long accNo, boolean forUpdate) throws InvalidException
+	{
+		String sql = "SELECT balance FROM accounts WHERE account_no = ?" + (forUpdate ? " FOR UPDATE" : "");
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
+		{
+			pstmt.setLong(1, accNo);
+			try (ResultSet rs = pstmt.executeQuery())
+			{
+				if (rs.next())
+				{
+					return rs.getBigDecimal("balance");
+				}
+				else
+				{
+					throw new InvalidException("Account not found for balance check.");
+				}
+			}
+		}
+		catch (SQLException e)
+		{
+			throw new InvalidException("Error occurred while fetching balance.", e);
 		}
 	}
 
@@ -133,7 +170,7 @@ public class AccountsDAO
 		}
 	}
 
-	public boolean doesAccountExist(long peerAccNo) throws InvalidException 
+	public boolean doesAccountExist(long peerAccNo) throws InvalidException
 	{
 		String sql = "SELECT 1 FROM accounts WHERE account_no = ?";
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
@@ -147,13 +184,14 @@ public class AccountsDAO
 			throw new InvalidException("Error occurred while checking account Existence.", e);
 		}
 	}
-	
-	public List<Accounts> getAllAccountsFiltered(Short type, Long branchId, int limit, int offset) throws InvalidException
+
+	public List<Accounts> getAllAccountsFiltered(Short type, Long branchId, int limit, int offset)
+			throws InvalidException
 	{
 		List<Accounts> accounts = new ArrayList<>();
-		StringBuilder sql = new StringBuilder("SELECT account_no, branch_id, client_id, account_type, status, balance "
-				+ "FROM accounts WHERE 1=1");
-		
+		StringBuilder sql = new StringBuilder(
+				"SELECT account_no, branch_id, client_id, account_type, status, balance " + "FROM accounts WHERE 1=1");
+
 		List<Object> params = new ArrayList<>();
 
 		if (branchId != null)
@@ -213,52 +251,66 @@ public class AccountsDAO
 		return accounts;
 	}
 
-	public AccountDetails getAccountByAccountNo(long accountNo) throws InvalidException {
-	    String sql = "SELECT a.account_no, a.branch_id, a.client_id, a.account_type, a.status, a.balance, " +
-	                 "a.created_time, b.branch_name, b.ifsc_code " +
-	                 "FROM accounts a " +
-	                 "JOIN branch b ON a.branch_id = b.branch_id " +
-	                 "WHERE a.account_no = ?";
+	public AccountDetails getAccountByAccountNo(long accountNo) throws InvalidException
+	{
+		String sql = "SELECT a.account_no, a.branch_id, a.client_id, a.account_type, a.status, a.balance, "
+				+ "a.created_time, b.branch_name, b.ifsc_code " + "FROM accounts a "
+				+ "JOIN branch b ON a.branch_id = b.branch_id " + "WHERE a.account_no = ?";
 
-	    try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql)) {
-	        pstmt.setLong(1, accountNo);
-	        try (ResultSet rs = pstmt.executeQuery()) {
-	            if (rs.next()) {
-	                // Populate Accounts object
-	                Accounts account = new Accounts();
-	                account.setAccountNo(rs.getLong("account_no"));
-	                account.setBranchId(rs.getLong("branch_id"));
-	                account.setClientId(rs.getLong("client_id"));
-	                account.setAccountType(rs.getShort("account_type"));
-	                account.setStatus(rs.getShort("status"));
-	                account.setBalance(rs.getBigDecimal("balance"));
-	                account.setCreatedTime(rs.getLong("created_time")); // assumed in Accounts
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
+		{
+			pstmt.setLong(1, accountNo);
+			try (ResultSet rs = pstmt.executeQuery())
+			{
+				if (rs.next())
+				{
+					short status = rs.getShort("status");
 
-	                // Populate wrapper DTO
-	                AccountDetails details = new AccountDetails();
-	                details.setAccount(account);
-	                details.setBranchName(rs.getString("branch_name"));
-	                details.setIfscCode(rs.getString("ifsc_code"));
+					// Check if the account is closed
+					if (status == Status.CLOSED.getValue())
+					{
+						throw new InvalidException("The account is closed and cannot be accessed: " + accountNo);
+					}
+					// Populate Accounts object
+					Accounts account = new Accounts();
+					account.setAccountNo(rs.getLong("account_no"));
+					account.setBranchId(rs.getLong("branch_id"));
+					account.setClientId(rs.getLong("client_id"));
+					account.setAccountType(rs.getShort("account_type"));
+					account.setStatus(status);
+					account.setBalance(rs.getBigDecimal("balance"));
+					account.setCreatedTime(rs.getLong("created_time")); // assumed in Accounts
 
-	                return details;
-	            } else {
-	                throw new InvalidException("Account not found for the Account No: " + accountNo);
-	            }
-	        }
-	    } catch (SQLException e) {
-	        throw new InvalidException("Error fetching account by account number", e);
-	    }
+					// Populate wrapper DTO
+					AccountDetails details = new AccountDetails();
+					details.setAccount(account);
+					details.setBranchName(rs.getString("branch_name"));
+					details.setIfscCode(rs.getString("ifsc_code"));
+
+					return details;
+				}
+				else
+				{
+					throw new InvalidException("Account not found for the Account No: " + accountNo);
+				}
+			}
+		}
+		catch (SQLException e)
+		{
+			throw new InvalidException("Error fetching account by account number", e);
+		}
 	}
-
 
 	public List<Accounts> getAccountsByClientId(long clientId) throws InvalidException
 	{
 		List<Accounts> accounts = new ArrayList<>();
-		String sql = "SELECT account_no, branch_id, client_id, account_type, status, balance FROM accounts WHERE client_id = ?";
+		String sql = "SELECT account_no, branch_id, client_id, account_type, status, balance FROM accounts "
+				+ "WHERE client_id = ? AND status != ?";
 
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{
 			pstmt.setLong(1, clientId);
+			pstmt.setShort(2, Status.CLOSED.getValue());
 			try (ResultSet rs = pstmt.executeQuery())
 			{
 				while (rs.next())
@@ -337,6 +389,5 @@ public class AccountsDAO
 
 		return accountNumbers;
 	}
-
 
 }

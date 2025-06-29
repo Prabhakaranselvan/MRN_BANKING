@@ -45,7 +45,7 @@ public class ClientDAO
 				+ "ON u.user_id = c.client_id WHERE u.user_id = ?";
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{
-			long userId =  client.getUserId();
+			long userId = client.getUserId();
 			pstmt.setLong(1, userId);
 
 			try (ResultSet rs = pstmt.executeQuery())
@@ -63,7 +63,7 @@ public class ClientDAO
 					client.setModifiedTime(rs.getLong("modified_time"));
 					long modifiedByValue = rs.getLong("modified_by");
 					client.setModifiedBy(rs.wasNull() ? null : modifiedByValue);
-					
+
 					// From client table
 					client.setDob(rs.getDate("date_of_birth").toString()); // or format it if needed
 					client.setAadhar(rs.getString("aadhar"));
@@ -133,7 +133,7 @@ public class ClientDAO
 			throw new InvalidException("Error updating client details by employee", e);
 		}
 	}
-	
+
 	private InvalidException handleConstraintViolation(SQLIntegrityConstraintViolationException e)
 	{
 		String message = e.getMessage();
@@ -153,6 +153,23 @@ public class ClientDAO
 		else
 		{
 			return new InvalidException("constraint violation occured", e);
+		}
+	}
+
+	public boolean exists(Long clientId) throws InvalidException
+	{
+		String sql = "SELECT 1 FROM client WHERE client_id = ?";
+		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
+		{
+			pstmt.setLong(1, clientId);
+			try (ResultSet rs = pstmt.executeQuery())
+			{
+				return rs.next();
+			}
+		}
+		catch (SQLException e)
+		{
+			throw new InvalidException("Error validating client existence", e);
 		}
 	}
 

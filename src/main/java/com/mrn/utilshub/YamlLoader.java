@@ -79,7 +79,6 @@ public class YamlLoader
     private static boolean matchesPath(String path, String rulePath) 
     {
     	Pattern pattern = Pattern.compile(rulePath);
-    	System.out.println("[DEBUG] Compiled regex: " + pattern.pattern());
     	Matcher matcher = pattern.matcher(path);
     	return matcher.matches();
     }

@@ -32,7 +32,9 @@ public class BranchHandler
 		return TransactionExecutor.execute(() ->
 		{
 			Branch inputBranch = (Branch) pojoInstance;
-			Branch branch = branchDAO.getBranchById(inputBranch.getBranchId());
+			Long branchId = inputBranch.getBranchId();
+			Utility.checkError(Validator.checkBranchId(branchId));
+			Branch branch = branchDAO.getBranchById(branchId);
 			return Utility.createResponse("Branch Details Fetched Successfully", "branch", branch);
 		});
 	}
@@ -45,7 +47,7 @@ public class BranchHandler
 		{
 			Branch branch = (Branch) pojoInstance;
 			Utility.checkError(Validator.checkBranch(branch));
-			branch.setModifiedBy( (long) session.get("userId"));
+			branch.setModifiedBy( (Long) session.get("userId"));
 
 			long nextId = branchDAO.getNextBranchId();
 			String ifsc = String.format("MRNB0%06d", nextId); // Format like MRNB000001
@@ -63,10 +65,9 @@ public class BranchHandler
 		return TransactionExecutor.execute(() ->
 		{
 			Branch updatedBranch = (Branch) pojoInstance;
-			Utility.checkError(Validator.checkBranch(updatedBranch));
+			Utility.checkError(Validator.checkBranchUpdate(updatedBranch));
 			
-			long sessionUserId = (long) session.get("userId");
-			updatedBranch.setModifiedBy(sessionUserId);
+			updatedBranch.setModifiedBy((Long) session.get("userId"));
 
 			branchDAO.updateBranchDetails(updatedBranch);
 			return Utility.createResponse("Branch updated Successfully");

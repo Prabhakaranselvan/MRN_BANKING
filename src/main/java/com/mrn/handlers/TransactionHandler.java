@@ -24,57 +24,65 @@ public class TransactionHandler
 	private final UserDAO userDAO = new UserDAO();
 	private final AccountsDAO accountsDAO = new AccountsDAO();
 	private final TransactionDAO txnDAO = new TransactionDAO();
-	
-	public Map<String, Object> handleGet(Map<String, String> queryParams, Map<String, Object> session) throws InvalidException {
-	    return TransactionExecutor.execute(() -> {
-	        Short sessionRole = (Short) session.get("userCategory");
-	        Long sessionBranchId = (Long) session.get("branchId");
-	        
-	        String branchIdParam = queryParams.get("branchId");
-	        String pageParam = queryParams.get("page");
-	        String limitParam = queryParams.get("limit");
 
-	        Long filterBranchId = (branchIdParam != null) ? Long.parseLong(branchIdParam) : null;
+	public Map<String, Object> handleGet(Map<String, String> queryParams, Map<String, Object> session)
+			throws InvalidException
+	{
+		return TransactionExecutor.execute(() ->
+		{
+			Short sessionRole = (Short) session.get("userCategory");
+			Long sessionBranchId = (Long) session.get("branchId");
 
-	        // Pagination
-	        int page = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
-	        int limit = (limitParam != null) ? Integer.parseInt(limitParam) : 10;
-	        int offset = (page - 1) * limit;
-	        
-	        Long effectiveBranchId = (sessionRole == 3) ? filterBranchId : sessionBranchId ;
+			// Validate query parameters
+			Utility.checkError(Validator.checkStatementFilterParams(queryParams));
 
-	        List<Transaction> transactions = txnDAO.getLatestTransactions(effectiveBranchId, limit, offset);
+			// Parse safely after validation
+			Long filterBranchId = queryParams.containsKey("branchId") ? Long.parseLong(queryParams.get("branchId"))
+					: null;
+			int pageNo = Integer.parseInt(queryParams.getOrDefault("page", "1"));
+			int limit = Integer.parseInt(queryParams.getOrDefault("limit", "10"));
+			int offset = (pageNo - 1) * limit;
 
-	        return Utility.createResponse("Latest transactions fetched successfully", "Transactions", transactions);
-	    });
+			Long effectiveBranchId = (sessionRole == 3) ? filterBranchId : sessionBranchId;
+
+			List<Transaction> transactions = txnDAO.getLatestTransactions(effectiveBranchId, limit, offset);
+
+			return Utility.createResponse("Latest transactions fetched successfully", "Transactions", transactions);
+		});
 	}
 
+	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException
+	{
+		return TransactionExecutor.execute(() ->
+		{
+			AccountStatement input = (AccountStatement) pojoInstance;
 
-	public Map<String, Object> handleGet(Object pojoInstance, Map<String, Object> session) throws InvalidException {
-	    return TransactionExecutor.execute(() -> {
-	        AccountStatement input = (AccountStatement) pojoInstance;
+			Long accountNo = input.getAccountNo();
+			Long clientId = input.getClientId();
 
-	        Long accountNo = input.getAccountNo();
-	        Long clientId = input.getClientId();
+			// Enforce mutual exclusivity: Only one of them must be provided
+			if ((accountNo == null && clientId == null) || (accountNo != null && clientId != null))
+			{
+				throw new InvalidException("Provide either Account Number or Client ID, but not both.");
+			}
 
-	        if (clientId == null) {
-	            if (accountNo == null) {
-	                throw new InvalidException("Either Client ID or Account Number must be provided.");
-	            }
-	            clientId = accountsDAO.getClientIdFromAccount(accountNo);
-	            input.setClientId(clientId);
-	        }
-	        
-	        AccessValidator.validateGet(pojoInstance, session);
-			
-	        boolean hasDateRange = input.getFromDate() != null && input.getToDate() != null;
+			// If only accountNo is provided, derive clientId
+			if (clientId == null)
+			{
+				clientId = accountsDAO.getClientIdFromAccount(accountNo);
+				input.setClientId(clientId);
+			}
 
-	        List<Transaction> txnList = (accountNo != null)
-	            ? txnDAO.getTransactionsByAccount(input, hasDateRange)
-	            : txnDAO.getTransactionsByClientId(input, hasDateRange);
+			AccessValidator.validateGet(pojoInstance, session);
 
-	        return Utility.createResponse("Transaction list fetched successfully", "Transactions", txnList);
-	    });
+			boolean hasDateRange = input.getFromDate() != null && input.getToDate() != null;
+
+			List<Transaction> txnList = (accountNo != null) 
+					? txnDAO.getTransactionsByAccount(input, hasDateRange)
+					: txnDAO.getTransactionsByClientId(input, hasDateRange);
+
+			return Utility.createResponse("Transaction list fetched successfully", "Transactions", txnList);
+		});
 	}
 
 	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException
@@ -83,7 +91,7 @@ public class TransactionHandler
 		{
 			Transaction txn = (Transaction) pojoInstance;
 			Utility.checkError(Validator.checkTransaction(txn));
-			long sessionUserId = (long) session.get("userId");
+			Long sessionUserId = (Long) session.get("userId");
 
 			validateAndPrepareTransaction(txn, sessionUserId, session);
 
@@ -113,7 +121,7 @@ public class TransactionHandler
 		txn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
 		txn.setDoneBy(userId);
 	}
-	
+
 	private long generateTxnRefNo()
 	{
 		long timestamp = System.currentTimeMillis();
@@ -121,14 +129,13 @@ public class TransactionHandler
 		return Long.parseLong(timestamp + "" + randomSuffix);
 	}
 
-
 	private void processSimpleTransaction(Transaction txn, long userId) throws InvalidException
 	{
 		BigDecimal currentBalance = accountsDAO.getBalanceWithLock(txn.getAccountNo());
 		BigDecimal txnAmount = txn.getAmount();
 		TxnType txnType = TxnType.fromValue(txn.getTxnType());
 		boolean isAmountDeduction = txnType == TxnType.WITHDRAWAL || txnType == TxnType.DEBIT;
-		
+
 		if (isAmountDeduction && currentBalance.compareTo(txnAmount) < 0)
 		{
 			throw new InvalidException("Insufficient balance for this transaction.");
@@ -171,7 +178,7 @@ public class TransactionHandler
 
 	private Map<Long, BigDecimal> lockAccountsInOrder(long acc1, long acc2) throws InvalidException
 	{
-		if(acc1==acc2)
+		if (acc1 == acc2)
 		{
 			throw new InvalidException("Sender and Receiver Accounts are the Same");
 		}

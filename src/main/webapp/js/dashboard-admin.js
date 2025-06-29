@@ -132,7 +132,7 @@ function loadPendingRequestActions() {
   const container = document.getElementById("pendingRequestsPreview");
   if (!container) return;
 
-  fetch("/MRN_BANKING/MRNBank/accountrequest?page=1&limit=10&status=PENDING", {
+  fetch("/MRN_BANKING/MRNBank/accountrequest?page=1&limit=10&status=0", {
     method: "GET",
     headers: { "Content-Type": "application/json", "Method": "GET" }
   })

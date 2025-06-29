@@ -101,7 +101,7 @@ function initAccountsScript() {
 
   function loadAccounts(page) {
     const params = new URLSearchParams({ page, limit });
-    if (typeFilter.value) params.append("type", getAccountTypeText(typeFilter.value));
+    if (typeFilter.value) params.append("type", typeFilter.value);
     if (branchFilter.value) params.append("branchId", branchFilter.value);
 
     fetch(`/MRN_BANKING/MRNBank/accounts?${params}`, {

@@ -15,10 +15,10 @@ public class HigherAuthorityUpdateStrategy implements UpdateStrategy
 	@Override
 	public void update(User user, Map<String, Object> session) throws InvalidException
 	{
-		long sessionUserId = (long) session.get("userId");
+		Long sessionUserId = (Long) session.get("userId");
 		user.setModifiedBy(sessionUserId);
 
-		Utility.checkError(Validator.checkUser(user));
+		Utility.checkError(Validator.checkHigherAuthorityUpdate(user));
 		Utility.validatePassword(user.getPassword(), userDAO.getPasswordByUserId(sessionUserId));
 		userDAO.updateByHigherAuthority(user);
 		if (user instanceof Client)

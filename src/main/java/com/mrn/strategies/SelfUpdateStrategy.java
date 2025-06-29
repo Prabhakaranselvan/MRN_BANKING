@@ -14,7 +14,7 @@ public class SelfUpdateStrategy implements UpdateStrategy
 	@Override
 	public void update(User user, Map<String, Object> session) throws InvalidException
 	{
-		long sessionUserId = (long) session.get("userId");
+		Long sessionUserId = (Long) session.get("userId");
 		user.setModifiedBy(sessionUserId);
 
 		Utility.checkError(Validator.checkSelfUpdate(user));
