@@ -19,8 +19,8 @@ public class TransactionDAO
 	public void addTransaction(Transaction txn) throws InvalidException
 	{
 		String sql = "INSERT INTO transaction (client_id, account_no, peer_acc_no, amount, txn_type, txn_time, txn_status, "
-				+ "txn_ref_No, closing_balance, description, done_by) "
-				+ "VALUES (?, ?, ?, ?, ?, UNIX_TIMESTAMP(), ?, ?, ?, ?, ?)";
+				+ "txn_ref_No, closing_balance, description, done_by, extra_info) "
+				+ "VALUES (?, ?, ?, ?, ?, UNIX_TIMESTAMP(), ?, ?, ?, ?, ?, ?)";
 
 		try (PreparedStatement pstmt = ConnectionManager.getConnection().prepareStatement(sql))
 		{
@@ -50,6 +50,17 @@ public class TransactionDAO
 				pstmt.setNull(9, java.sql.Types.VARCHAR);
 			}
 			pstmt.setLong(10, txn.getDoneBy());
+			
+			String extraInfo = txn.getExtraInfo();
+			if (txn.isExternalTransfer())
+			{
+				pstmt.setString(11, extraInfo.trim());
+			}
+			else
+			{
+				pstmt.setNull(11, java.sql.Types.VARCHAR);
+			}
+			
 
 			if (pstmt.executeUpdate() <= 0)
 			{

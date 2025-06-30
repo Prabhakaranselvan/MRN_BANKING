@@ -32,7 +32,6 @@
       </div>
     </div>
     <div id="accountsList" class="accounts-list">
-      <p>Loading accounts...</p>
     </div>
   </div>
 </div>

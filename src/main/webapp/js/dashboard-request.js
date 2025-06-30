@@ -113,7 +113,9 @@ function initRequestScript() {
         <button class="action-btn" onclick="approveRequest(${req.requestId}, 2)" title="Reject">
           <span class="material-icons">cancel</span>
         </button >`
-        : `<span class="material-icons" style="color: #bbb;padding: 6px;">lock</span>`;
+        : `	<button class="lock-btn" title="Locked">
+	          <span class="material-icons" style="color: #bbb;">lock</span>
+	        </button >`;
 
       return `
         <div class="request-row">

@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Container Styling */
+/* Main Container */
 .transaction-container {
     max-width: 800px;
     margin: 25px auto;
@@ -10,7 +10,7 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-/* Header Styling */
+/* Header */
 .form-header {
     font-size: 26px;
     text-align: center;
@@ -25,14 +25,14 @@
     gap: 20px;
 }
 
-/* Row group for field alignment */
+/* Row Grouping */
 .form-row {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
 }
 
-/* Default field styling */
+/* Individual Field Styling */
 .form-group {
     flex: 1;
     min-width: 240px;
@@ -40,22 +40,19 @@
     flex-direction: column;
 }
 
-/* Full width for single field rows */
+/* Full-Width Field */
 .form-group.full-width {
     flex: 1 1 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
 }
 
-/* Label styling */
+/* Labels */
 label {
     font-weight: 500;
     margin-bottom: 6px;
     color: #34495e;
 }
 
-/* Input and select styling */
+/* Input & Select Fields */
 input,
 select {
     padding: 10px;
@@ -63,6 +60,7 @@ select {
     border-radius: 6px;
     font-size: 15px;
     background-color: #fdfdfd;
+    transition: border-color 0.3s ease;
 }
 
 input:focus,
@@ -88,7 +86,7 @@ select:focus {
     background-color: #1e8449;
 }
 
-/* Result Text Styles */
+/* Transaction Result Message */
 .transfer-result {
     margin-top: 20px;
     text-align: center;
@@ -104,7 +102,7 @@ select:focus {
     color: #e74c3c;
 }
 
-/* Peer group toggle for transfer type */
+/* Peer Input Section Visibility Toggle */
 .peer-group {
     display: none;
 }
@@ -114,21 +112,20 @@ select:focus {
     flex-direction: column;
 }
 
-/* Password toggle wrapper */
+/* Password Field Toggle */
 .password-wrapper {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-/* Password field padding for icon */
 .password-wrapper input[type="password"],
 .password-wrapper input[type="text"] {
     flex: 1;
     padding-right: 40px;
 }
 
-/* Material icon button inside password */
+/* Eye Icon for Password Toggle */
 .toggle-password {
     position: absolute;
     right: 10px;
@@ -146,3 +143,8 @@ select:focus {
     color: #333;
 }
 
+/* Extra Info Fields for Outside Bank Transfer */
+#extraInfoFields {
+    flex-direction: column;
+    gap: 20px;
+}

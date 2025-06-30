@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONObject;
+
 import com.mrn.dao.AccountsDAO;
 import com.mrn.dao.BranchDAO;
 import com.mrn.dao.ClientDAO;
@@ -421,17 +423,60 @@ public class Validator
 		Long accNo = txn.getAccountNo();
 		checkAccountNo(accNo);
 		validateAccountStatus(accNo);
-		checkLongField(txn.getAccountNo(), "Account No");
 		checkDecimalField(txn.getAmount(), "Transaction Amount");
+		checkField(txn.getPassword(), "Password");
 		validateEnum(() -> TxnType.fromValue(txn.getTxnType()));
-		if (txn.getTxnType() == TxnType.DEBIT.getValue() || txn.getTxnType() == TxnType.CREDIT.getValue())
+
+		if (errorMsg.length() > 0) return errorMsg; // Stop here if invalid enum
+
+		TxnType txnType = TxnType.fromValue(txn.getTxnType());
+		if (txnType == TxnType.DEBIT || txnType == TxnType.CREDIT)
 		{
 			checkLongField(txn.getPeerAccNo(), "Peer Acc No");
 		}
-		checkField(txn.getPassword(), "Password");
+
+		
+
+		// ✅ Additional Validation for Outside Bank Transfers
+		if (txnType == TxnType.DEBIT)
+		{
+			Long peerAccNo = txn.getPeerAccNo();
+			if (peerAccNo != null && !accountsDAO.doesAccountExist(peerAccNo))
+			{
+				String extraInfo = txn.getExtraInfo();
+				if (extraInfo == null || extraInfo.isEmpty())
+				{
+					errorMsg.append("Extra info is required for outside bank transfer.<br/>");
+				}
+				else
+				{
+					try
+					{
+						JSONObject extra = new JSONObject(extraInfo);
+						if (!extra.has("peerBankName") || extra.getString("peerBankName").isBlank())
+						{
+							errorMsg.append("Peer Bank Name is required in extra info.<br/>");
+						}
+						if (!extra.has("peerIFSCCode") || extra.getString("peerIFSCCode").isBlank())
+						{
+							errorMsg.append("Peer IFSC Code is required in extra info.<br/>");
+						}
+						if (!extra.has("peerName") || extra.getString("peerName").isBlank())
+						{
+							errorMsg.append("Peer Name is required in extra info.<br/>");
+						}
+					}
+					catch (Exception e)
+					{
+						errorMsg.append("Invalid extraInfo JSON format for outside bank transfer.<br/>");
+					}
+				}
+			}
+		}
+
 		return errorMsg;
 	}
-	
+
 	public static void validateAccountStatus(Long accountNo) throws InvalidException
 	{
 		if (accountNo != null && accountNo > 0)

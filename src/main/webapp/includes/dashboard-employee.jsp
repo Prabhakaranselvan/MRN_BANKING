@@ -32,7 +32,6 @@
       </div>
     </div>
     <div id="employeesList" class="clients-list">
-      <p>Loading employees...</p>
     </div>
   </div>
 </div>

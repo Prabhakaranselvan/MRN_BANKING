@@ -2,7 +2,8 @@ function handleLogout() {
     fetch("/MRN_BANKING/MRNBank/logout", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+			"Method": "POST"
         }
     })
         .then(response => {
@@ -26,12 +27,14 @@ function toggleSidebar() {
 }
 
 function loadContent(page) {
-    const container = document.getElementById("main-content");
-    container.innerHTML = 	`
-	  <div class="loading-spinner">
-	    <span class="material-icons">hourglass_top</span> Loading...
-	  </div>
-	`;
+	const container = document.getElementById("main-content");
+	let spinnerTimeout = setTimeout(() => {
+	    container.innerHTML = `
+	      <div class="loading-spinner">
+	        <span class="material-icons">hourglass_top</span> Loading...
+	      </div>
+	    `;
+	}, 150); // show spinner only if load takes longer than 150ms
 	
 	const [basePage, queryString] = page.split("?");
 	    const queryParams = new URLSearchParams(queryString || "");
@@ -66,6 +69,7 @@ function loadContent(page) {
 	            return response.text(); // For normal successful HTML pages
         })
         .then(html => {
+			clearTimeout(spinnerTimeout); // ✅ Cancel spinner if content arrived fast
             container.innerHTML = html;
 			
 			// Remove previous dynamic styles
@@ -137,6 +141,7 @@ function loadContent(page) {
 	      	}
         })
         .catch(error => {
+			clearTimeout(spinnerTimeout);
             console.error("Error loading content:", error);
             container.innerHTML = "<p>Failed to load content.</p>";
         });

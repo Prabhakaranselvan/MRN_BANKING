@@ -129,20 +129,29 @@ function initAccountsScript() {
   }
 
   function renderAccounts(accounts) {
-    const rows = accounts.map(a => `
-      <div class="account-row">
-        <div class="account-no">${a.accountNo}</div>
-        <div class="client-id">${a.clientId}</div>
-        <div class="account-type">${getAccountTypeText(a.accountType)}</div>
-        <div class="acc-balance">₹${a.balance}</div>
-        <div class="account-status ${getStatusClass(a.status)}">${getStatusText(a.status)}</div>
-        <div class="account-actions">
-          <button onclick='editAccount(${JSON.stringify(a)})' class="action-btn" title="Edit Account">
-            <span class="material-icons">edit_square</span>
-          </button>
+    const rows = accounts.map(a => {
+      const statusText = getStatusText(a.status);
+      const statusClass = getStatusClass(a.status);
+
+      const actions = a.status !== 2
+        ? `<button onclick='editAccount(${JSON.stringify(a)})' class="action-btn" title="Edit Account">
+             <span class="material-icons">edit_square</span>
+           </button>`
+        : `<button class="lock-btn" title="Locked">
+   	          <span class="material-icons" style="color: #bbb;">lock</span>
+   	        </button >`;
+
+      return `
+        <div class="account-row">
+          <div class="account-no">${a.accountNo}</div>
+          <div class="client-id">${a.clientId}</div>
+          <div class="account-type">${getAccountTypeText(a.accountType)}</div>
+          <div class="acc-balance">₹${a.balance}</div>
+          <div class="account-status ${statusClass}">${statusText}</div>
+          <div class="account-actions">${actions}</div>
         </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
 
     container.innerHTML = `
       <div class="account-table">
@@ -158,6 +167,7 @@ function initAccountsScript() {
       </div>
     `;
   }
+
 
   function getAccountTypeText(type) {
     const t = Number(type);

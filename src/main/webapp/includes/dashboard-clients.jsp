@@ -20,7 +20,6 @@
 			</div>
 
 			<div id="clientsList" class="clients-list">
-				<p>Loading clients...</p>
 			</div>
 		</div>
 	</div>

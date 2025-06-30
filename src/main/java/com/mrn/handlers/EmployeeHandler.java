@@ -40,7 +40,7 @@ public class EmployeeHandler
 			int offset = (pageNo - 1) * limit;
 
 			// Access Restriction
-			Short effectiveRole = (sessionRole == 2) ? (short) 1 : filterRole;
+			Short effectiveRole = (sessionRole == 2) ? Short.valueOf((short) 1) : filterRole;
 			Long effectiveBranchId = (sessionRole == 2) ? sessionBranchId : filterBranchId;
 
 			List<Employee> employees = employeeDAO.getAllEmployeesFiltered(effectiveRole, effectiveBranchId, limit, offset);

@@ -77,20 +77,18 @@ public class TransactionHandler
 
 			boolean hasDateRange = input.getFromDate() != null && input.getToDate() != null;
 
-			List<Transaction> txnList = (accountNo != null) 
-					? txnDAO.getTransactionsByAccount(input, hasDateRange)
+			List<Transaction> txnList = (accountNo != null) ? txnDAO.getTransactionsByAccount(input, hasDateRange)
 					: txnDAO.getTransactionsByClientId(input, hasDateRange);
 
 			return Utility.createResponse("Transaction list fetched successfully", "Transactions", txnList);
 		});
 	}
 
-	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException
-	{
-		return TransactionExecutor.execute(() ->
-		{
+	public Map<String, Object> handlePost(Object pojoInstance, Map<String, Object> session) throws InvalidException {
+		return TransactionExecutor.execute(() -> {
 			Transaction txn = (Transaction) pojoInstance;
-			Utility.checkError(Validator.checkTransaction(txn));
+
+			Utility.checkError(Validator.checkTransaction(txn)); // Already includes extraInfo validation
 			Long sessionUserId = (Long) session.get("userId");
 
 			validateAndPrepareTransaction(txn, sessionUserId, session);
@@ -98,17 +96,20 @@ public class TransactionHandler
 			TxnType txnType = TxnType.fromValue(txn.getTxnType());
 			Long peerAccNo = txn.getPeerAccNo();
 
-			if (txnType == TxnType.DEBIT && accountsDAO.doesAccountExist(peerAccNo))
-			{
-				processTransferTransaction(txn, peerAccNo, sessionUserId);
+			if (txnType == TxnType.DEBIT && peerAccNo != null) {
+				if (accountsDAO.doesAccountExist(peerAccNo)) {
+					processInternalTransaction(txn, peerAccNo, sessionUserId); // Internal bank transfer
+				} else {
+					processExternalTransfer(txn, sessionUserId); // Outside bank transfer with extraInfo
+				}
+			} else {
+				processSimpleTransaction(txn, sessionUserId); // Deposit / Withdrawal
 			}
-			else
-			{
-				processSimpleTransaction(txn, sessionUserId);
-			}
+
 			return Utility.createResponse("Transaction successfully");
 		});
 	}
+
 
 	private void validateAndPrepareTransaction(Transaction txn, long userId, Map<String, Object> session)
 			throws InvalidException
@@ -147,7 +148,25 @@ public class TransactionHandler
 		accountsDAO.updateBalance(txn.getAccountNo(), newBalance, userId);
 	}
 
-	private void processTransferTransaction(Transaction senderTxn, long peerAccNo, long userId) throws InvalidException
+	private void processExternalTransfer(Transaction txn, long userId) throws InvalidException {
+		BigDecimal currentBalance = accountsDAO.getBalanceWithLock(txn.getAccountNo());
+		BigDecimal txnAmount = txn.getAmount();
+
+		if (currentBalance.compareTo(txnAmount) < 0) {
+			throw new InvalidException("Insufficient balance for this external transfer.");
+		}
+
+		BigDecimal newBalance = currentBalance.subtract(txnAmount);
+		txn.setClosingBalance(newBalance);
+		txn.setExternalTransfer(true);
+
+		// At this point, extraInfo is already validated in Validator.checkTransaction()
+		txnDAO.addTransaction(txn);
+		accountsDAO.updateBalance(txn.getAccountNo(), newBalance, userId);
+	}
+
+
+	private void processInternalTransaction(Transaction senderTxn, long peerAccNo, long userId) throws InvalidException
 	{
 		long senderAccNo = senderTxn.getAccountNo();
 		BigDecimal txnAmount = senderTxn.getAmount();

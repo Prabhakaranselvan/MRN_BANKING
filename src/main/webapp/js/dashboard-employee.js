@@ -106,21 +106,28 @@ function initEmployeesScript() {
   }
 
   function renderEmployees(employees) {
-    const rows = employees.map(e => `
-      <div class="client-row">
-        <div class="client-id">${e.userId}</div>
-        <div class="client-name"><strong>${e.name}</strong></div>
-        <div class="client-email">${e.email}</div>
-        <div class="client-status ${e.status === 1 ? 'active' : e.status === 0 ? 'inactive' : 'closed'}">
-          ${e.status === 1 ? 'Active' : e.status === 0 ? 'Inactive' : 'Closed'}
+    const rows = employees.map(e => {
+      const statusClass = e.status === 1 ? 'active' : e.status === 0 ? 'inactive' : 'closed';
+      const statusText = e.status === 1 ? 'Active' : e.status === 0 ? 'Inactive' : 'Closed';
+
+      const actions = e.status !== 2
+        ? `<button onclick="viewEmployee(${e.userId}, ${e.userCategory})" class="action-btn" title="View Profile">
+             <span class="material-icons">account_circle</span>
+           </button>`
+        : `<button class="lock-btn" title="Locked">
+             <span class="material-icons" style="color: #bbb;">lock</span>
+           </button>`;
+
+      return `
+        <div class="client-row">
+          <div class="client-id">${e.userId}</div>
+          <div class="client-name"><strong>${e.name}</strong></div>
+          <div class="client-email">${e.email}</div>
+          <div class="client-status ${statusClass}">${statusText}</div>
+          <div class="client-actions">${actions}</div>
         </div>
-        <div class="client-actions">
-          <button onclick="viewEmployee(${e.userId}, ${e.userCategory})" class="action-btn" title="View Profile">
-            <span class="material-icons">account_circle</span>
-          </button>
-        </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
 
     container.innerHTML = `
       <div class="client-table">
@@ -135,6 +142,7 @@ function initEmployeesScript() {
       </div>
     `;
   }
+
 
   if (roleFilter) roleFilter.addEventListener("change", () => loadEmployees(1));
   if (branchFilter) branchFilter.addEventListener("change", () => loadEmployees(1));

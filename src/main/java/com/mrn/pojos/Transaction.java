@@ -16,6 +16,8 @@ public class Transaction
 	private BigDecimal closingBalance;
 	private String description;
 	private Long doneBy;
+	private String extraInfo;
+	private boolean externalTransfer;
 	
 	private String Password;
 
@@ -148,6 +150,28 @@ public class Transaction
 	{
 		Password = password;
 	}
+
+	public String getExtraInfo()
+	{
+		return extraInfo;
+	}
+
+	public void setExtraInfo(String extraInfo)
+	{
+		this.extraInfo = extraInfo;
+	}
+
+	public boolean isExternalTransfer()
+	{
+		return externalTransfer;
+	}
+
+	public void setExternalTransfer(boolean externalTransfer)
+	{
+		this.externalTransfer = externalTransfer;
+	}
+	
+	
 	
 	
 

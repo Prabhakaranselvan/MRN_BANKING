@@ -25,7 +25,12 @@
     <div class="section-box">
       <div class="section-header">
         <h4>Accounts</h4>
+        <div class="section-header-inner">
+         <select id="accountSelectDropdown" class="account-select-dropdown">
+	      <option value="">-- All Accounts --</option>
+	    </select>
         <span class="material-icons clickable" onclick="loadContent('dashboard-client-accounts.jsp')">open_in_new</span>
+        </div>
       </div>
       <div id="accountCards" class="card-container"></div>
     </div>
@@ -33,7 +38,7 @@
     <!-- Balance Chart -->
     <div class="section-box">
       <div class="section-header">
-        <h4>Balance Distribution</h4>
+        <h4 id="chartTitle">Balance Distribution</h4>
       </div>
       <canvas id="balancePieChart" height="200"></canvas>
     </div>

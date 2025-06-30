@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.mrn.exception.InvalidException;
 import com.mrn.utilshub.ModuleResolver;
 
@@ -55,6 +56,23 @@ public class BankingServlet extends HttpServlet
 					Class<?> pojoClass = ModuleResolver.getPojoClass(module);
 					pojoInstance = gson.fromJson(jsonString, pojoClass);
 				}
+				catch (JsonSyntaxException e)
+				{
+					Throwable cause = e.getCause();
+					if (cause instanceof NumberFormatException)
+					{
+						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+						writeSafeJsonError(response, "Invalid input: numeric value expected. [Cause - " + cause.getMessage() + "] ");
+					}
+					else
+					{
+						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+						writeSafeJsonError(response, "Malformed JSON or invalid data type. [Cause - " + cause.getMessage() + "] ");
+					}
+					e.printStackTrace();
+					return;
+				}
+
 			}
 			else
 			{
@@ -112,6 +130,14 @@ public class BankingServlet extends HttpServlet
 		String json = gson.toJson(resultMap);
 		response.getWriter().write(json);
 	}
+	
+	private void writeSafeJsonError(HttpServletResponse response, String errorMessage) throws IOException
+	{
+		Map<String, String> errorMap = new HashMap<>();
+		errorMap.put("error", errorMessage);
+		String json = new Gson().toJson(errorMap); // safely escapes characters like quotes
+		response.getWriter().write(json);
+	}
 
 	private void writeJsonError(HttpServletResponse response, String errorMessage) throws IOException
 	{
@@ -122,7 +148,8 @@ public class BankingServlet extends HttpServlet
 	{
 		// Invalidate old session if exists
 		HttpSession oldSession = request.getSession(false);
-		if (oldSession != null) {
+		if (oldSession != null)
+		{
 			oldSession.invalidate();
 		}
 
@@ -130,7 +157,8 @@ public class BankingServlet extends HttpServlet
 		HttpSession newSession = request.getSession(true);
 
 		// Define keys you want to set as session attributes
-		List<String> sessionKeys = new ArrayList<>(Arrays.asList("userId", "userCategory", "branchId", "name", "email"));
+		List<String> sessionKeys = new ArrayList<>(
+				Arrays.asList("userId", "userCategory", "branchId", "name", "email"));
 
 		// Loop through and set attributes
 		for (String key : sessionKeys)

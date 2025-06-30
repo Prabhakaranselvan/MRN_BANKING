@@ -38,10 +38,10 @@
 
 <!-- Sidebar -->
 	<aside class="sidebar" id="sidebar">
-    	<div class="brand">
+    	<%-- <div class="brand">
         	<img src="${pageContext.request.contextPath}/images/Logo_BG_Removed.png" alt="Company Logo" class="logo-icon" />
             <span class="brand-name">MRN Bank</span>
-        </div>
+        </div> --%>
         <nav class="nav-links">
             <%
             	if (userRole == 0 || userRole == 2 || userRole == 3) {

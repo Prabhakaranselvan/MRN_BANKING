@@ -35,35 +35,43 @@ function initClientsScript() {
 		}
 
 		function renderClients(clients) {
-		    const rows = clients.map(c => `
-		        <div class="client-row">
-		            <div class="client-id">${c.userId}</div>
-		            <div class="client-name"><strong>${c.name}</strong></div>
-		            <div class="client-email">${c.email}</div>
-		            <div class="client-status ${c.status === 1 ? 'active' : c.status === 0 ? 'inactive' : 'closed'}">
-		                ${c.status === 1 ? 'Active' : c.status === 0 ? 'Inactive' : 'Closed'}
-		            </div>
-		            <div class="client-actions">
-		                <button onclick="viewClient(${c.userId}, ${c.userCategory})" class="action-btn" title="View Profile">
-		                    <span class="material-icons">account_circle</span>
-		                </button>
-		            </div>
-		        </div>
-		    `).join("");
+		  const rows = clients.map(c => {
+		    const statusClass = c.status === 1 ? 'active' : c.status === 0 ? 'inactive' : 'closed';
+		    const statusText = c.status === 1 ? 'Active' : c.status === 0 ? 'Inactive' : 'Closed';
 
-		    container.innerHTML = `
-		        <div class="client-table">
-		            <div class="client-header">
-		                <div class="client-id">USER ID</div>
-		                <div class="client-name">NAME</div>
-		                <div class="client-email">EMAIL</div>
-		                <div class="client-status">STATUS</div>
-		                <div class="client-actions">ACTION</div>
-		            </div>
-		            ${rows}
-		        </div>
+		    const actions = c.status !== 2
+		      ? `<button onclick="viewClient(${c.userId}, ${c.userCategory})" class="action-btn" title="View Profile">
+		           <span class="material-icons">account_circle</span>
+		         </button>`
+		      : `<button class="lock-btn" title="Locked">
+		           <span class="material-icons" style="color: #bbb;">lock</span>
+		         </button>`;
+
+		    return `
+		      <div class="client-row">
+		        <div class="client-id">${c.userId}</div>
+		        <div class="client-name"><strong>${c.name}</strong></div>
+		        <div class="client-email">${c.email}</div>
+		        <div class="client-status ${statusClass}">${statusText}</div>
+		        <div class="client-actions">${actions}</div>
+		      </div>
 		    `;
+		  }).join("");
+
+		  container.innerHTML = `
+		    <div class="client-table">
+		      <div class="client-header">
+		        <div class="client-id">USER ID</div>
+		        <div class="client-name">NAME</div>
+		        <div class="client-email">EMAIL</div>
+		        <div class="client-status">STATUS</div>
+		        <div class="client-actions">ACTION</div>
+		      </div>
+		      ${rows}
+		    </div>
+		  `;
 		}
+
 		
 		prevBtn.addEventListener("click", () => {
 	       if (currentPage > 1) {
