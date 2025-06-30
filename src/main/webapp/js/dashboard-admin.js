@@ -39,7 +39,7 @@ function renderAllCharts() {
 	  const accountCount = totalAccounts ? totalAccounts.count : 0;
 	  
 	  const totalBranches = branchData.length;
-	        const estimatedClients = Math.round(accountCount * 0.7);
+	        const estimatedClients = 12;
 	        const avgAccountsPerBranch = totalBranches > 0 ? Math.round(accountCount / totalBranches) : 0;
 
 			// Fill summary panel

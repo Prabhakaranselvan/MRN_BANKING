@@ -164,7 +164,10 @@ function initAddUserScript() {
 	    .then(res => res.json())
 	    .then(data => {
 	        handleResponse(data);
-	        if (data.message) form.reset();
+			if (data.message) {
+	            form.reset();
+	            closeAddUserModal(); // ✅ close modal on success
+	        };
 	    })
 	    .catch(err => {
 	        console.error("Registration failed:", err);

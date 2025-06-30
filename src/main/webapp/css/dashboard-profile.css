@@ -1,27 +1,53 @@
 @charset "UTF-8";
 
-/* Container */
-.form-container {
-	display: flex;
-	align-content: center;
-	justify-content: center;
-	height: 100%;
-	flex-wrap: wrap;
+.profile-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
+.profile-modal-box {
+    background: #fff;
+    border-radius: 12px;
+    width: 590px;
+    padding: 30px;
+    position: relative;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.profile-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #555;
+    transition: color 0.2s;
+}
+
+.profile-close-btn:hover {
+    color: #e74c3c;
+}
+
+
 /* Form Styling */
-.mrn-form {
-	width: 30%;
-	padding: 30px;
-	background: #ffffff;
-	border-radius: 20px;
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+.profile-mrn-form {
+	width: 100%;
 	display: flex;
 	flex-direction: column;
 }
 
 /* Form Header */
-.form-header {
+.profile-form-header {
 	text-align: center;
 	font-size: 22px;
 	margin-block-start: 0px;
@@ -32,7 +58,7 @@
 }
 
 /* Labels */
-.form-label {
+.profile-form-label {
 	font-size: 15px;
 	font-weight: 600;
 	margin-bottom: 6px;
@@ -40,7 +66,7 @@
 }
 
 /* Inputs */
-.form-input {
+.profile-form-input {
 	padding: 10px 14px;
 	border: none;
 	font-size: 15px;
@@ -52,39 +78,39 @@
 	transition: all 0.3s ease;
 }
 
-.form-input:focus {
+.profile-form-input:focus {
 	outline: none;
 	background: #e6ecf3;
 	box-shadow: 0 0 0 2px #3498db;
 }
 
 /* Required Star */
-.required {
+.profile-required {
 	color: red;
 	font-weight: bold;
 }
 
 /* Gender Section */
-.gender {
+.profile-gender {
 	display: flex;
 	gap: 30px;
 	align-items: center;
 	margin-bottom: 20px;
 }
 
-.options {
+.profile-options {
 	display: flex;
 	align-items: center;
 	gap: 6px;
 }
 
-.radio-label {
+.profile-radio-label {
 	font-size: 14px;
 	color: #2f3640;
 	margin-bottom: 6px;
 }
 
-.radio-input {
+.profile-radio-input {
 	margin: 0;
 	accent-color: #007BFF;
 	cursor: pointer;
@@ -92,42 +118,32 @@
 }
 
 /* Layout Containers */
-.double-column {
+.profile-double-column {
 	display: flex;
 	justify-content: space-between;
 	gap: 16px;
 }
 
-.part, .part-with-icon {
+.profile-part {
 	display: flex;
 	flex-direction: column;
 	width: 48%;
 	position: relative;
 }
 
-.part-with-icon .form-input {
+.profile-form-input {
 	padding-right: 35px;
 }
 
-.part-with-icon .material-symbols-outlined {
-	position: absolute;
-	right: 10px;
-	top: 50%;
-	transform: translateY(-50%);
-	color: #999;
-	font-size: 22px;
-	pointer-events: none;
-}
-
 /* Buttons */
-.buttons {
+.profile-buttons {
 	display: flex;
 	justify-content: center;
 	gap: 15px;
 	margin-top: 20px;
 }
 
-.form-button {
+.profile-form-button {
 	width: 40%;
 	padding: 12px;
 	background: linear-gradient(135deg, #3498db, #2980b9);
@@ -141,13 +157,13 @@
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.form-button:hover {
+.profile-form-button:hover {
 	background: linear-gradient(135deg, #2980b9, #1c6cae);
 	transform: translateY(-2px);
 }
 
 /* Error Text */
-.error-message {
+.profile-error-message {
 	height: 20px;
 	overflow: hidden;
 	color: red;
@@ -160,6 +176,6 @@
 	flex-direction: column;
 }
 
-.password-confirm {
+.profile-password-confirm {
 	flex-direction: column;
 }

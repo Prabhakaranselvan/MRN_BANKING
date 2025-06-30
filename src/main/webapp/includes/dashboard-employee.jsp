@@ -4,7 +4,7 @@
 <div class="container">
   <div class="clients-container">
     <div class="clients-header">
-      <h2 class="form-header">EMPLOYEE LIST</h2>
+      <h2 class="form-header">EMPLOYEE</h2>
       <div class="clients-header-actions">
         <div id="filterControls" class="filters">
           <select id="roleFilter">
@@ -19,7 +19,7 @@
           </select>
         </div>
         <div class="pagination">
-        	<button id="addClientBtn" class="add-user-btn" onclick="loadContent('dashboard-addUser.jsp?targetRole=1')">
+        	<button id="addClientBtn" class="add-user-btn" onclick="openAddUserModal(1)">
 				<span class="material-icons">person_add</span>
 			</button>
           <button id="prevPage" class="page-btn" title="Previous">

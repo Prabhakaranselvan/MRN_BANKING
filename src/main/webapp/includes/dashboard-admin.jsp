@@ -38,10 +38,8 @@
 			<div class="section-header">
 				<h4>Account Summary Charts</h4>
 				<div class="chart-tabs">
-					<button class="chart-tab active" onclick="switchChartSlide(0)">By
-						Type</button>
-					<button class="chart-tab" onclick="switchChartSlide(1)">By
-						Branch</button>
+					<button class="chart-tab active">By	Type</button>
+					<button class="chart-tab">By Branch</button>
 				</div>
 				<span class="material-icons clickable"
 					onclick="loadContent('dashboard-accounts.jsp')">open_in_new</span>
@@ -74,7 +72,6 @@
 				onclick="loadContent('dashboard-statement.jsp')">open_in_new</span>
 		</div>
 		<div id="modernTxnList" class="txn-list">
-			<p>Loading...</p>
 		</div>
 	</div>
 

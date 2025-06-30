@@ -4,7 +4,7 @@ function initProfileScript() {
     const saveBtn = document.getElementById("save-btn");
 	const cancelBtn = document.getElementById("cancel-btn");
 
-    const passwordField = document.querySelector(".password-confirm");
+    const passwordField = document.querySelector(".profile-password-confirm");
 	
 	const targetId = document.body.getAttribute("data-target-id");
 	const targetRole = parseInt(document.body.getAttribute("data-target-role"), 10);
@@ -112,9 +112,9 @@ function initProfileScript() {
 	    isEditMode = false;
 
 		if (isPrivilegedEditing) {
-            loadContent("dashboard-profile.jsp?targetId=" + targetId +"&targetRole=" + targetRole);
+			openProfileModal(targetId, targetRole);
         } else {
-            loadContent("dashboard-profile.jsp");
+			openProfileModal();
         }
 	});
 
@@ -164,11 +164,11 @@ function initProfileScript() {
             handleResponse(data);
             isEditMode = false;
 
-            if (isPrivilegedEditing) {
-                loadContent("dashboard-profile.jsp?targetId=" + targetId +"&targetRole=" + targetRole);
-            } else {
-                loadContent("dashboard-profile.jsp");
-            }
+			if (isPrivilegedEditing) {
+				openProfileModal(targetId, targetRole);
+	        } else {
+				openProfileModal();
+	        }
         })
         .catch(err => {
             console.error("Error updating profile:", err);

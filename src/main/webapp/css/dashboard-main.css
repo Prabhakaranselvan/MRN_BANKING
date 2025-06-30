@@ -1,3 +1,6 @@
+.dashboard-content {
+	padding:30px 38px 18px 38px;
+}
 .dashboard-main {
 	max-width: 1200px;
 	margin: 0px auto;
@@ -11,7 +14,7 @@
 	justify-content: space-between;
 	align-items: center;
 	flex-wrap: wrap;
-	margin-bottom: 29px;
+	margin-bottom: 20px;
 	background: #fff;
 	padding: 20px;
 	border-radius: 12px;
@@ -61,7 +64,7 @@
 	display: grid;
 	grid-template-columns: 2fr 1fr;
 	gap: 30px;
-	margin-bottom: 29px;
+	margin-bottom: 20px;
 }
 
 .section-box {
@@ -174,13 +177,13 @@
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
-	padding-right: 8px;
 }
 
 .txn-item {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	padding: 5px 12px;
 }
 
 .txn-info {

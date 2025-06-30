@@ -41,7 +41,7 @@
 			        <hr class="divider" />
 			
 			        <div class="profile-actions">
-			            <a href="#" onclick="loadContent('dashboard-profile.jsp'); closeDropdown(); return false;" class="profile-link">My Profile</a>
+			            <a href="#" onclick="openProfileModal(); closeDropdown(); return false;" class="profile-link">My Profile</a>
 			            <a href="#" class="signout-link" onclick="handleLogout()">Sign Out</a>
 			        </div>
 			    </div>

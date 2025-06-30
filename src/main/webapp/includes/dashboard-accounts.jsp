@@ -4,7 +4,7 @@
 <div class="container">
   <div class="accounts-container">
     <div class="accounts-header">
-      <h2 class="form-header">ACCOUNTS LIST</h2>
+      <h2 class="form-header">ACCOUNTS</h2>
       <div class="accounts-header-actions">
         <div id="filterControls" class="filters">
           <select id="accountTypeFilter">

@@ -159,9 +159,10 @@ function initEmployeesScript() {
     loadEmployees(currentPage);
   });
 
-  window.viewEmployee = function(userId, userCategory) {
-    loadContent(`dashboard-profile.jsp?targetId=${userId}&targetRole=${userCategory}`);
-  };
-
+  
   loadEmployees(currentPage);
+}
+
+function viewEmployee(targetId, targetRole) {
+     openProfileModal(targetId, targetRole);
 }

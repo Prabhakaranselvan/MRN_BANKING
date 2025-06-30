@@ -36,14 +36,7 @@ function loadContent(page) {
 	    `;
 	}, 150); // show spinner only if load takes longer than 150ms
 	
-	const [basePage, queryString] = page.split("?");
-	    const queryParams = new URLSearchParams(queryString || "");
-
-	    // Store targetId and userCategory in body for script use
-	    document.body.setAttribute("data-target-id", queryParams.get("targetId") || "");
-	    document.body.setAttribute("data-target-role", queryParams.get("targetRole") || "");
-		
-	    fetch("includes/" + basePage + (queryString ? "?" + queryString : ""))
+	    fetch("includes/" + page)
 	.then(response => {
 	            if (response.status === 401) {
 	                // This means your JSP sent the JSON error (session expired)
@@ -91,11 +84,7 @@ function loadContent(page) {
 			    clickedLink.classList.add('active');
 			}
 
-			if (page.startsWith("dashboard-profile.jsp")) {
-				loadCssOnce("profileCss", "/css/dashboard-profile.css");
-			    loadScriptOnce("profileScriptLoaded", "/js/dashboard-profile.js", "initProfileScript");
-			} 
-			else if (page === "dashboard-accounts.jsp") {
+			if (page === "dashboard-accounts.jsp") {
 				loadCssOnce("accountsCss", "/css/dashboard-accounts.css");
 			    loadScriptOnce("accountsScriptLoaded", "/js/dashboard-accounts.js", "initAccountsScript");
 			} 
@@ -114,10 +103,6 @@ function loadContent(page) {
 			else if (page === "dashboard-clients.jsp") {
 				loadCssOnce("clientsCss", "/css/dashboard-clients.css");
 			    loadScriptOnce("clientsScriptLoaded", "/js/dashboard-clients.js", "initClientsScript");
-			} 
-			else if (page.startsWith("dashboard-addUser.jsp")) {
-				loadCssOnce("addUserCss", "/css/dashboard-addUser.css");
-                loadScriptOnce("addUserScriptLoaded", "/js/dashboard-addUser.js", "initAddUserScript");
 			} 
 			else if (page === "dashboard-main.jsp") {
 				loadCssOnce("mainCss", "/css/dashboard-main.css");
@@ -183,12 +168,112 @@ function loadCssOnce(cssId, cssPath) {
 
 function removeDynamicCss() {
     const dynamicCssIds = [
-        "profileCss", "accountsCss", "clientAccountsCss", "statementCss", 
-        "transactionCss", "clientsCss", "addUserCss", "employeeCss", "branchCss", "requestCss", "adminCss"
+        "accountsCss", "clientAccountsCss", "statementCss", 
+        "transactionCss", "clientsCss", "employeeCss", "branchCss", "requestCss", "adminCss"
     ];
     dynamicCssIds.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.remove();
     });
 }
+
+
+function openProfileModal(targetId = null, targetRole = null) {
+	const modalRoot = document.getElementById("modal-root");
+
+
+	   document.body.setAttribute("data-target-id", targetId != null ? targetId : '');
+	   document.body.setAttribute("data-target-role", targetRole != null ? targetRole : '');
+
+	    // Build URL conditionally
+	    const baseUrl = `${window.appContext}/includes/dashboard-profile.jsp`;
+	    const fetchUrl = (targetId != null && targetRole != null)
+	        ? `${baseUrl}?targetId=${targetId}&targetRole=${targetRole}`
+	        : baseUrl;
+
+	    fetch(fetchUrl)
+        .then(response => {
+            if (response.status === 401) {
+                return response.json().then(data => {
+                    console.warn("Session expired. Redirecting to login.");
+                    if (typeof handleResponse === "function") handleResponse(data);
+                    setTimeout(() => {
+                        window.location.href = `${window.appContext}/login.jsp`;
+                    }, 1000);
+                    throw new Error("Unauthorized - session expired");
+                });
+            }
+
+            if (!response.ok) throw new Error("Failed to load profile modal. HTTP " + response.status);
+            return response.text();
+        })
+        .then(html => {
+            modalRoot.innerHTML = html;
+            document.body.style.overflow = "hidden";
+            loadScriptOnce("profileScriptLoaded", `/js/dashboard-profile.js`, "initProfileScript");
+        })
+        .catch(err => {
+            console.error("Failed to load profile modal:", err);
+            modalRoot.innerHTML = `
+              <div class="modal-overlay">
+                <div class="modal-box">Failed to load profile.</div>
+              </div>
+            `;
+        });
+}
+
+function closeProfileModal() {
+    const modalRoot = document.getElementById("modal-root");
+    modalRoot.innerHTML = "";
+}
+
+function openAddUserModal(targetRole = null) {
+	const modalRoot = document.getElementById("modal-root");
+
+
+	   document.body.setAttribute("data-target-role", targetRole != null ? targetRole : '');
+
+	    // Build URL conditionally
+	    const baseUrl = `${window.appContext}/includes/dashboard-addUser.jsp`;
+	    const fetchUrl = (targetRole != null)
+	        ? `${baseUrl}?targetRole=${targetRole}`
+	        : baseUrl;
+
+	    fetch(fetchUrl)
+        .then(response => {
+            if (response.status === 401) {
+                return response.json().then(data => {
+                    console.warn("Session expired. Redirecting to login.");
+                    if (typeof handleResponse === "function") handleResponse(data);
+                    setTimeout(() => {
+                        window.location.href = `${window.appContext}/login.jsp`;
+                    }, 1000);
+                    throw new Error("Unauthorized - session expired");
+                });
+            }
+
+            if (!response.ok) throw new Error("Failed to load Add User modal. HTTP " + response.status);
+            return response.text();
+        })
+        .then(html => {
+            modalRoot.innerHTML = html;
+            document.body.style.overflow = "hidden";
+            loadScriptOnce("addUserScriptLoaded", "/js/dashboard-addUser.js", "initAddUserScript");
+        })
+        .catch(err => {
+            console.error("Failed to load add user modal:", err);
+            modalRoot.innerHTML = `
+              <div class="user-modal-overlay">
+                <div class="user-modal-box">Failed to load add User.</div>
+              </div>
+            `;
+        });
+}
+
+
+function closeAddUserModal() {
+    const modalRoot = document.getElementById("modal-root");
+    modalRoot.innerHTML = "";
+}
+
 

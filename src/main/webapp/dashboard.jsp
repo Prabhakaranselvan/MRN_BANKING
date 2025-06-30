@@ -29,6 +29,8 @@
 
     <%@ include file="/includes/head-resources.jsp" %>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-profile.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard-addUser.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
@@ -128,6 +130,8 @@
       	<%@ include file="/includes/dialog-box.jsp"%>
       	
     </div> 
+    
+    <div id="modal-root"></div>
 <script>
     window.appContext = "${pageContext.request.contextPath}";
     

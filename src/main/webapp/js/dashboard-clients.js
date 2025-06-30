@@ -90,6 +90,6 @@ function initClientsScript() {
 
 }
 
-function viewClient(userId, userCategory) {
-    loadContent(`dashboard-profile.jsp?targetId=${userId}&targetRole=${userCategory}`);
+function viewClient(targetId, targetRole) {
+     openProfileModal(targetId, targetRole);
 }
