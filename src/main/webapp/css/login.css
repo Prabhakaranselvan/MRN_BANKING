@@ -14,13 +14,15 @@ body {
 	height: 88.5vh;
 	display: flex;
 	align-items: center;
-	justify-content: flex-end;
+	justify-content: flex-start;
+	gap:100px;
 }
 
 .login-image {
-	width: 36.5%;
+	width: 45%;
 	height: auto;
-	padding-right: 15.5%;
+	padding-left: 7.5%;
+	
 }
 
 .out-box {
@@ -33,34 +35,19 @@ body {
 
 .box {
 	position: relative;
-	width: 300px;
-	height: 150px;
+width: 450px;
+	height: 500px;
 	filter: drop-shadow(0 15px 50px #ccc);
-	border-radius: 20px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	transition: 0.5s;
 	background: #ffffff;
 	border-radius: 20px;
 }
 
-.box.expanded {
-	width: 450px;
-	height: 500px;
-}
-
-.box.expanded .login {
-	inset: 25px;
-}
-
-.box.expanded .login-form {
-	transform: translateY(0px);
-}
-
 .login {
 	position: absolute;
-	inset: 40px;
+	inset: 25px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -83,8 +70,6 @@ body {
 	flex-direction: column;
 	gap: 20px;
 	width: 72%;
-	transform: translateY(148px);
-	transition: 0.5s;
 }
 
 h2 {

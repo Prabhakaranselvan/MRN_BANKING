@@ -16,7 +16,7 @@
 .user-modal-box {
     background: #fff;
     border-radius: 12px;
-    width: 590px;
+    width: 640px;
     padding: 30px;
     position: relative;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
@@ -128,7 +128,7 @@ select:focus {
 .user-part {
 	display: flex;
 	flex-direction: column;
-	width: 48%;
+	width: 47%;
 	position: relative;
 }
 

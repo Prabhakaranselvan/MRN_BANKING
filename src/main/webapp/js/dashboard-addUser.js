@@ -25,6 +25,17 @@ function initAddUserScript() {
         });
     });
 	
+	const balanceInput = document.getElementById("balance");
+	balanceInput.addEventListener("input", () => {
+	    let value = balanceInput.value.replace(/[^0-9.]/g, '').replace(/^(\d*\.\d{0,2}).*$/, '$1');
+	    let floatVal = parseFloat(value);
+	    if (!isNaN(floatVal)) {
+	      if (floatVal > 100000) value = '100000';
+	      else if (floatVal < 1) value = '1';
+	    }
+	    balanceInput.value = value;
+	  });
+	
 	// Prevent numbers in the name field
     const nameInput = document.querySelector("input[name='name']");
     nameInput.addEventListener("input", function () {
@@ -66,7 +77,7 @@ function initAddUserScript() {
 	    })
 	    .then(res => res.json())
 	    .then(data => {
-	        branchSelect.innerHTML = '<option value="">Select Branch</option>';
+	        branchSelect.innerHTML = '<option value="">-- Select --</option>';
 	        data.Branches.forEach(branch => {
             const option = document.createElement("option");
             option.value = branch.branchId;

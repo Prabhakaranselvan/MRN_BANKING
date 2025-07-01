@@ -27,10 +27,8 @@ LocalDate minEligibleDate = today.minusYears(18);
 			<div class="user-part">
 				<label class="user-form-label" for="name">Name <span
 					class="user-required">*</span></label> <input class="user-form-input" type="text"
-					name="name" placeholder="Name"
-					pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" maxlength="30"
-					title="Name should contain only letters, spaces, hyphens or apostrophes."
-					required>
+					name="name" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" maxlength="30"
+					title="Name should contain only letters, spaces, hyphens or apostrophes." required>
 			</div>
 			<div class="user-part client-only">
 				<label class="user-form-label" for="dob">Date of Birth <span
@@ -93,7 +91,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 		
 		<div class="user-part client-only">
 			<label class="user-form-label" for="balance">Opening Balance <span class="user-required">*</span></label>
-			<input class="user-form-input" type="number" name="balance" placeholder="Enter Opening Balance" step="0.01" min="0" required>
+			<input class="user-form-input" type="text" id="balance" name="balance" required>
 		</div>
 
 		<div class="user-double-column client-only">
@@ -115,7 +113,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 		<div class="user-address client-only">
 			<label class="user-form-label" for="address">Address <span
 				class="user-required">*</span></label> <input class="user-form-input" type="text"
-				name="address" placeholder="Address" maxlength="60"
+				name="address" maxlength="60"
 				title="Enter your full address (max 60 characters).">
 		</div>
 

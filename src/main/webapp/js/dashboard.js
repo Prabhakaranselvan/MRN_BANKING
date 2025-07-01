@@ -1,4 +1,7 @@
-function handleLogout() {
+/*function handleLogout() {
+	const confirmLogout = confirm("Are you sure you want to sign out?");
+	    if (!confirmLogout) return;
+		
     fetch("/MRN_BANKING/MRNBank/logout", {
         method: "POST",
         headers: {
@@ -17,7 +20,37 @@ function handleLogout() {
             console.error("Logout failed", error);
             alert("Logout failed. Please try again.");
         });
+}*/
+
+function handleLogout() {
+  document.getElementById("logoutConfirmModal").classList.remove("hidden");
 }
+
+function closeLogoutModal() {
+  document.getElementById("logoutConfirmModal").classList.add("hidden");
+}
+
+function confirmLogout() {
+  fetch("/MRN_BANKING/MRNBank/logout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Method": "POST"
+    }
+  })
+    .then(response => {
+      if (response.redirected) {
+        window.location.href = response.url;
+      } else {
+        window.location.href = "/MRN_BANKING/logout.jsp";
+      }
+    })
+    .catch(error => {
+      console.error("Logout failed", error);
+      alert("Logout failed. Please try again.");
+    });
+}
+
 
 function toggleSidebar() {
     const sidebar = document.getElementById("sidebar");

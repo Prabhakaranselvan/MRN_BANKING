@@ -21,6 +21,7 @@
 	<%@ include file="/includes/header.jsp"%>
 
 	<div class="inner-body">
+		<img src="${pageContext.request.contextPath}/images/Login_Image.png" alt="Login_Image" class="login-image" />
 		<div class="out-box">
 			<div class="box">
 				<div class="login">
@@ -48,25 +49,13 @@
 				</div>
 			</div>
 		</div>
-		<img src="${pageContext.request.contextPath}/images/Login_Image.png" alt="Login_Image" class="login-image" />
+		
 	</div>
 	
 	<%@ include file="/includes/footer.jsp"%>
 	<%@ include file="/includes/dialog-box.jsp"%>
 
-	<script>
-		document.addEventListener("DOMContentLoaded", () => {
-			const box = document.querySelector(".box");
-			let hasExpanded = false;
-	
-			box.addEventListener("mouseenter", () => {
-				if (!hasExpanded) {
-					box.classList.add("expanded");
-					hasExpanded = true;
-				}
-			});
-		});
-		
+	<script>		
 		document.getElementById("toggle-password").addEventListener("click", function () {
 		    const passwordInput = document.getElementById("password");
 		    const type = passwordInput.getAttribute("type");
