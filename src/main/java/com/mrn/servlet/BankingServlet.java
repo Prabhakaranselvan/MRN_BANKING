@@ -44,6 +44,7 @@ public class BankingServlet extends HttpServlet
 			}
 
 			String httpMethod = request.getMethod().toUpperCase();
+			String headerMethod = request.getHeader("Method").toUpperCase();
 
 			Object pojoInstance = null;
 			Map<String, String> queryParams = new HashMap<>();
@@ -53,7 +54,7 @@ public class BankingServlet extends HttpServlet
 				{
 					String jsonString = reader.lines().collect(Collectors.joining());
 					Gson gson = new Gson();
-					Class<?> pojoClass = ModuleResolver.getPojoClass(module);
+					Class<?> pojoClass = ModuleResolver.getPojoClass(module, headerMethod, httpMethod);;
 					pojoInstance = gson.fromJson(jsonString, pojoClass);
 				}
 				catch (JsonSyntaxException e)
@@ -91,7 +92,6 @@ public class BankingServlet extends HttpServlet
 			}
 			else
 			{
-				String headerMethod = request.getHeader("Method").toUpperCase();
 				String key = headerMethod + "|" + httpMethod;
 				RequestStrategy strategy = ModuleResolver.getStrategy(key);
 				Map<String, Object> sessionMap = getSessionAttributes(request);

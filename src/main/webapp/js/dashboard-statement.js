@@ -2,6 +2,14 @@ function initStatementScript() {
     const form = document.getElementById("statementForm");
     const resultBox = document.getElementById("statementResult");
     const accountSelect = document.getElementById("accountSelect");
+	
+	const accountInput = document.getElementById("accountInput");
+	const clientInput = document.getElementById("clientInput");
+
+	const accountDropdownGroup = document.getElementById("accountDropdownGroup");
+	const accountInputGroup = document.getElementById("accountInputGroup");
+	const clientInputGroup = document.getElementById("clientInputGroup");
+
     const userId = document.body.getAttribute("data-user-id");
     const userRole = parseInt(document.body.getAttribute("data-user-role"));
 
@@ -11,41 +19,24 @@ function initStatementScript() {
     paginationWrapper.style.display = "none";
 
     let currentPage = 1;
-    const limit = 5;
+    const limit = 10;
 
     if (userRole === 1 || userRole === 2 || userRole === 3) {
-        const wrapper = document.createElement("div");
-        wrapper.className = "form-group";
-        wrapper.style.display = "flex";
-        wrapper.style.gap = "10px";
-
-        const accInput = document.createElement("input");
-        accInput.type = "text";
-        accInput.id = "accountInput";
-        accInput.name = "accountNo";
-        accInput.placeholder = "Account No (11 digits)";
-        accInput.maxLength = 11;
-        accInput.className = "form-control";
-        accInput.style.flex = "1";
+		accountDropdownGroup.style.display = "none";
+		accountInputGroup.style.display = "flex";
+		accountInput.style.display = "block";
 
         // Only digits and max 11
-        accInput.addEventListener("input", () => {
-            accInput.value = accInput.value.replace(/\D/g, "").slice(0, 11);
-        });
-        accInput.addEventListener("keydown", (e) => {
-            if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
-        });
-
-        wrapper.appendChild(accInput);
+		accountInput.addEventListener("input", () => {
+           accountInput.value = accountInput.value.replace(/\D/g, "").slice(0, 11);
+       });
+       accountInput.addEventListener("keydown", (e) => {
+           if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+       });
 
         if (userRole === 3) {
-            const clientInput = document.createElement("input");
-            clientInput.type = "text";
-            clientInput.id = "clientInput";
-            clientInput.name = "clientId";
-            clientInput.placeholder = "Client ID";
-            clientInput.className = "form-control";
-            clientInput.style.flex = "1";
+			clientInputGroup.style.display = "flex";
+			clientInput.style.display = "block";
 			
 			clientInput.addEventListener("input", () => {
 	           clientInput.value = clientInput.value.replace(/\D/g, "").slice(0, 6);
@@ -54,12 +45,13 @@ function initStatementScript() {
                 if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
             });
 
-            wrapper.appendChild(clientInput);
         }
-
-        accountSelect.replaceWith(wrapper);
     } else {
-        // Client role (dropdown only)
+		// Client role – use dropdown
+		accountDropdownGroup.style.display = "";
+		accountInputGroup.style.display = "none";
+		clientInputGroup.style.display = "none";
+				
         fetch("/MRN_BANKING/MRNBank/accounts", {
             method: "POST",
             headers: { "Content-Type": "application/json"			,
@@ -81,6 +73,14 @@ function initStatementScript() {
 
     form.addEventListener("submit", e => {
         e.preventDefault();
+		    const fromDate = form.fromDate.value;
+		    const toDate = form.toDate.value;
+
+		    // Validate: To Date must be greater than or equal to From Date
+		    if (fromDate && toDate && new Date(toDate) < new Date(fromDate)) {
+				handleResponse({ error: "To Date must be greater than or equal to From Date." });
+		        return;
+		    }
         currentPage = 1;
         fetchStatement();
     });
@@ -108,8 +108,7 @@ function initStatementScript() {
 
         // Roles 1 & 2: must use only account number
         if (userRole === 1 || userRole === 2) {
-            const accInput = document.getElementById("accountInput");
-            const accVal = accInput.value.trim();
+            const accVal = accountInput.value.trim();
             if (!accVal) {
                 handleResponse({ error: "Please enter an account number." });
                 return;
@@ -118,10 +117,8 @@ function initStatementScript() {
 
         } else if (userRole === 3) {
             // GM: can use either, not both
-            const accInput = document.getElementById("accountInput");
-            const clientInput = document.getElementById("clientInput");
-            const accVal = accInput.value.trim();
-            const clientVal = clientInput.value.trim();
+			const accVal = accountInput.value.trim();
+           const clientVal = clientInput.value.trim();
 
             if (accVal && clientVal) {
                 handleResponse({ error: "Please enter either Account No or Client ID, not both." });
@@ -138,13 +135,11 @@ function initStatementScript() {
         } else {
             // Client (dropdown)
             const selectedAcc = accountSelect.value;
-            if (!selectedAcc) {
+			if (selectedAcc) {
+                requestBody.accountNo = selectedAcc;
+            } else {
                 requestBody.clientId = userId;
             }
-			else
-			{
-				requestBody.accountNo = selectedAcc;
-			}
         }
 
         if (fromDate) requestBody.fromDate = fromDate;
@@ -184,39 +179,36 @@ function initStatementScript() {
 }
 
 function displayStatement(transactions) {
-    const container = document.getElementById("statementResult");
+  const container = document.getElementById("statementResult");
 
-    const txnTypeMap = ["DEPOSIT", "WITHDRAWAL", "CREDIT", "DEBIT"];
+  const txnTypeMap = ["DEPOSIT", "WITHDRAWAL", "CREDIT", "DEBIT"];
 
-    const rows = transactions.map(txn => `
-        <tr>
-            <td>${txn.txnRefNo}</td>
-            <td>${new Date(txn.txnTime * 1000).toLocaleString()}</td>
-            <td>${txnTypeMap[txn.txnType]}</td>
-            <td>${txn.peerAccNo || "-"}</td>
-            <td>${txn.amount}</td>
-            <td>${txn.closingBalance}</td>
-            <td class="description">${txn.description || "-"}</td>
-        </tr>
-    `).join("");
+  const rows = transactions.map(txn => `
+    <div class="statement-row">
+      <div class="statement-ref">#${txn.txnRefNo}</div>
+      <div class="statement-time">${new Date(txn.txnTime * 1000).toLocaleString()}</div>
+      <div class="statement-type">${txnTypeMap[txn.txnType]}</div>
+      <div class="statement-peer">${txn.peerAccNo || "-"}</div>
+      <div class="statement-amount">${txn.amount}</div>
+      <div class="statement-balance">${txn.closingBalance}</div>
+      <div class="statement-desc">${txn.description || "-"}</div>
+    </div>
+  `).join("");
 
-    container.innerHTML = `
-        <table class="statement-table">
-            <thead>
-                <tr>
-                    <th>Txn Ref</th>
-                    <th>Time</th>
-                    <th>Type</th>
-                    <th>Peer Acc No</th>
-                    <th>Amount</th>
-                    <th>Closing Balance</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${rows}
-            </tbody>
-        </table>
-    `;
+  container.innerHTML = `
+    <div class="statement-table">
+      <div class="statement-header">
+        <div class="statement-ref">Txn Ref</div>
+        <div class="statement-time">Time</div>
+        <div class="statement-type">Type</div>
+        <div class="statement-peer">Peer Acc No</div>
+        <div class="statement-amount">Amount</div>
+        <div class="statement-balance">Closing Balance</div>
+        <div class="statement-desc">Description</div>
+      </div>
+      ${rows}
+    </div>
+  `;
 }
+
 

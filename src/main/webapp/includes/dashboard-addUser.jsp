@@ -74,6 +74,27 @@ LocalDate minEligibleDate = today.minusYears(18);
 					title="Phone number must be 10 digits" required>
 			</div>
 		</div>
+		
+		<div class="user-double-column">
+			<div class="user-part">
+				<label class="user-form-label" for="branchSelect">Branch <span class="required">*</span></label> 
+				 <select  class="user-form-input" id="branchSelect" name="branchId" required></select>
+			</div>
+			<div class="user-part client-only">
+				<label class="user-form-label" for="accountTypeSelect">Account Type<span class="required">*</span></label> 
+				<select  class="user-form-input" id="accountTypeSelect" name="accountTypeSelect" required>
+			        <option value="">-- Select --</option>
+			        <option value="1">Savings</option>
+			        <option value="2">Current</option>
+			        <option value="3">Fixed Deposit</option>
+			      </select>
+			</div>
+		</div>
+		
+		<div class="user-part client-only">
+			<label class="user-form-label" for="balance">Opening Balance <span class="user-required">*</span></label>
+			<input class="user-form-input" type="number" name="balance" placeholder="Enter Opening Balance" step="0.01" min="0" required>
+		</div>
 
 		<div class="user-double-column client-only">
 			<div class="user-part">
@@ -98,13 +119,13 @@ LocalDate minEligibleDate = today.minusYears(18);
 				title="Enter your full address (max 60 characters).">
 		</div>
 
-		<div class="user-part employee-only">
+		<!-- <div class="user-part employee-only">
 			<label class="user-form-label" for="branchId">Branch <span
 				class="user-required">*</span></label> <select class="user-branch-input"
 				name="branchId" id="branchId">
 				<option value="">Select Branch</option>
 			</select>
-		</div>
+		</div> -->
 
 		<div class="user-double-column">
 			<div class="user-part">

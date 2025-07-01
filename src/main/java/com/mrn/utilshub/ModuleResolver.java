@@ -17,7 +17,7 @@ public class ModuleResolver
 	{
 		// Populate POJO class mappings
 		POJO_MAP.put("login", com.mrn.pojos.Login.class);
-		POJO_MAP.put("signup", com.mrn.pojos.Client.class);
+		POJO_MAP.put("signup", com.mrn.pojos.WrapperClientAccount.class);
 		POJO_MAP.put("client", com.mrn.pojos.Client.class);
 		POJO_MAP.put("employee", com.mrn.pojos.Employee.class);
 		POJO_MAP.put("branch", com.mrn.pojos.Branch.class);
@@ -51,7 +51,7 @@ public class ModuleResolver
 			}
 			else
 			{
-				Method method = handler.getClass().getMethod("handleGet",Map.class, Map.class);
+				Method method = handler.getClass().getMethod("handleGet", Map.class, Map.class);
 				return (Map<String, Object>) method.invoke(handler, queryParams, session);
 			}
 		});
@@ -78,9 +78,14 @@ public class ModuleResolver
 		});
 	}
 
-	public static Class<?> getPojoClass(String module)
+	public static Class<?> getPojoClass(String module, String headerMethod, String httpMethod)
 	{
-		return POJO_MAP.get(module);
+		if ("client".equals(module) && "POST".equals(headerMethod) && "POST".equals(httpMethod))
+		{
+			return com.mrn.pojos.WrapperClientAccount.class; // only for Add Client
+		}
+
+		return POJO_MAP.get(module); // fallback for everything else
 	}
 
 	public static Class<?> getHandlerClass(String module)

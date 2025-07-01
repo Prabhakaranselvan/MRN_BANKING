@@ -13,7 +13,7 @@ import com.mrn.utilshub.Validator;
 
 public class AccountRequestHandler
 {
-	AccountRequestDAO requestDAO = new AccountRequestDAO();
+	private final AccountRequestDAO requestDAO = new AccountRequestDAO();
 
 	// GET|GET /account-requests(?:\\?.*)?
 	// Roles: 2, 3

@@ -36,7 +36,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 				<div class="double-column">
 					<div class="part">
 						<label class="form-label" for="name">Name <span class="required">*</span></label>
-						<input class="form-input" type="text" name="name" placeholder="Name" maxlength="30"
+						<input class="form-input" type="text" name="name" maxlength="30"
 							pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus
 							title="Name should contain only letters, spaces, hyphens or apostrophes."> 
 					</div>
@@ -78,6 +78,22 @@ LocalDate minEligibleDate = today.minusYears(18);
 						<span class="material-symbols-outlined">call</span>
 					</div>
 				</div>
+				
+				<div class="double-column">
+					<div class="part">
+						<label class="form-label" for="branchSelect">Branch <span class="required">*</span></label> 
+						 <select  class="form-input" id="branchSelect" name="branchSelect" required></select>
+					</div>
+					<div class="part">
+						<label class="form-label" for="accountTypeSelect">Account Type<span class="required">*</span></label> 
+						<select  class="form-input" id="accountTypeSelect" name="accountTypeSelect" required>
+					        <option value="">-- Select --</option>
+					        <option value="1">Savings</option>
+					        <option value="2">Current</option>
+					        <option value="3">Fixed Deposit</option>
+					      </select>
+					</div>
+				</div>
 
 				<div class="double-column">
 					<div class="part">
@@ -94,7 +110,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 				</div>
 
 				<label class="form-label">Address <span class="required">*</span></label>
-				<input class="form-input" type="text" name="address" placeholder="Address" maxlength="60" required
+				<input class="form-input" type="text" name="address" maxlength="60" required
 					title="Enter your full address (max 60 characters)."> 
 				
 				<div class="double-column">
@@ -164,6 +180,31 @@ LocalDate minEligibleDate = today.minusYears(18);
 	            password.type = type;
 	            confirmPassword.type = type;
 	        });
+	        
+	        const branchSelect = document.getElementById("branchSelect");
+	        // Fetch branches
+	        fetch("/MRN_BANKING/MRNBank/branch", {
+	            method: "GET",
+	            headers: {
+	                "Content-Type": "application/json",
+	                "Method": "GET"
+	            }
+	        })
+	        .then(res => res.json())
+	        .then(data => {
+	            branchSelect.innerHTML = '<option value="">-- Select --</option>';
+	            if (Array.isArray(data.Branches)) {
+	                data.Branches.forEach(branch => {
+	                    const option = document.createElement("option");
+	                    option.value = branch.branchId;
+	                    option.textContent = branch.branchName + " (" + branch.branchLocation + ")";
+	                    branchSelect.appendChild(option);
+	                });
+	            }
+	        })
+	        .catch(err => {
+	            console.error("Failed to load branches:", err);
+	        });
 	
 	        // Handle form submission
 	        form.addEventListener("submit", async function (event) {
@@ -178,15 +219,25 @@ LocalDate minEligibleDate = today.minusYears(18);
 	            }
 	
 	            const formData = new FormData(form);
-	            const jsonBody = {};
+	            const clientData = {};
+	            const accountRequestData = {};
 	
 	            for (const [key, value] of formData.entries()) {
 	                if (key === "userCategory") {
-	                    jsonBody[key] = parseInt(value);
+	                    clientData[key] = parseInt(value);
+	                } else if (key === "branchSelect") {
+	                    accountRequestData["branchId"] = parseInt(value);
+	                } else if (key === "accountTypeSelect") {
+	                    accountRequestData["accountType"] = parseInt(value);
 	                } else {
-	                    jsonBody[key] = value;
+	                    clientData[key] = value;
 	                }
 	            }
+	            
+	            const wrapperBody = {
+	                    client: clientData,
+	                    accountRequest: accountRequestData
+	                };
 	
 	            try {
 	                const response = await fetch(`${pageContext.request.contextPath}/MRNBank/signup`, {
@@ -195,7 +246,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 	                        "Content-Type": "application/json",
                         	"Method": "POST"
 	                    },
-	                    body: JSON.stringify(jsonBody)
+	                    body: JSON.stringify(wrapperBody)
 	                });
 	
 	                const data = await response.json();

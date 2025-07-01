@@ -1,7 +1,7 @@
 function initAddUserScript() {
 	const form = document.getElementById("MRN-Form");
     const userCategorySelect = document.getElementById("userCategory");
-    const branchSelect = document.getElementById("branchId");
+    const branchSelect = document.getElementById("branchSelect");
     const dobField = document.getElementById("dob");
     const showPasswordCheckbox = document.getElementById("show-password");
     const password = document.getElementById("password");
@@ -40,21 +40,22 @@ function initAddUserScript() {
         });
     }
 	
+	const isGM = userRole === 3;
 	// Determine if branch selection should be fixed
-	const isManagerAddingEmployee = userRole === 2 && targetRole === 1;
+    const isManagerAddingEmployee = userRole === 2 && targetRole === 1;
+    const isManagerOrEmployeeAddingClient = (userRole === 1 || userRole === 2) && targetRole === 0;
 
-	if (isManagerAddingEmployee) {
-		document.querySelectorAll("select.branch-input").forEach(select => {
-	      select.style.pointerEvents = "none";
-	      select.style.backgroundColor = "#f4f4f4";
-	      select.style.color = "#777";
-	    });
-	  setFixedBranch(userBranchId);
-	} else {
-	  loadBranches();
-	}
+	if (isGM) {
+	        loadAllBranches(); // GM can assign any branch
+	    } else if (isManagerAddingEmployee || isManagerOrEmployeeAddingClient) {
+			branchSelect.style.pointerEvents = "none";
+			branchSelect.style.backgroundColor = "#f4f4f4";
+			branchSelect.style.color = "#777";
 
-	function loadBranches() {
+	        setFixedBranch(userBranchId); // Force-assign current user's branch
+	    }
+
+	function loadAllBranches() {
 		// Fetch branches for dropdown
 	    fetch("/MRN_BANKING/MRNBank/branch", {
 	        method: "GET",
@@ -67,13 +68,13 @@ function initAddUserScript() {
 	    .then(data => {
 	        branchSelect.innerHTML = '<option value="">Select Branch</option>';
 	        data.Branches.forEach(branch => {
-	            const option = document.createElement("option");
-	            option.value = branch.branchId;
-	            option.textContent = `${branch.branchName} (${branch.branchLocation})`;
-	            branchSelect.appendChild(option);
+            const option = document.createElement("option");
+            option.value = branch.branchId;
+            option.textContent = `${branch.branchName} (${branch.branchLocation})`;
+            branchSelect.appendChild(option);
 	        });
 	    })
-		    .catch(err => console.error("[loadBranches] Error:", err));
+		    .catch(err => console.error("[loadAllBranches] Error:", err));
 		}
 
 	function setFixedBranch(branchId) {
@@ -93,34 +94,41 @@ function initAddUserScript() {
 	        return;
 	      }
 
-	      const label = `${data.branch.branchName} (${data.branch.branchLocation})`;
-	      const value = String(data.branch.branchId);
-	      const option = new Option(label, value);
+		const label = `${data.branch.branchName} (${data.branch.branchLocation})`;
+        const value = String(data.branch.branchId);
+        const option = new Option(label, value);
 
-	      branchSelect.innerHTML = "";
-	      branchSelect.appendChild(option.cloneNode(true));
-	      branchSelect.value = value;
-		  
-		  document.querySelectorAll("select.branch-input").forEach((select, i) => {
-            select.innerHTML = "";
-            const opt = option.cloneNode(true);
-            opt.selected = true;
-            select.appendChild(opt);
-            select.value = value;
-            console.log(`[setFixedBranch] Set branch-input[${i}] value to: ${select.value}`);
-          });
-	    })
+        branchSelect.innerHTML = "";
+		const opt = option.cloneNode(true);
+        opt.selected = true;
+        branchSelect.appendChild(opt);
+        branchSelect.value = value;
+  	  
+         console.log(`[setFixedBranch] value : ${branchSelect.value}`);
+      })
 	    .catch(err => console.error("[setFixedBranch] Error:", err));
 	}
 
 	// Role-based visibility
-    userCategorySelect.addEventListener("change", () => {
-        const value = parseInt(userCategorySelect.value);
-        document.querySelectorAll(".client-only").forEach(el => el.style.display = value === 0 ? "flex" : "none");
-        document.querySelectorAll(".employee-only").forEach(el => el.style.display = value > 0 ? "flex" : "none");
-    });
+	userCategorySelect.addEventListener("change", () => {
+	    const value = parseInt(userCategorySelect.value);
+
+	    document.querySelectorAll(".client-only").forEach(el => {
+	        const inputs = el.querySelectorAll("input, select");
+	        if (value === 0) {
+	            el.style.display = "flex";
+	            inputs.forEach(input => input.disabled = false);  // ✅ enable
+	        } else {
+	            el.style.display = "none";
+	            inputs.forEach(input => input.disabled = true);   // ✅ disable to skip validation
+	        }
+	    });
+	});
+
+
 
 	userCategorySelect.value = targetRole;
+	userCategorySelect.dispatchEvent(new Event("change"));
     // Restrict visible roles based on logged-in role
     const allowedRoles = userRole === 1 ? [0] : userRole === 2 ? [0, 1] : [0, 1, 2];
     Array.from(userCategorySelect.options).forEach(opt => {
@@ -141,17 +149,42 @@ function initAddUserScript() {
 	        errorMessage.textContent = "";
 	    }
 
-	    const formData = new FormData(form);
-	    const jsonBody = {};
-	    for (const [key, value] of formData.entries()) {
-	        if (key === "userCategory") {
-	            jsonBody[key] = parseInt(value);
-	        } else {
-	            jsonBody[key] = value;
-	        }
-	    }
+		const formData = new FormData(form);
+	    const role = parseInt(formData.get("userCategory"));
+	    const body = {};
+		const user = {
+	        userCategory: role,
+	        name: formData.get("name"),
+	        gender: formData.get("gender"),
+	        email: formData.get("email"),
+	        phoneNo: formData.get("phoneNo"),
+	        password: formData.get("password")
+	    };
+		if (role === 0) {
+		       // Client-specific
+		       user.dob = formData.get("dob");
+		       user.aadhar = formData.get("aadhar");
+		       user.pan = formData.get("pan");
+		       user.address = formData.get("address");
 
-	    const endpoint = jsonBody.userCategory === 0 ? "/MRN_BANKING/MRNBank/client" : "/MRN_BANKING/MRNBank/employee";
+		       const account = {
+		           branchId: parseInt(formData.get("branchId")),
+		           accountType: parseInt(formData.get("accountTypeSelect")),
+				   balance: parseInt(formData.get("balance"))
+		       };
+
+		       body.client = user;
+		       body.account = account;
+		   } else {
+		       // Employee/Manager
+		       user.branchId = parseInt(formData.get("branchId"));
+		       body.userCategory = role;
+		       Object.assign(body, user);
+		   }
+
+		   const endpoint = role === 0
+		          ? "/MRN_BANKING/MRNBank/client"
+		          : "/MRN_BANKING/MRNBank/employee";
 
 	    fetch(endpoint, {
 	        method: "POST",
@@ -159,7 +192,7 @@ function initAddUserScript() {
 	            "Content-Type": "application/json",
 	            "Method": "POST"
 	        },
-	        body: JSON.stringify(jsonBody)
+	        body: JSON.stringify(body)
 	    })
 	    .then(res => res.json())
 	    .then(data => {
@@ -175,6 +208,4 @@ function initAddUserScript() {
 	    });
 	});
 
-	// Initial trigger
-	userCategorySelect.dispatchEvent(new Event("change"));
 }

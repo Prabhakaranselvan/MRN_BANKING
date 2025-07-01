@@ -58,9 +58,9 @@
 
 /* ==== Labels ==== */
 .user-form-label {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 3px;
   color: #34495e;
 }
 
@@ -73,8 +73,8 @@
 /* ==== Inputs and Selects ==== */
 .user-form-input,
 .user-branch-input{
-  padding: 12px 14px;
-  font-size: 15px;
+  padding: 10px 14px;
+  font-size: 14px;
   border-radius: 10px;
   border: 1px solid #d1dbe5;
   background-color: #f9fafb;
@@ -91,10 +91,6 @@ select:focus {
   box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
-
- .user-form-input {
-  padding-right: 42px;
-}
 
 /* ==== Gender Radio ==== */
 .user-gender {
