@@ -22,12 +22,14 @@
           <button id="addAccountBtn" class="add-account-btn">
             <span class="material-icons">add</span>
           </button>
-          <button id="prevPage" class="page-btn" title="Previous">
-            <span class="material-icons">chevron_left</span>
-          </button>
-          <button id="nextPage" class="page-btn" title="Next">
-            <span class="material-icons">chevron_right</span>
-          </button>
+        <div  id="paginationWrapper" class="pagination-bar">
+	          <button id="prevPage" class="page-btn" title="Previous">
+	            <span class="material-icons">chevron_left</span>
+	          </button>
+	          <button id="nextPage" class="page-btn" title="Next">
+	            <span class="material-icons">chevron_right</span>
+	          </button>
+        </div>
         </div>
       </div>
     </div>

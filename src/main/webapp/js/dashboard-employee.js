@@ -2,6 +2,8 @@ function initEmployeesScript() {
   const container = document.getElementById("employeesList");
   const prevBtn = document.getElementById("prevPage");
   const nextBtn = document.getElementById("nextPage");
+  const paginationWrapper = document.getElementById("paginationWrapper");
+  paginationWrapper.style.display = "none";
   const roleFilter = document.getElementById("roleFilter");
   const branchFilter = document.getElementById("branchFilter");
 
@@ -91,12 +93,18 @@ function initEmployeesScript() {
         console.log("Employee list:", data);
         if (data.employees && data.employees.length > 0) {
           renderEmployees(data.employees);
+		  paginationWrapper.style.display = "flex";
           prevBtn.disabled = currentPage === 1;
           nextBtn.disabled = data.employees.length < limit;
         } else {
           container.innerHTML = `<p>No employees found.</p>`;
-          prevBtn.disabled = true;
-          nextBtn.disabled = true;
+		  if (currentPage === 1) {
+	            paginationWrapper.style.display = "none";
+	        } else {
+	            paginationWrapper.style.display = "flex";
+	            prevBtn.disabled = false;
+	            nextBtn.disabled = true;
+	        }
         }
       })
       .catch(err => {

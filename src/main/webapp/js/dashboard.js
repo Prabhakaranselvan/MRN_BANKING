@@ -52,6 +52,7 @@ function confirmLogout() {
 }
 
 
+
 function toggleSidebar() {
     const sidebar = document.getElementById("sidebar");
     const icon = document.getElementById("toggle-icon");

@@ -75,6 +75,12 @@ function initStatementScript() {
         e.preventDefault();
 		    const fromDate = form.fromDate.value;
 		    const toDate = form.toDate.value;
+			
+			// If only one date is filled
+			    if ((fromDate && !toDate) || (!fromDate && toDate)) {
+			        handleResponse({ error: "Please provide both From Date and To Date." });
+			        return;
+			    }
 
 		    // Validate: To Date must be greater than or equal to From Date
 		    if (fromDate && toDate && new Date(toDate) < new Date(fromDate)) {

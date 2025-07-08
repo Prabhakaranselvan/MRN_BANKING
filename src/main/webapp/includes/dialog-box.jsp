@@ -30,7 +30,7 @@
 
             dialog.addEventListener("close", () => {
                 if (redirectUrl) {
-                    window.location.href = redirectUrl;
+                	window.location.replace(redirectUrl);
                 }
             }, { once: true }); // Ensures it's removed after one execution
             

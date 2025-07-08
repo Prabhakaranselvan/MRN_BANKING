@@ -22,12 +22,14 @@
         	<button id="addClientBtn" class="add-user-btn" onclick="openAddUserModal(1)">
 				<span class="material-icons">person_add</span>
 			</button>
-          <button id="prevPage" class="page-btn" title="Previous">
-            <span class="material-icons">chevron_left</span>
-          </button>
-          <button id="nextPage" class="page-btn" title="Next">
-            <span class="material-icons">chevron_right</span>
-          </button>
+		<div  id="paginationWrapper" class="pagination-bar">
+	          <button id="prevPage" class="page-btn" title="Previous">
+	            <span class="material-icons">chevron_left</span>
+	          </button>
+	          <button id="nextPage" class="page-btn" title="Next">
+	            <span class="material-icons">chevron_right</span>
+          	</button>
+         </div>
         </div>
       </div>
     </div>

@@ -2,6 +2,8 @@ function initClientsScript() {
     const container = document.getElementById("clientsList");
 	const prevBtn = document.getElementById("prevPage");
    const nextBtn = document.getElementById("nextPage");
+   const paginationWrapper = document.getElementById("paginationWrapper");
+   paginationWrapper.style.display = "none";
 
    let currentPage = 1;
    const limit = 10;
@@ -19,13 +21,20 @@ function initClientsScript() {
             console.log("Clients list:", data);
             if (data.clients && data.clients.length > 0) {
                 renderClients(data.clients);
-                prevBtn.disabled = currentPage === 1;
-                nextBtn.disabled = data.clients.length < limit; // Disable if less than limit
-            } else {
-                container.innerHTML = `<p>No clients found.</p>`;
-                prevBtn.disabled = true;
-                nextBtn.disabled = true;
-            }
+				paginationWrapper.style.display = "flex";
+		        prevBtn.disabled = currentPage === 1;
+		        nextBtn.disabled = data.clients.length < limit;
+		    } else {
+		       container.innerHTML = `<p>No clients found.</p>`;
+		        if (currentPage === 1) {
+		            paginationWrapper.style.display = "none";
+		        } else {
+		            paginationWrapper.style.display = "flex";
+		            prevBtn.disabled = false;
+		            nextBtn.disabled = true;
+		        }
+		    }
+                
         })
         .catch(err => {
             console.error("Error loading clients:", err);

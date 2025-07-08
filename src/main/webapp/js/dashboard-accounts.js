@@ -3,6 +3,8 @@ function initAccountsScript() {
   const container = document.getElementById("accountsList");
   const prevBtn = document.getElementById("prevPage");
   const nextBtn = document.getElementById("nextPage");
+  const paginationWrapper = document.getElementById("paginationWrapper");
+  paginationWrapper.style.display = "none";
   const addBtn = document.getElementById("addAccountBtn");
 
   const typeFilter = document.getElementById("accountTypeFilter");
@@ -113,13 +115,20 @@ function initAccountsScript() {
     })
       .then(res => res.json())
       .then(data => {
-		if (data.Accounts && data.Accounts.length) {
+		if (data.Accounts && data.Accounts.length > 0) {
           renderAccounts(data.Accounts);
+		  paginationWrapper.style.display = "flex";
           prevBtn.disabled = currentPage === 1;
           nextBtn.disabled = data.Accounts.length < limit;
         } else {
           container.innerHTML = "<p>No accounts found.</p>";
-          prevBtn.disabled = nextBtn.disabled = true;
+		  if (currentPage === 1) {
+	            paginationWrapper.style.display = "none";
+	        } else {
+	            paginationWrapper.style.display = "flex";
+	            prevBtn.disabled = false;
+	            nextBtn.disabled = true;
+	        }
         }
       })
       .catch(err => {

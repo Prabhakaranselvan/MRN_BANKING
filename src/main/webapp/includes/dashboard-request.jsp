@@ -18,7 +18,7 @@
 						<!-- dynamically populate -->
 					</select>
 				</div>
-				<div class="pagination">
+				<div id="paginationWrapper" class="pagination">
 					<button id="prevPage" class="page-btn" title="Previous">
 						<span class="material-icons">chevron_left</span>
 					</button>

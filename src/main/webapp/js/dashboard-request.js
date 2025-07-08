@@ -2,6 +2,8 @@ function initRequestScript() {
   const container = document.getElementById("accountRequestList");
   const prevBtn = document.getElementById("prevPage");
   const nextBtn = document.getElementById("nextPage");
+  const paginationWrapper = document.getElementById("paginationWrapper");
+  paginationWrapper.style.display = "none";
   const statusFilter = document.getElementById("statusFilter");
   const branchFilter = document.getElementById("branchFilter");
 
@@ -82,15 +84,21 @@ function initRequestScript() {
       .then(res => res.json())
       .then(data => {
         const requests = data.AccountRequests || [];
-        if (requests.length > 0) {
-          renderRequests(requests);
-          prevBtn.disabled = currentPage === 1;
-          nextBtn.disabled = requests.length < limit;
-        } else {
-          container.innerHTML = `<p>No account requests found.</p>`;
-          prevBtn.disabled = true;
-          nextBtn.disabled = true;
-        }
+		if (requests.length > 0) {
+            renderRequests(requests);
+	        paginationWrapper.style.display = "flex";
+	        prevBtn.disabled = currentPage === 1;
+	        nextBtn.disabled = requests.length < limit;
+	    } else {
+	        container.innerHTML = `<p>No account requests found.</p>`;
+	        if (currentPage === 1) {
+	            paginationWrapper.style.display = "none";
+	        } else {
+	            paginationWrapper.style.display = "flex";
+	            prevBtn.disabled = false;
+	            nextBtn.disabled = true;
+	        }
+	    }
       })
       .catch(err => {
         console.error("Error loading account requests:", err);

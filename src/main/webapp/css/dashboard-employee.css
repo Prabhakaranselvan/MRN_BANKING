@@ -66,6 +66,12 @@
 	gap: 10px;
 }
 
+.pagination-bar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
 .page-btn,
 .add-user-btn {
 	background-color: #1976d2;

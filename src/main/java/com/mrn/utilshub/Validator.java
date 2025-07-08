@@ -523,6 +523,10 @@ public class Validator
 				{
 					errorMsg.append(paramName).append(" must be a positive number.<br/>");
 				}
+				else if (value > 100)
+				{
+					errorMsg.append(paramName).append(" must not exceed 100.<br/>");
+				}
 			}
 			catch (NumberFormatException e)
 			{

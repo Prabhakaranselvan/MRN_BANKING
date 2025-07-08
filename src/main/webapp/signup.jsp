@@ -4,6 +4,11 @@
 <%@ page import="java.time.LocalDate"%>
 
 <%
+HttpSession session = request.getSession(false); // Do not create a new session
+if (session != null && session.getAttribute("userId") != null) {
+    response.sendRedirect(request.getContextPath() + "/dashboard.jsp");
+    return;
+}
 LocalDate today = LocalDate.now();
 LocalDate minEligibleDate = today.minusYears(18);
 %>

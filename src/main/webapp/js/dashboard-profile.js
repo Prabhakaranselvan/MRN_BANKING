@@ -13,18 +13,18 @@ function initProfileScript() {
     const userRole = parseInt(document.body.getAttribute("data-user-role"));
 	
 	// Enforce numeric-only input
-	    const numberInputs = document.querySelectorAll("#phone, #aadhar");
-	    numberInputs.forEach(input => {
-	        input.addEventListener("input", function () {
-	            this.value = this.value.replace(/\D/g, '');
-	        });
-	    });
-		
-		// Prevent numbers in the name field
-	    const nameInput = document.querySelector("input[name='name']");
-	    nameInput.addEventListener("input", function () {
-	        this.value = this.value.replace(/[0-9]/g, ''); // Remove any digits
-	    });
+    const numberInputs = document.querySelectorAll("#phone, #aadhar");
+    numberInputs.forEach(input => {
+        input.addEventListener("input", function () {
+            this.value = this.value.replace(/\D/g, '');
+        });
+    });
+	
+	// Prevent numbers in the name field
+    const nameInput = document.querySelector("input[name='name']");
+    nameInput.addEventListener("input", function () {
+        this.value = this.value.replace(/[0-9]/g, ''); // Remove any digits
+    });
 	
 	const isSelfEdit = !targetId && userRole!==3;
 	const isEditingClient = targetRole === 0 || userRole === 0;
