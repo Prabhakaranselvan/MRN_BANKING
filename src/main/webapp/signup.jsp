@@ -2,6 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" session="false"%>
 <%@ page import="java.time.LocalDate"%>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 
 <%
 HttpSession session = request.getSession(false); // Do not create a new session
@@ -10,13 +11,19 @@ if (session != null && session.getAttribute("userId") != null) {
     return;
 }
 LocalDate today = LocalDate.now();
-LocalDate minEligibleDate = today.minusYears(18);
+LocalDate maxBirthDate = today.minusYears(18);     // Latest allowed DOB (must be at least 18 years old)
+LocalDate minBirthDate = today.minusYears(150);    // Earliest allowed DOB (max age 150 years)
+
+DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+String maxBirthDateStr = maxBirthDate.format(dobFormatter); // e.g., 07/13/2007
+String minBirthDateStr = minBirthDate.format(dobFormatter); // e.g., 07/13/1875
 %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Signup</title>
+<title>Sign Up</title>
 
 <%@ include file="/includes/head-resources.jsp"%>
 <link rel="stylesheet"
@@ -41,14 +48,15 @@ LocalDate minEligibleDate = today.minusYears(18);
 				<div class="double-column">
 					<div class="part">
 						<label class="form-label" for="name">Name <span class="required">*</span></label>
-						<input class="form-input" type="text" name="name" maxlength="30"
-							pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus
-							title="Name should contain only letters, spaces, hyphens or apostrophes."> 
+						<input class="form-input" type="text" name="name" maxlength="70"
+							pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" required autofocus
+							title="Name should contain only letters, spaces, hyphens, and apostrophes (1–70 characters)."> 
 					</div>
 					<div class="part">
 						<label class="form-label" for="dob">Date of Birth <span class="required">*</span></label> 
-						<input class="form-input" type="date" id="dob" name="dob" max="<%=minEligibleDate%>"
-						 	title="You must be at least 18 years old." required>
+						<input class="form-input" type="date" id="dob" name="dob"  min="<%=minBirthDate%>" 
+						max="<%=maxBirthDate%>"  title="You must be between 18 and 150 years old. 
+						Allowed DOB: <%= minBirthDateStr %> to <%= maxBirthDateStr %>" required>
 					</div>
 				</div>
 
@@ -72,14 +80,14 @@ LocalDate minEligibleDate = today.minusYears(18);
 					<div class="part-with-icon">
 						<label class="form-label" for="email">Email <span class="required">*</span></label>
 						<input class="form-input" type="email" id="email" name="email"
-							pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" 
-							title="Enter a valid email address (e.g., user@example.com)." required> 
+							pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" maxlength="250"
+							title="Please enter a valid email (e.g., user@example.com) with 6–250 characters." required> 
 						<span class="material-symbols-outlined">mail</span>
 					</div>
 					<div class="part-with-icon">
 						<label class="form-label" for="phone">Phone Number <span class="required">*</span></label> 
 						<input class="form-input" type="text" id="phone" name="phoneNo" maxlength="10" pattern="\d{10}"
-							title="Phone number must be 10 digits" required> 
+							title="Phone number must be exactly 10 digits." required> 
 						<span class="material-symbols-outlined">call</span>
 					</div>
 				</div>
@@ -110,13 +118,14 @@ LocalDate minEligibleDate = today.minusYears(18);
 						<label class="form-label" for="pan">PAN Number <span class="required">*</span></label> 
 						<input class="form-input" type="text" id="pan" name="pan" maxlength="10" pattern="[A-Z]{5}\d{4}[A-Z]"
 							oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" required
-							title="PAN format: 5 uppercase letters, 4 digits, and 1 uppercase letter (e.g., ABCDE1234F).">
+							title="PAN must be in format: 5 uppercase letters, 4 digits, and 1 uppercase letter (e.g., ABCDE1234F).">
 					</div>
 				</div>
 
 				<label class="form-label">Address <span class="required">*</span></label>
-				<input class="form-input" type="text" name="address" maxlength="60" required
-					title="Enter your full address (max 60 characters)."> 
+				<input class="form-input" type="text" name="address" minlength="5" maxlength="60" 
+					pattern="[A-Za-z0-9 ,-\\.]+" required
+					title="Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / -" > 
 				
 				<div class="double-column">
 					<div class="part">
@@ -129,7 +138,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 						<label class="form-label" for="confirm-password">Confirm Password <span class="required">*</span></label> 
 						<input class="form-input" type="password" id="confirm-password"	name="confirm_password" maxlength="20"
 							pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
-							 title="Must match the password above.">
+							 title="Confirm your password. It must match the password you entered a.">
 					</div>
 				</div>
 
@@ -146,7 +155,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 				
 				<div class="group">
 					<p class="signup-text">Already an User?</p>  
-					<a href="${pageContext.request.contextPath}/login.jsp">Login</a>
+					<a href="${pageContext.request.contextPath}/login.jsp">Sign in</a>
 				</div>
 			</form>
 		</div>
@@ -177,7 +186,31 @@ LocalDate minEligibleDate = today.minusYears(18);
 	        nameInput.addEventListener("input", function () {
 	            this.value = this.value.replace(/[0-9]/g, ''); // Remove any digits
 	        });
+	        
+	     // Custom DOB validation: Show clear age-related error
+	       const dob = document.getElementById("dob");
 
+	       dob.addEventListener("invalid", function () {
+	           const validity = dob.validity;
+
+	           if (validity.rangeOverflow) {
+	        	    // Too young: DOB after max (e.g., after 07/13/2007)
+	        	    dob.setCustomValidity(`You must be at least 18 years old.\nAllowed DOB: on or before <%=maxBirthDateStr%>`);
+	        	    dob.reportValidity();
+	        	} 
+	        	else if (validity.rangeUnderflow) {
+	        	    // Too old: DOB before min (e.g., before 07/13/1874)
+	        	    dob.setCustomValidity(`You must be no older than 150 years.\nAllowed DOB: on or after <%=minBirthDateStr%>`);
+	        	    dob.reportValidity();
+	        	}
+	           else {
+	               dob.setCustomValidity(""); // For other errors, use default
+	           }
+	       });
+
+	       dob.addEventListener("input", function () {
+	           dob.setCustomValidity(""); // Always clear previous message on input
+	       });
 
 	        // Toggle password visibility
 	        showPasswordCheckbox.addEventListener("change", function () {

@@ -1,6 +1,8 @@
 package com.mrn.utilshub;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -30,24 +32,47 @@ public class Validator
 {
 
 	private static final Map<String, String> validationPatterns = new HashMap<>();
+	private static final Map<String, String> validationMessages = new HashMap<>();
 	private static StringBuilder errorMsg = new StringBuilder();
 	private static final BranchDAO branchDAO = new BranchDAO();
 	private static final ClientDAO clientDAO = new ClientDAO();
 	private static final AccountsDAO accountsDAO = new AccountsDAO();
+	
+	static {
+	    validationPatterns.put("Name", "^(?=.{1,70}$)[A-Za-z]+(?:[-' ][A-Za-z]+)*$");
+	    validationMessages.put("Name", "Name should contain only letters, spaces, hyphens, and apostrophes (1–70 characters).");
 
-	static
-	{
-		validationPatterns.put("Name", "^[A-Za-z]+(?:[-' ][A-Za-z]+)*$");
-		validationPatterns.put("Gender", "^(Male|Female|Other)$");
-		validationPatterns.put("Email Address", "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-		validationPatterns.put("Phone Number", "^\\d{10}$");
-		validationPatterns.put("Password", "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,20}$");
-		validationPatterns.put("Aadhar Number", "^\\d{12}$");
-		validationPatterns.put("PAN", "^[A-Z]{5}\\d{4}[A-Z]$");
-		validationPatterns.put("Branch Name", "^[A-Za-z0-9 .'-]{3,50}$");
-		validationPatterns.put("Branch Location", "^[A-Za-z .'-]{3,50}$");
-		validationPatterns.put("Account No", "^\\d{11}$");
+	    validationPatterns.put("Gender", "^(Male|Female|Other)$");
+	    validationMessages.put("Gender", "Gender must be Male, Female, or Other.");
+
+	    validationPatterns.put("Email Address", "^(?=.{6,250}$)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+	    validationMessages.put("Email Address", "Please enter a valid email (e.g., user@example.com) with 6–250 characters.");
+
+	    validationPatterns.put("Phone Number", "^\\d{10}$");
+	    validationMessages.put("Phone Number", "Phone number must be exactly 10 digits.");
+
+	    validationPatterns.put("Password", "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,20}$");
+	    validationMessages.put("Password", "Password must be 8–20 characters, with uppercase, lowercase, number, and special character.");
+
+	    validationPatterns.put("Aadhar Number", "^\\d{12}$");
+	    validationMessages.put("Aadhar Number", "Aadhar number must be exactly 12 digits.");
+
+	    validationPatterns.put("PAN", "^[A-Z]{5}\\d{4}[A-Z]$");
+	    validationMessages.put("PAN", "PAN must be in format: 5 uppercase letters, 4 digits, 1 uppercase letter.");
+
+	    validationPatterns.put("Branch Name", "^[A-Za-z0-9 .'-]{3,50}$");
+	    validationMessages.put("Branch Name", "Branch name must be 3–50 characters long and may include letters, numbers, and symbols.");
+
+	    validationPatterns.put("Branch Location", "^[A-Za-z .'-]{3,50}$");
+	    validationMessages.put("Branch Location", "Branch location must be 3–50 letters and may include spaces and punctuation.");
+
+	    validationPatterns.put("Account No", "^\\d{11}$");
+	    validationMessages.put("Account No", "Account number must be exactly 11 digits.");
+
+	    validationPatterns.put("Address", "^(?=.{5,100}$)[A-Za-z0-9 ,.'/-]+$");
+	    validationMessages.put("Address", "Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / -");
 	}
+
 
 	public static StringBuilder checkLoginCredentials(Login credentials)
 	{
@@ -79,10 +104,10 @@ public class Validator
 		if (user instanceof Client)
 		{
 			Client client = (Client) user;
-			checkEmpty(client.getDob(), "Date of Birth");
+			checkValidDate(client.getDob(), "Date of Birth");
 			checkField(client.getAadhar(), "Aadhar Number");
 			checkField(client.getPan(), "PAN");
-			checkEmpty(client.getAddress(), "Address");
+			checkField(client.getAddress(), "Address");
 		}
 		else if (user instanceof Employee)
 		{
@@ -105,7 +130,7 @@ public class Validator
 		if (user instanceof Client)
 		{
 			Client client = (Client) user;
-			checkEmpty(client.getAddress(), "Address");
+			checkField(client.getAddress(), "Address");
 		}
 		return errorMsg;
 	}
@@ -367,8 +392,7 @@ public class Validator
 			BigDecimal balance = accountsDAO.getAccountBalance(accNo);
 			if (balance.compareTo(BigDecimal.ZERO) != 0)
 			{
-				throw new InvalidException(
-						"Account cannot be closed. Balance must be zero, current balance: ₹" + balance);
+				throw new InvalidException("Account cannot be closed. Balance must be zero, current balance: ₹" + balance);
 			}
 		}
 
@@ -578,14 +602,41 @@ public class Validator
 	{
 		if (!checkEmpty(field, fieldName))
 		{
+			// Pattern check
 			Pattern pattern = Pattern.compile(validationPatterns.get(fieldName));
 			Matcher matcher = pattern.matcher(field);
 			if (!matcher.matches())
 			{
-				errorMsg.append(fieldName).append(" is invalid. Please follow the correct format.<br/>");
+				String message = validationMessages.getOrDefault(fieldName,
+		                fieldName + " is invalid. Please follow the correct format.");
+		            errorMsg.append(message).append("<br/>");
 			}
 		}
 	}
+	
+	private static void checkValidDate(String field, String fieldName) {
+	    if (!checkEmpty(field, fieldName)) {
+	        try {
+	            LocalDate dob = LocalDate.parse(field);
+	            LocalDate today = LocalDate.now();
+	            LocalDate minDate = today.minusYears(150);
+	            LocalDate maxDate = today.minusYears(18);
+
+	            if (dob.isBefore(minDate) || dob.isAfter(maxDate)) {
+	                errorMsg.append(fieldName)
+	                        .append(" must be between ")
+	                        .append(minDate)
+	                        .append(" and ")
+	                        .append(maxDate)
+	                        .append(" (Age should be between 18 and 150 years).<br/>");
+	            }
+
+	        } catch (DateTimeParseException e) {
+	            errorMsg.append(fieldName).append(" must be a valid date in yyyy-MM-dd format.<br/>");
+	        }
+	    }
+	}
+
 
 	private static void checkLongField(Long value, String fieldName)
 	{

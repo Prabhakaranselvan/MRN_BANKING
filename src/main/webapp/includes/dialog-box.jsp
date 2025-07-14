@@ -22,6 +22,10 @@
 
         // Reset previous classes
         dialog.classList.remove("toast-success", "toast-error");
+        
+        // Remove any existing outside-click listener to prevent duplicates
+        document.removeEventListener("click", outsideClickListener);
+
 
         if (responseJson.message) {
             title.textContent = "Success";
@@ -37,7 +41,7 @@
             dialog.showModal();
             setTimeout(() => {
                 dialog.close();
-            }, 1000);
+            }, 1500);
             
         } else if (responseJson.error) {
             title.textContent = "Error";
@@ -51,6 +55,16 @@
             dialog.classList.add("toast-error");
 
             dialog.showModal();
+        }
+        
+     // Attach listener for outside click
+        document.addEventListener("click", outsideClickListener);
+
+        function outsideClickListener(event) {
+            if (dialog.open && !dialog.querySelector(".toast-content").contains(event.target)) {
+                dialog.close();
+                document.removeEventListener("click", outsideClickListener);
+            }
         }
     }
 </script>

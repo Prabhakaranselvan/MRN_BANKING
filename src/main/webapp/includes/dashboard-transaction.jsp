@@ -1,4 +1,8 @@
-<div class="transaction-container">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
+	session="false"%>
+	
+<%@ include file="/includes/dashboard-sessionguard.jsp"%><div class="transaction-container">
+
     <h2 class="form-header">FUND OPERATION</h2>
 
     <form id="transferForm" class="transfer-form">

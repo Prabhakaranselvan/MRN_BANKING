@@ -10,7 +10,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
+<title>Sign In</title>
 
 <%@ include file="/includes/head-resources.jsp"%>
 <link rel="stylesheet"
@@ -28,11 +28,11 @@
 					<form id="loginForm" class="login-form">
 
 						<h2>
-							<i class="fa-solid fa-right-to-bracket"></i> Login
+							<i class="fa-solid fa-right-to-bracket"></i> Sign in
 						</h2>
 						<input type="text" id="email" name="email" placeholder="Email"
-						pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" 
-						title="Please enter a valid email address (e.g. user@example.com)"required /> 
+						pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"  maxlength="250"
+						title="Please enter a valid email (e.g., user@example.com) with 6–250 characters." required /> 
 						<div class="password-wrapper">
 						    <input type="password" id="password" name="password" maxlength="20"
 						        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" placeholder="Password" required
