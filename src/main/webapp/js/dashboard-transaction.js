@@ -61,9 +61,10 @@ function initTransactionScript() {
   });
 
   togglePasswordBtn.addEventListener("click", () => {
-    const isVisible = passwordInput.type === "text";
-    passwordInput.type = isVisible ? "password" : "text";
-    togglePasswordBtn.textContent = isVisible ? "visibility" : "visibility_off";
+	const isHidden = passwordInput.type === "password";
+    passwordInput.type = isHidden ? "text" : "password";
+    togglePasswordBtn.textContent = isHidden ? "visibility_off" : "visibility";
+    togglePasswordBtn.title = isHidden ? "Hide Password" : "Show Password";
   });
 
   if (userRole === 0) {
@@ -124,6 +125,7 @@ function initTransactionScript() {
       const peer = parseInt(peerAccNoInside.value);
       if (isNaN(peer)) return handleResponse({ error: "Please enter a valid inside bank recipient account number." });
       body.peerAccNo = peer;
+	  body.internalTransfer = true;
     }
 
     if (txn === 4) {

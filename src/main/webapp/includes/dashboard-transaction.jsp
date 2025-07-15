@@ -1,8 +1,7 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
-	session="false"%>
-	
-<%@ include file="/includes/dashboard-sessionguard.jsp"%><div class="transaction-container">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false" %>
+<%@ include file="/includes/dashboard-sessionguard.jsp" %>
 
+<div class="transaction-container">
     <h2 class="form-header">FUND OPERATION</h2>
 
     <form id="transferForm" class="transfer-form">
@@ -71,7 +70,7 @@
                 <label for="txnPassword">Transaction Password</label>
                 <div class="password-wrapper">
                     <input type="password" id="txnPassword" name="txnPassword" required placeholder="Enter your password" />
-                    <span id="togglePassword" class="material-icons toggle-password">visibility_off</span>
+                    <span id="togglePassword" class="material-icons toggle-password" title="Show Password">visibility</span>
                 </div>
             </div>
         </div>

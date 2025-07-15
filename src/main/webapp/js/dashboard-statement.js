@@ -160,7 +160,6 @@ function initStatementScript() {
         })
         .then(res => res.json())
 		.then(data => {
-		    handleResponse(data);
 		    if (data.Transactions && data.Transactions.length > 0) {
 		        displayStatement(data.Transactions);
 		        paginationWrapper.style.display = "flex";

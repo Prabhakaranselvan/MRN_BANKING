@@ -1,6 +1,5 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
-	session="false"%>
-<%@ include file="/includes/dashboard-sessionguard.jsp"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false" %>
+<%@ include file="/includes/dashboard-sessionguard.jsp" %>
 
 <div class="container">
 	<div class="account-requests-container">

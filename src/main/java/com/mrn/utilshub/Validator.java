@@ -458,46 +458,43 @@ public class Validator
 		{
 			checkLongField(txn.getPeerAccNo(), "Peer Acc No");
 		}
-
 		
+		if (txnType == TxnType.DEBIT) {
+		    Long peerAccNo = txn.getPeerAccNo();
+		    boolean isInternal = txn.isInternalTransfer();
+		    System.out.println(isInternal);
 
-		// ✅ Additional Validation for Outside Bank Transfers
-		if (txnType == TxnType.DEBIT)
-		{
-			Long peerAccNo = txn.getPeerAccNo();
-			if (peerAccNo != null && !accountsDAO.doesAccountExist(peerAccNo))
-			{
-				String extraInfo = txn.getExtraInfo();
-				if (extraInfo == null || extraInfo.isEmpty())
-				{
-					errorMsg.append("Extra info is required for outside bank transfer.<br/>");
-				}
-				else
-				{
-					try
-					{
-						JSONObject extra = new JSONObject(extraInfo);
-						if (!extra.has("peerBankName") || extra.getString("peerBankName").isBlank())
-						{
-							errorMsg.append("Peer Bank Name is required in extra info.<br/>");
-						}
-						if (!extra.has("peerIFSCCode") || extra.getString("peerIFSCCode").isBlank())
-						{
-							errorMsg.append("Peer IFSC Code is required in extra info.<br/>");
-						}
-						if (!extra.has("peerName") || extra.getString("peerName").isBlank())
-						{
-							errorMsg.append("Peer Name is required in extra info.<br/>");
-						}
-					}
-					catch (Exception e)
-					{
-						errorMsg.append("Invalid extraInfo JSON format for outside bank transfer.<br/>");
-					}
-				}
-			}
+		    if (isInternal) {
+		        // Internal transfer must have a valid peer account number
+		        if (peerAccNo == null || !accountsDAO.doesAccountExist(peerAccNo)) {
+		            errorMsg.append("For internal bank transfer, provide a valid internal account number.<br/>");
+		        }
+		    } else {
+		        // External transfer
+		    	if (peerAccNo != null && accountsDAO.doesAccountExist(peerAccNo)) {
+		    		throw new InvalidException("External transfers cannot be made to MRN Bank accounts.<br/>");
+		        }
+	            String extraInfo = txn.getExtraInfo();
+	            if (extraInfo == null || extraInfo.isEmpty()) {
+	                errorMsg.append("Extra info is required for outside bank transfer.<br/>");
+	            } else {
+	                try {
+	                    JSONObject extra = new JSONObject(extraInfo);
+	                    if (!extra.has("peerBankName") || extra.getString("peerBankName").isBlank()) {
+	                        errorMsg.append("Peer Bank Name is required in extra info.<br/>");
+	                    }
+	                    if (!extra.has("peerIFSCCode") || extra.getString("peerIFSCCode").isBlank()) {
+	                        errorMsg.append("Peer IFSC Code is required in extra info.<br/>");
+	                    }
+	                    if (!extra.has("peerName") || extra.getString("peerName").isBlank()) {
+	                        errorMsg.append("Peer Name is required in extra info.<br/>");
+	                    }
+	                } catch (Exception e) {
+	                    errorMsg.append("Invalid extraInfo JSON format for outside bank transfer.<br/>");
+	                }
+	            }
+		    }
 		}
-
 		return errorMsg;
 	}
 

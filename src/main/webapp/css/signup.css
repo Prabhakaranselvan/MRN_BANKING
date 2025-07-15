@@ -205,7 +205,30 @@ body {
 	font-size:16px;
 }
 
+/* ==== Show Password Checkbox ==== */
+.show-password {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #34495e;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  cursor: pointer; /* Ensures entire area is clickable */
+  user-select: none; /* Prevents text selection on click */
+}
+
+.show-password input[type="checkbox"] {
+  cursor: pointer;
+  transform: scale(1.1); /* Slightly larger and easier to click */
+  accent-color: #3498db; /* Optional: modern blue checkbox */
+}
+
+
+/* ==== Error Messages ==== */
 .error-message {
-	height: 20px;
-	overflow: hidden;
+  font-size: 14px;
+  font-weight: bold;
+  color: #e74c3c;
+  height: 20px;
 }

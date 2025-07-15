@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8" session="false" %>
 
 <!-- Dialog Modal -->
 <dialog id="dialog" class="custom-toast">
@@ -26,35 +25,37 @@
         // Remove any existing outside-click listener to prevent duplicates
         document.removeEventListener("click", outsideClickListener);
 
+        let isSuccess = false;
 
         if (responseJson.message) {
             title.textContent = "Success";
             message.textContent = responseJson.message;
             dialog.classList.add("toast-success");
-
-            dialog.addEventListener("close", () => {
-                if (redirectUrl) {
-                	window.location.replace(redirectUrl);
-                }
-            }, { once: true }); // Ensures it's removed after one execution
-            
-            dialog.showModal();
-            setTimeout(() => {
-                dialog.close();
-            }, 1500);
-            
+            isSuccess = true;
         } else if (responseJson.error) {
             title.textContent = "Error";
             message.innerHTML = responseJson.error;
             dialog.classList.add("toast-error");
-
-            dialog.showModal();
         } else {
             title.textContent = "Notice";
             message.textContent = "Unexpected response.";
             dialog.classList.add("toast-error");
+        }
 
-            dialog.showModal();
+        // ✅ Attach redirect only if redirectUrl is provided
+        if (redirectUrl) {
+            dialog.addEventListener("close", () => {
+                window.location.replace(redirectUrl);
+            }, { once: true });
+        }
+
+        dialog.showModal();
+
+        // ✅ Auto-close only for success
+        if (isSuccess) {
+            setTimeout(() => {
+                if (dialog.open) dialog.close();
+            }, 1500);
         }
         
      // Attach listener for outside click

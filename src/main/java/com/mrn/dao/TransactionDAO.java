@@ -52,13 +52,14 @@ public class TransactionDAO
 			pstmt.setLong(10, txn.getDoneBy());
 			
 			String extraInfo = txn.getExtraInfo();
-			if (txn.isExternalTransfer())
+			System.out.println(txn.isInternalTransfer());
+			if (txn.isInternalTransfer())
 			{
-				pstmt.setString(11, extraInfo.trim());
+				pstmt.setNull(11, java.sql.Types.VARCHAR);
 			}
 			else
 			{
-				pstmt.setNull(11, java.sql.Types.VARCHAR);
+				pstmt.setString(11, extraInfo.trim());
 			}
 			
 

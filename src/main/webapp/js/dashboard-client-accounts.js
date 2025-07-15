@@ -55,7 +55,10 @@ function initClientAccountsScript() {
         const selectedAccountNo = accountSelect.value;
         accountInfo.innerHTML = "";
 
-        if (!selectedAccountNo) return;
+        if (!selectedAccountNo) {
+		    accountInfo.innerHTML = `<p>Please select an account to view details.</p>`;
+		    return;
+		  }
 
         fetch("/MRN_BANKING/MRNBank/accounts", {
             method: "POST",

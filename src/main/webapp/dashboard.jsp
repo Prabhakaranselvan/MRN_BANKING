@@ -1,12 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false" %>
 <%
     HttpSession session = request.getSession(false); // Do not create a new session
-
-    // Redirect to login if session is missing
     if (session == null || session.getAttribute("userId") == null) {
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
+    
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+    
     String userName = (String) session.getAttribute("name");
     String userEmail = (String) session.getAttribute("email");
     Long userId = (Long) session.getAttribute("userId");
@@ -17,7 +20,6 @@
     request.setAttribute("userName", userName);
     request.setAttribute("userRole", userRole);
     request.setAttribute("userEmail", userEmail);
-    
     request.setAttribute("showProfile", true);
 %>
 
@@ -53,10 +55,6 @@
 			    <span class="material-icons">dashboard</span>
 			    <span class="link-text">Dashboard</span>
 			</a>
-           <!--  <a href="#" onclick="loadContent('dashboard-profile.jsp'); return false;">
-            	<span class="material-icons">person</span>
-            	<span class="link-text">My Profile</span>
-           	</a> -->
            	<%
             	}
            		if (userRole == 1 || userRole == 2 || userRole == 3) {
@@ -108,88 +106,90 @@
 			  <span class="material-icons">business</span>
 			  <span class="link-text">Branch Directory</span>
 			</a>
-			
-           <!--  <a href="#"><span class="material-icons">help</span><span class="link-text">Help</span></a>
-            <a href="#"><span class="material-icons">settings</span><span class="link-text">Settings</span></a>
-            <a href="#"><span class="material-icons">lock</span><span class="link-text">Password</span></a> -->
         </nav>
 
         <button class="toggle-btn" onclick="toggleSidebar()">
-		    <span class="material-icons" id="toggle-icon">menu</span>
+        	<span class="material-icons" id="toggle-icon">menu</span>
 		</button>
-
     </aside>
     
     <div class="dashboard-wrapper">
         <!-- Main Content -->
-        <main class="dashboard-content"  id="main-content">
-           <%@ include file="/includes/dashboard-main.jsp" %>
-        </main>
-        
+        <main class="dashboard-content"  id="main-content"></main>
+     
         <%@ include file="/includes/footer.jsp" %>
       	<%@ include file="/includes/dialog-box.jsp"%>
-      	
     </div> 
-    
+ 
     <div id="modal-root"></div>
-<script>
-    window.appContext = "${pageContext.request.contextPath}";
     
-    function closeDropdown() {
-        const dropdown = document.querySelector(".zoho-style-dropdown");
-        dropdown?.classList.remove("show");
-    }
-
-    const userRole = parseInt(document.body.getAttribute("data-user-role"));
-    document.addEventListener("DOMContentLoaded", function () {
-    	if (userRole === 0) {
-   			 loadContent("dashboard-main.jsp");
-   		}
-    	else if (userRole === 1) {
-   			loadContent("dashboard-accounts.jsp")
-   		}
-    	else {
-    		loadContent("dashboard-admin.jsp");
-			}
-    	
-
-        // Profile dropdown toggle
-        const profileBtn = document.querySelector(".profile-icon-btn");
-        const dropdown = document.querySelector(".zoho-style-dropdown");
-        const closeBtn = document.querySelector(".close-btn");
-
-        function toggleDropdown() {
-            dropdown.classList.toggle("show");
-        }
-
-        function closeDropdown() {
-            dropdown.classList.remove("show");
-        }
-
-        // Toggle on button click
-        profileBtn?.addEventListener("click", (e) => {
-            e.stopPropagation();
-            toggleDropdown();
-        });
-
-        // Close on outside click
-        document.addEventListener("click", (e) => {
-            if (!dropdown.contains(e.target) && !profileBtn.contains(e.target)) {
-                closeDropdown();
-            }
-        });
-
-        // Close on ✕ button
-        closeBtn?.addEventListener("click", (e) => {
-            e.stopPropagation();
-            closeDropdown();
-        });
-    });
-</script>
-
-    <script src="${pageContext.request.contextPath}/js/dashboard.js"></script>
-   
-    
-
+	<script>
+	    window.appContext = "${pageContext.request.contextPath}";
+	    
+	 // Prevent navigating back to login/signup pages after login
+	    if (window.history && window.history.pushState) {
+	    window.history.pushState(null, "", location.href);
+	    window.onpopstate = function () {
+	        window.history.pushState(null, "", location.href);
+	    };
+	}
+	
+	    
+	    function closeDropdown() {
+	        const dropdown = document.querySelector(".zoho-style-dropdown");
+	        dropdown?.classList.remove("show");
+	    }
+	
+	    const userRole = parseInt(document.body.getAttribute("data-user-role"));
+	    document.addEventListener("DOMContentLoaded", function () {
+	    	if (userRole === 0) {
+	   			 loadContent("dashboard-main.jsp");
+	   		}
+	    	else if (userRole === 1) {
+	   			loadContent("dashboard-accounts.jsp")
+	   		}
+	    	else {
+	    		loadContent("dashboard-admin.jsp");
+				}
+	    	
+	
+	        // Profile dropdown toggle
+	        const profileBtn = document.querySelector(".profile-icon-btn");
+	        const dropdown = document.querySelector(".zoho-style-dropdown");
+	        const closeBtn = document.querySelector(".close-btn");
+	
+	        function toggleDropdown() {
+	            dropdown.classList.toggle("show");
+	        }
+	
+	        function closeDropdown() {
+	            dropdown.classList.remove("show");
+	        }
+	
+	        // Toggle on button click
+	        profileBtn?.addEventListener("click", (e) => {
+	            e.stopPropagation();
+	            toggleDropdown();
+	        });
+	
+	        // Close on outside click
+	        document.addEventListener("click", (e) => {
+	            if (!dropdown.contains(e.target) && !profileBtn.contains(e.target)) {
+	                closeDropdown();
+	            }
+	        });
+	
+	        // Close on ✕ button
+	        closeBtn?.addEventListener("click", (e) => {
+	            e.stopPropagation();
+	            closeDropdown();
+	        });
+	    });
+	</script>
+	
+	<!-- Scripts -->
+	<script src="${pageContext.request.contextPath}/js/dashboard.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </body>
 </html>

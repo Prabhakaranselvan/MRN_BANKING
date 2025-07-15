@@ -1,43 +1,42 @@
 @charset "UTF-8";
 
 .profile-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.4);
+	z-index: 9999;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .profile-modal-box {
-    background: #fff;
-    border-radius: 12px;
-    width: 590px;
-    padding: 30px;
-    position: relative;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+	background: #fff;
+	border-radius: 12px;
+	width: 590px;
+	padding: 30px;
+	position: relative;
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
 }
 
 .profile-close-btn {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #555;
-    transition: color 0.2s;
+	position: absolute;
+	top: 12px;
+	right: 16px;
+	background: none;
+	border: none;
+	font-size: 24px;
+	cursor: pointer;
+	color: #555;
+	transition: color 0.2s;
 }
 
 .profile-close-btn:hover {
-    color: #e74c3c;
+	color: #e74c3c;
 }
-
 
 /* Form Styling */
 .profile-mrn-form {
@@ -73,8 +72,9 @@
 	margin-bottom: 25px;
 	background: #f0f2f5;
 	border-radius: 14px;
-	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);
-	color: #2c3e50;
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px
+		rgba(0, 0, 0, 0.05);
+	color: #000000;
 	transition: all 0.3s ease;
 }
 
@@ -82,6 +82,13 @@
 	outline: none;
 	background: #e6ecf3;
 	box-shadow: 0 0 0 2px #3498db;
+}
+
+.profile-form-input:disabled {
+	background: #f4f4f4;   /* Grayed-out background */
+	color: #7f8c8d;         /* Muted text color */
+	box-shadow: none;
+	cursor: not-allowed;
 }
 
 /* Required Star */
@@ -178,4 +185,21 @@
 
 .profile-password-confirm {
 	flex-direction: column;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Material Icons';
+    font-size: 22px;
+    color: #999;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.password-toggle-icon:hover {
+   color: #000;
 }

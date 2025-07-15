@@ -97,7 +97,7 @@ public class TransactionHandler
 			Long peerAccNo = txn.getPeerAccNo();
 
 			if (txnType == TxnType.DEBIT && peerAccNo != null) {
-				if (accountsDAO.doesAccountExist(peerAccNo)) {
+				if (txn.isInternalTransfer() && accountsDAO.doesAccountExist(peerAccNo)) {
 					processInternalTransaction(txn, peerAccNo, sessionUserId); // Internal bank transfer
 				} else {
 					processExternalTransfer(txn, sessionUserId); // Outside bank transfer with extraInfo
@@ -158,7 +158,6 @@ public class TransactionHandler
 
 		BigDecimal newBalance = currentBalance.subtract(txnAmount);
 		txn.setClosingBalance(newBalance);
-		txn.setExternalTransfer(true);
 
 		// At this point, extraInfo is already validated in Validator.checkTransaction()
 		txnDAO.addTransaction(txn);
@@ -225,8 +224,9 @@ public class TransactionHandler
 		txn.setTxnStatus((short) TxnStatus.SUCCESS.getValue());
 		txn.setTxnRefNo(senderTxn.getTxnRefNo());
 		txn.setClosingBalance(newBalance);
-		txn.setDescription(senderTxn.getDescription());
+		txn.setDescription("Received From" + senderTxn.getAccountNo());
 		txn.setDoneBy(userId);
+		txn.setInternalTransfer(true);
 		return txn;
 	}
 }

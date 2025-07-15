@@ -17,7 +17,7 @@ public class Transaction
 	private String description;
 	private Long doneBy;
 	private String extraInfo;
-	private boolean externalTransfer;
+	private boolean internalTransfer;
 	
 	private String Password;
 
@@ -161,14 +161,14 @@ public class Transaction
 		this.extraInfo = extraInfo;
 	}
 
-	public boolean isExternalTransfer()
+	public boolean isInternalTransfer()
 	{
-		return externalTransfer;
+		return internalTransfer;
 	}
 
-	public void setExternalTransfer(boolean externalTransfer)
+	public void setInternalTransfer(boolean externalTransfer)
 	{
-		this.externalTransfer = externalTransfer;
+		this.internalTransfer = externalTransfer;
 	}
 	
 	

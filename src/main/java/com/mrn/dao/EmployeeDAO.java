@@ -69,7 +69,7 @@ public class EmployeeDAO
 			params.add(role);
 		}
 
-		sql.append(" ORDER BY e.employee_id ASC LIMIT ? OFFSET ?");
+		sql.append(" ORDER BY e.employee_id DESC LIMIT ? OFFSET ?");
 		params.add(limit);
 		params.add(offset);
 

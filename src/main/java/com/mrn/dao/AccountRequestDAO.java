@@ -84,7 +84,7 @@ public class AccountRequestDAO
 			params.add(status);
 		}
 
-		sql.append(" ORDER BY requested_time ASC LIMIT ? OFFSET ?");
+		sql.append(" ORDER BY request_id DESC LIMIT ? OFFSET ?");
 		params.add(limit);
 		params.add(offset);
 

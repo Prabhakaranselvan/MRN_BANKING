@@ -1,6 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
 
 <header class="banner">
     <div class="logo-container">
@@ -23,7 +22,7 @@
 			            <div class="profile-info">
 			                <div class="user-name">${userName}</div>
 			                <div class="user-email">${userEmail}</div>
-			                <div class="user-id">User Id: ${userId} <span class="material-symbols-outlined help-icon" title="Unique internal ID">help</span></div>
+			                <div class="user-id">User Id: ${userId}</div>
 			                <div class="user-role">User Role: 
 				                <strong><c:choose>
 								            <c:when test="${userRole == 0}">Client</c:when>
@@ -66,8 +65,8 @@
   </div>
 </div>
 
-
 <style>
+
 .logout-modal {
   position: fixed;
   inset: 0;
@@ -75,7 +74,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 99999;
   font-family: 'Segoe UI', sans-serif;
 }
 
@@ -151,7 +150,4 @@
 .logout-confirm-btn:hover {
   background-color: #b71c1c;
 }
-
-
 </style>
-

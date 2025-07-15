@@ -1,5 +1,6 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false" %>
 <%@ include file="/includes/dashboard-sessionguard.jsp" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <div class="dashboard-main">
   <!-- Welcome, Balance, and Transfer -->
@@ -29,7 +30,8 @@
          <select id="accountSelectDropdown" class="account-select-dropdown">
 	      <option value="">-- All Accounts --</option>
 	    </select>
-        <span class="material-icons clickable" onclick="loadContent('dashboard-client-accounts.jsp')">open_in_new</span>
+        <span class="material-icons clickable" onclick="loadContent('dashboard-client-accounts.jsp')" 
+        	title ="Accounts">open_in_new</span>
         </div>
       </div>
       <div id="accountCards" class="card-container"></div>
@@ -48,14 +50,11 @@
   <div class="section-box">
     <div class="section-header">
       <h4>Latest Transactions</h4>
-      <span class="material-icons clickable" onclick="loadContent('dashboard-statement.jsp')">open_in_new</span>
+      <span class="material-icons clickable" onclick="loadContent('dashboard-statement.jsp')" 
+      	title ="Account Statement">open_in_new</span>
     </div>
     <div id="modernTxnList" class="txn-list">
       <p>Loading...</p>
     </div>
   </div>
 </div>
-
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>

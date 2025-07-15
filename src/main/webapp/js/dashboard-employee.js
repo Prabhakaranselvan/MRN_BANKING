@@ -152,8 +152,14 @@ function initEmployeesScript() {
   }
 
 
-  if (roleFilter) roleFilter.addEventListener("change", () => loadEmployees(1));
-  if (branchFilter) branchFilter.addEventListener("change", () => loadEmployees(1));
+  if (roleFilter) roleFilter.addEventListener("change", () => {
+     currentPage = 1;
+     loadEmployees(currentPage);
+   });
+  if (branchFilter) branchFilter.addEventListener("change", () => {
+      currentPage = 1;
+      loadEmployees(currentPage);
+    });
 
   prevBtn.addEventListener("click", () => {
     if (currentPage > 1) {

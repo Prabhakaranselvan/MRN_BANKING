@@ -148,18 +148,20 @@ input[type="submit"]:hover {
 }
 
 .toggle-icon {
-	position: absolute;
-	right: 10px;
-	top: 50%;
-	transform: translateY(-50%);
-	cursor: pointer;
-	color: #666;
-	user-select: none;
-	font-size: 20px;
-	transition: color 0.2s;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Material Icons';
+    font-size: 22px;
+    color: #999;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
 }
 
 .toggle-icon:hover {
-	color: #2062e4;
+    color: #000;
 }
+
 

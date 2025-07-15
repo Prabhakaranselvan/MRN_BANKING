@@ -56,7 +56,7 @@ function initMainScript() {
     totalBalEl.textContent = `₹${totalBalance.toFixed(2)}`;
 	
 	// Insert dropdown and info panel
-	    cardsContainer.prepend(accountInfo);
+	cardsContainer.prepend(accountInfo);
 		
     renderDoughnutChart(labels, balances, colors);
   }
@@ -93,7 +93,7 @@ function initMainScript() {
         },
         body: JSON.stringify({ accountNo: parseInt(selectedAccountNo) })
       })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         const acc = data.Account.account;
         const branchName = data.Account.branchName;

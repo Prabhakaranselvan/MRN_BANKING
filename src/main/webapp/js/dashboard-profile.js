@@ -26,6 +26,19 @@ function initProfileScript() {
         this.value = this.value.replace(/[0-9]/g, ''); // Remove any digits
     });
 	
+	//Toggle password
+	const toggleIcon = document.querySelector(".password-toggle-icon");
+	const passwordInput = document.getElementById("password");
+
+	if (toggleIcon && passwordInput) {
+	    toggleIcon.addEventListener("click", function togglePasswordVisibility() {
+			const isHidden = passwordInput.type === "password";
+	        passwordInput.type = isHidden ? "text" : "password";
+	        toggleIcon.textContent = isHidden ? "visibility_off" : "visibility";
+	        toggleIcon.title = isHidden ? "Hide Password" : "Show Password";
+	    });
+	}
+	
 	const isSelfEdit = !targetId && userRole!==3;
 	const isEditingClient = targetRole === 0 || userRole === 0;
 	
@@ -41,12 +54,6 @@ function initProfileScript() {
 				isPrivilegedEditing = targetRole < userRole;
 			}
 	}
-	console.log(targetRole);
-	console.log(userRole);
-	console.log(isSelfEdit);
-	console.log(isEditingClient);
-	console.log(isPrivilegedEditing);
-
 
     const clientOnlyFields = document.getElementById("client-only-fields");
 	const dobWrapper = document.getElementById("dob-wrapper");
@@ -160,7 +167,6 @@ function initProfileScript() {
         })
         .then(res => res.json())
         .then(data => {
-            console.log("Update profile response:", data);
             handleResponse(data);
             isEditMode = false;
 
@@ -195,7 +201,6 @@ function fetchProfileData(form, userId, isEditingClient) {
         return data;
     }))
     .then(data => {
-        console.log("Fetch profile response:", data);
         const user = data.clients || data.Employee;
 
         if (user) {

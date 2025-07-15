@@ -1,11 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%>
+
 <%
     HttpSession session = request.getSession(false); // Do not create a new session
     if (session != null && session.getAttribute("userId") != null) {
         response.sendRedirect(request.getContextPath() + "/dashboard.jsp");
         return;
     }
+    
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
 %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,7 +43,7 @@
 						    <input type="password" id="password" name="password" maxlength="20"
 						        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" placeholder="Password" required
 						        title="Password must be 8–20 characters with uppercase, lowercase, number, and special character." />
-						    <span id="toggle-password" class="toggle-icon material-icons">visibility</span>
+						    <span id="toggle-password" class="toggle-icon material-icons" title="Show Password">visibility</span>
 						</div>
 
 						<input type="submit" value="Sign in" />
@@ -55,18 +61,13 @@
 	<%@ include file="/includes/footer.jsp"%>
 	<%@ include file="/includes/dialog-box.jsp"%>
 
-	<script>		
+	<script>	
 		document.getElementById("toggle-password").addEventListener("click", function () {
 		    const passwordInput = document.getElementById("password");
-		    const type = passwordInput.getAttribute("type");
-		    
-		    if (type === "password") {
-		        passwordInput.setAttribute("type", "text");
-		        this.textContent = "visibility_off";
-		    } else {
-		        passwordInput.setAttribute("type", "password");
-		        this.textContent = "visibility";
-		    }
+		    const isHidden = passwordInput.type === "password";
+		    passwordInput.type = isHidden ? "text" : "password";
+		    this.textContent = isHidden ? "visibility_off" : "visibility";
+		    this.title = isHidden ? "Hide Password" : "Show Password";
 		});
 	 
 	    document.getElementById("loginForm").addEventListener("submit", async function (event) {
@@ -92,6 +93,7 @@
 	            handleResponse({ error: "An error occurred while connecting to the server." });
 	        }
 	    });
+	    
 	</script>
 	
 </body>

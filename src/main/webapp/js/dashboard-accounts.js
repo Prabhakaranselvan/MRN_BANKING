@@ -1,4 +1,3 @@
-
 function initAccountsScript() {
   const container = document.getElementById("accountsList");
   const prevBtn = document.getElementById("prevPage");
@@ -37,8 +36,6 @@ function initAccountsScript() {
   }
 
   function setFixedBranch(branchId) {
-    console.log("[setFixedBranch] Starting with branchId:", branchId);
-
     fetch("/MRN_BANKING/MRNBank/branch", {
       method: "POST",
       headers: {
@@ -47,13 +44,8 @@ function initAccountsScript() {
       },
       body: JSON.stringify({ branchId })
     })
-      .then(res => res.json())
-      .then(data => {
-        if (!data.branch) {
-          console.warn("[setFixedBranch] No branch data returned", data);
-          return;
-        }
-
+      .then(handleFetchResponse)
+	  .then(data => {
         const label = `${data.branch.branchName} (${data.branch.branchLocation})`;
         const value = String(data.branch.branchId);
         const option = new Option(label, value);
@@ -68,10 +60,13 @@ function initAccountsScript() {
           opt.selected = true;
           select.appendChild(opt);
           select.value = value;
-          console.log(`[setFixedBranch] Set branch-input[${i}] value to: ${select.value}`);
         });
       })
-      .catch(err => console.error("[setFixedBranch] Error:", err));
+	  .catch((err) => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   }
 
   function loadBranches() {
@@ -82,7 +77,7 @@ function initAccountsScript() {
         Method: "GET"
       }
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         branchFilter.innerHTML = '<option value="">All Branches</option>';
         document.querySelectorAll("select.branch-input").forEach(select => {
@@ -98,7 +93,12 @@ function initAccountsScript() {
             select.appendChild(opt.cloneNode(true));
           });
         });
-      });
+      })
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   }
 
   function loadAccounts(page) {
@@ -113,7 +113,7 @@ function initAccountsScript() {
         Method: "GET"
       }
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
 		if (data.Accounts && data.Accounts.length > 0) {
           renderAccounts(data.Accounts);
@@ -132,8 +132,10 @@ function initAccountsScript() {
         }
       })
       .catch(err => {
-        console.error("Failed to fetch accounts", err);
-        container.innerHTML = "<p class='error'>Error loading accounts.</p>";
+		if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	      container.innerHTML = "<p class='error'>Error loading accounts.</p>";
+	    }
       });
   }
 
@@ -224,11 +226,16 @@ function initAccountsScript() {
       },
       body: JSON.stringify(json)
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         handleResponse(data);
         addModal.style.display = "none";
         loadAccounts(currentPage);
+      })
+	  .catch(err => {
+  		if (err !== "handled") {
+  	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+  	    }
       });
   });
 
@@ -248,17 +255,30 @@ function initAccountsScript() {
       },
       body: JSON.stringify(json)
     })
-      .then(res => res.json())
-      .then(data => {
-        handleResponse(data);
-        updateModal.style.display = "none";
-		updateForm.reset(); // This clears all inputs including password
-        loadAccounts(currentPage);
-      });
+    .then(handleFetchResponse)
+    .then(data => {
+      handleResponse(data);
+      updateModal.style.display = "none";
+   	  updateForm.reset(); // This clears all inputs including password
+      loadAccounts(currentPage);
+    })
+    .catch(err => {
+	  if (err !== "handled") {
+        handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+      }
+    });
   });
 
-  typeFilter.addEventListener("change", () => loadAccounts(1));
-  branchFilter.addEventListener("change", () => loadAccounts(1));
+  typeFilter.addEventListener("change", () => {
+    currentPage = 1;
+    loadAccounts(currentPage);
+  });
+
+  branchFilter.addEventListener("change", () => {
+    currentPage = 1;
+    loadAccounts(currentPage);
+  });
+
 
   prevBtn.addEventListener("click", () => {
     if (currentPage > 1) {

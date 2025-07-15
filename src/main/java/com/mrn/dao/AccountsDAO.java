@@ -206,7 +206,7 @@ public class AccountsDAO
 			params.add(type);
 		}
 
-		sql.append(" ORDER BY account_no ASC LIMIT ? OFFSET ?");
+		sql.append(" ORDER BY account_no DESC LIMIT ? OFFSET ?");
 		params.add(limit);
 		params.add(offset);
 

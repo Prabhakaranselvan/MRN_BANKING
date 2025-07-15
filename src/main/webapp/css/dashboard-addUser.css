@@ -175,15 +175,23 @@ select:focus {
   color: #34495e;
   margin-top: -10px;
   margin-bottom: 10px;
+  cursor: pointer; /* Ensures entire area is clickable */
+  user-select: none; /* Prevents text selection on click */
 }
+
+.user-show-password input[type="checkbox"] {
+  cursor: pointer;
+  transform: scale(1.1); /* Slightly larger and easier to click */
+  accent-color: #3498db; /* Optional: modern blue checkbox */
+}
+
 
 /* ==== Error Messages ==== */
 .user-error-message {
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: bold;
   color: #e74c3c;
-  margin-top: -10px;
-  margin-bottom: 10px;
-  min-height: 18px;
+  height: 20px;
 }
 
 /* ==== Responsive Enhancements ==== */

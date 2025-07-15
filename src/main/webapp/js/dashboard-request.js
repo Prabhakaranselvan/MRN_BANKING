@@ -179,8 +179,15 @@ function initRequestScript() {
       });
   };
 
-  if (statusFilter) statusFilter.addEventListener("change", () => loadRequests(1));
-  if (branchFilter) branchFilter.addEventListener("change", () => loadRequests(1));
+  if (statusFilter) statusFilter.addEventListener("change", () => {
+      currentPage = 1;
+      loadRequests(currentPage);
+  });
+  if (branchFilter) branchFilter.addEventListener("change", () =>  {
+       currentPage = 1;
+       loadRequests(currentPage);
+   });
+   
   prevBtn.addEventListener("click", () => {
     if (currentPage > 1) {
       currentPage--;

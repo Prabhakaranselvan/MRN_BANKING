@@ -3,19 +3,10 @@ function initAddUserScript() {
     const userCategorySelect = document.getElementById("userCategory");
     const branchSelect = document.getElementById("branchSelect");
     const dobField = document.getElementById("dob");
-    const showPasswordCheckbox = document.getElementById("show-password");
-    const password = document.getElementById("password");
-    const confirmPassword = document.getElementById("confirm-password");
-    const errorMessage = document.getElementById("password-error");
 
 	const userRole = parseInt(document.body.dataset.userRole);       // Logged-in user's role
     const targetRole = parseInt(document.body.dataset.targetRole);
 	const userBranchId = parseInt(document.body.dataset.branchId);
-	    
-    if (!form || !password || !confirmPassword || !userCategorySelect) {
-        console.warn("Add Client form elements not found.");
-        return;
-    }
 
     // Enforce numeric-only input
     const numberInputs = document.querySelectorAll("#phone, #aadhar");
@@ -41,15 +32,6 @@ function initAddUserScript() {
     nameInput.addEventListener("input", function () {
         this.value = this.value.replace(/[0-9]/g, ''); // Remove any digits
     });
-
-    // Toggle password visibility
-    if (showPasswordCheckbox) {
-        showPasswordCheckbox.addEventListener("change", function () {
-            const type = this.checked ? "text" : "password";
-            password.type = type;
-            confirmPassword.type = type;
-        });
-    }
 	
 	const isGM = userRole === 3;
 	// Determine if branch selection should be fixed
@@ -148,17 +130,43 @@ function initAddUserScript() {
         }
     });
 
+
+	const password = document.getElementById("password");
+	const confirmPassword = document.getElementById("confirm-password");
+    const errorMessage = document.getElementById("password-error");
+	let errorTimer = null;
+		        
+     // Function to show mismatch error
+    function showPasswordMismatchError() {
+        errorMessage.textContent = "Passwords do not match!";
+        errorMessage.style.color = "red";
+
+        if (errorTimer) clearTimeout(errorTimer);
+        errorTimer = setTimeout(() => {
+            errorMessage.textContent = "";
+        }, 3000);
+    }
+	
+	// Toggle password visibility
+	const showPasswordCheckbox = document.getElementById("show-password");
+	if (showPasswordCheckbox) {
+	    showPasswordCheckbox.addEventListener("change", function () {
+	        const type = this.checked ? "text" : "password";
+	        password.type = type;
+	        confirmPassword.type = type;
+	    });
+	}
+			
 	// Form submission
 	form.addEventListener("submit", function (e) {
 	    e.preventDefault();
 
-	    if (password.value !== confirmPassword.value) {
-	        errorMessage.textContent = "Passwords do not match!";
-	        errorMessage.style.color = "red";
-	        return;
-	    } else {
-	        errorMessage.textContent = "";
-	    }
+		if (password.value !== confirmPassword.value) {
+            showPasswordMismatchError();
+            return;
+        }
+
+        errorMessage.textContent = ""; // Clear if matched
 
 		const formData = new FormData(form);
 	    const role = parseInt(formData.get("userCategory"));
@@ -218,5 +226,12 @@ function initAddUserScript() {
 	        handleResponse({ error: "Failed to submit form." });
 	    });
 	});
+
+    // Optional: Show early mismatch if both fields are filled and focus leaves confirm
+    confirmPassword.addEventListener("blur", () => {
+        if (password.value && confirmPassword.value && password.value !== confirmPassword.value) {
+            showPasswordMismatchError();
+        }
+    });
 
 }

@@ -1,22 +1,17 @@
-
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8" session="false"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8" session="false"%>
 <%@ page import="java.time.LocalDate"%>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 
 <%
-HttpSession session = request.getSession(false); // Do not create a new session
-if (session != null && session.getAttribute("userId") != null) {
-    response.sendRedirect(request.getContextPath() + "/dashboard.jsp");
-    return;
-}
-LocalDate today = LocalDate.now();
-LocalDate maxBirthDate = today.minusYears(18);     // Latest allowed DOB (must be at least 18 years old)
-LocalDate minBirthDate = today.minusYears(150);    // Earliest allowed DOB (max age 150 years)
-
-DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-String maxBirthDateStr = maxBirthDate.format(dobFormatter); // e.g., 07/13/2007
-String minBirthDateStr = minBirthDate.format(dobFormatter); // e.g., 07/13/1875
+    HttpSession session = request.getSession(false); // Do not create a new session
+    if (session != null && session.getAttribute("userId") != null) {
+        response.sendRedirect(request.getContextPath() + "/dashboard.jsp");
+        return;
+    }
+    
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
 %>
 
 <!DOCTYPE html>
@@ -52,11 +47,19 @@ String minBirthDateStr = minBirthDate.format(dobFormatter); // e.g., 07/13/1875
 							pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" required autofocus
 							title="Name should contain only letters, spaces, hyphens, and apostrophes (1–70 characters)."> 
 					</div>
+					<%
+						LocalDate today = LocalDate.now();
+						LocalDate maxBirthDate = today.minusYears(18);     // Latest allowed DOB (at least 18 years old)
+						LocalDate minBirthDate = today.minusYears(150);    // Earliest allowed DOB (max age 150 years)
+						
+						DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+						String maxBirthDateStr = maxBirthDate.format(dobFormatter); // e.g., 07/13/2007
+						String minBirthDateStr = minBirthDate.format(dobFormatter); // e.g., 07/13/1875
+					%>
 					<div class="part">
 						<label class="form-label" for="dob">Date of Birth <span class="required">*</span></label> 
-						<input class="form-input" type="date" id="dob" name="dob"  min="<%=minBirthDate%>" 
-						max="<%=maxBirthDate%>"  title="You must be between 18 and 150 years old. 
-						Allowed DOB: <%= minBirthDateStr %> to <%= maxBirthDateStr %>" required>
+						<input class="form-input" type="date" id="dob" name="dob"  min="<%=minBirthDate%>" max="<%=maxBirthDate%>"  
+						title="You must be between 18 and 150 years old. Allowed DOB: <%= minBirthDateStr %> to <%= maxBirthDateStr %>" required>
 					</div>
 				</div>
 
@@ -138,7 +141,7 @@ String minBirthDateStr = minBirthDate.format(dobFormatter); // e.g., 07/13/1875
 						<label class="form-label" for="confirm-password">Confirm Password <span class="required">*</span></label> 
 						<input class="form-input" type="password" id="confirm-password"	name="confirm_password" maxlength="20"
 							pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
-							 title="Confirm your password. It must match the password you entered a.">
+							 title="Confirm your password. It must match the password you entered already.">
 					</div>
 				</div>
 
@@ -167,12 +170,6 @@ String minBirthDateStr = minBirthDate.format(dobFormatter); // e.g., 07/13/1875
 	<script>
 	    document.addEventListener("DOMContentLoaded", () => 
 	    {
-	        const form =  document.getElementById("signupForm");
-	        const password = document.getElementById("password");
-	        const confirmPassword = document.getElementById("confirm-password");
-	        const showPasswordCheckbox = document.getElementById("show-password");
-	        const errorMessage = document.getElementById("password-error");
-	
 	        // Enforce numeric-only input
 	        const numberInputs = document.querySelectorAll("#phone, #aadhar");
 	        numberInputs.forEach(input => {
@@ -189,7 +186,6 @@ String minBirthDateStr = minBirthDate.format(dobFormatter); // e.g., 07/13/1875
 	        
 	     // Custom DOB validation: Show clear age-related error
 	       const dob = document.getElementById("dob");
-
 	       dob.addEventListener("invalid", function () {
 	           const validity = dob.validity;
 
@@ -212,13 +208,6 @@ String minBirthDateStr = minBirthDate.format(dobFormatter); // e.g., 07/13/1875
 	           dob.setCustomValidity(""); // Always clear previous message on input
 	       });
 
-	        // Toggle password visibility
-	        showPasswordCheckbox.addEventListener("change", function () {
-	            const type = this.checked ? "text" : "password";
-	            password.type = type;
-	            confirmPassword.type = type;
-	        });
-	        
 	        const branchSelect = document.getElementById("branchSelect");
 	        // Fetch branches
 	        fetch("/MRN_BANKING/MRNBank/branch", {
@@ -244,17 +233,43 @@ String minBirthDateStr = minBirthDate.format(dobFormatter); // e.g., 07/13/1875
 	            console.error("Failed to load branches:", err);
 	        });
 	
-	        // Handle form submission
+
+	        const form =  document.getElementById("signupForm");
+	        const password = document.getElementById("password");
+	        const confirmPassword = document.getElementById("confirm-password");
+	        const errorMessage = document.getElementById("password-error");
+	        let errorTimer = null;
+	        
+	     // Toggle password visibility
+	        const showPasswordCheckbox = document.getElementById("show-password");
+	        showPasswordCheckbox.addEventListener("change", function () {
+	            const type = this.checked ? "text" : "password";
+	            password.type = type;
+	            confirmPassword.type = type;
+	        });
+	        
+	        
+	     // Function to show mismatch error
+	        function showPasswordMismatchError() {
+	            errorMessage.textContent = "Passwords do not match!";
+	            errorMessage.style.color = "red";
+
+	            if (errorTimer) clearTimeout(errorTimer);
+	            errorTimer = setTimeout(() => {
+	                errorMessage.textContent = "";
+	            }, 3000);
+	        }
+	
+	        // Handle form submission 
 	        form.addEventListener("submit", async function (event) {
 	            event.preventDefault();
 	
 	            if (password.value !== confirmPassword.value) {
-	                errorMessage.textContent = "Passwords do not match!";
-	                errorMessage.style.color = "red";
+	                showPasswordMismatchError();
 	                return;
-	            } else {
-	                errorMessage.textContent = "";
 	            }
+
+	            errorMessage.textContent = ""; // Clear if matched
 	
 	            const formData = new FormData(form);
 	            const clientData = {};
@@ -292,6 +307,21 @@ String minBirthDateStr = minBirthDate.format(dobFormatter); // e.g., 07/13/1875
 	            } 
 	            catch (error) {
 	                handleResponse({ error: "An error occurred while submitting the form." });
+	            }
+	        });
+	        
+	     // Hide error on input anywhere in form
+	      /*   form.addEventListener("input", () => {
+	            if (errorMessage.textContent) {
+	                errorMessage.textContent = "";
+	                clearTimeout(errorTimer);
+	            }
+	        }); */
+
+	        // Optional: Show early mismatch if both fields are filled and focus leaves confirm
+	        confirmPassword.addEventListener("blur", () => {
+	            if (password.value && confirmPassword.value && password.value !== confirmPassword.value) {
+	                showPasswordMismatchError();
 	            }
 	        });
 	    });

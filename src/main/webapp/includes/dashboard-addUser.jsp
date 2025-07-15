@@ -1,11 +1,8 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
-	session="false"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false" %>
 <%@ include file="/includes/dashboard-sessionguard.jsp"%>
-<%@ page import="java.time.LocalDate"%>
-<%
-LocalDate today = LocalDate.now();
-LocalDate minEligibleDate = today.minusYears(18);
-%>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+
 <div class="user-modal-overlay" id="profile-modal">
   <div class="user-modal-box">
     <button class="user-close-btn" onclick="closeProfileModal()">✖</button>
@@ -27,14 +24,23 @@ LocalDate minEligibleDate = today.minusYears(18);
 			<div class="user-part">
 				<label class="user-form-label" for="name">Name <span
 					class="user-required">*</span></label> <input class="user-form-input" type="text"
-					name="name" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" maxlength="30"
-					title="Name should contain only letters, spaces, hyphens or apostrophes." required>
+					name="name" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" maxlength="70"
+					title="Name should contain only letters, spaces, hyphens, and apostrophes (1–70 characters)." required>
 			</div>
+			<%
+				LocalDate today = LocalDate.now();
+				LocalDate maxBirthDate = today.minusYears(18);     // Latest allowed DOB (Atleast 18 years old)
+				LocalDate minBirthDate = today.minusYears(150);    // Earliest allowed DOB (max age 150 years)
+				
+				DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+				String maxBirthDateStr = maxBirthDate.format(dobFormatter); // e.g., 07/13/2007
+				String minBirthDateStr = minBirthDate.format(dobFormatter); // e.g., 07/13/1875
+			%>
 			<div class="user-part client-only">
 				<label class="user-form-label" for="dob">Date of Birth <span
 					class="user-required">*</span></label> <input class="user-form-input" type="date"
-					id="dob" name="dob" max="<%=minEligibleDate%>"
-					title="You must be at least 18 years old.">
+					id="dob" name="dob" min="<%=minBirthDate%>"	max="<%=maxBirthDate%>"  
+					title="You must be between 18 and 150 years old. Allowed DOB: <%= minBirthDateStr %> to <%= maxBirthDateStr %>" required>
 			</div>
 		</div>
 
@@ -62,14 +68,14 @@ LocalDate minEligibleDate = today.minusYears(18);
 				<label class="user-form-label" for="email">Email <span
 					class="user-required">*</span></label> <input class="user-form-input" type="email"
 					id="email" name="email" required
-					pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
-					title="Enter a valid email address (e.g., user@example.com).">
+					pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" maxlength="250"
+							title="Please enter a valid email (e.g., user@example.com) with 6–250 characters.">
 			</div>
 			<div class="user-part">
 				<label class="user-form-label" for="phone">Phone Number <span
 					class="user-required">*</span></label> <input class="user-form-input" type="text"
 					id="phone" name="phoneNo" maxlength="10" pattern="\d{10}"
-					title="Phone number must be 10 digits" required>
+					ttitle="Phone number must be exactly 10 digits." required>
 			</div>
 		</div>
 		
@@ -104,26 +110,18 @@ LocalDate minEligibleDate = today.minusYears(18);
 			<div class="user-part">
 				<label class="user-form-label" for="pan">PAN Number <span
 					class="user-required">*</span></label> <input class="user-form-input" type="text"
-					id="pan" name="pan" maxlength="10" pattern="[A-Z]{5}\d{4}[A-Z]"
+					id="pan" name="pan" maxlength="10" pattern="[A-Z]{5}\d{4}[A-Z]" required
 					oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')"
-					title="PAN format: 5 uppercase letters, 4 digits, and 1 uppercase letter (e.g., ABCDE1234F).">
+					title="PAN must be in format: 5 uppercase letters, 4 digits, and 1 uppercase letter (e.g., ABCDE1234F).">
 			</div>
 		</div>
 
 		<div class="user-address client-only">
-			<label class="user-form-label" for="address">Address <span
-				class="user-required">*</span></label> <input class="user-form-input" type="text"
-				name="address" maxlength="60"
-				title="Enter your full address (max 60 characters).">
+			<label class="user-form-label" for="address">Address <span class="user-required">*</span></label> 
+			<input class="user-form-input" type="text" name="address" minlength="5" maxlength="60" 
+					pattern="[A-Za-z0-9 ,-\\.]+" required
+					title="Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / -" >
 		</div>
-
-		<!-- <div class="user-part employee-only">
-			<label class="user-form-label" for="branchId">Branch <span
-				class="user-required">*</span></label> <select class="user-branch-input"
-				name="branchId" id="branchId">
-				<option value="">Select Branch</option>
-			</select>
-		</div> -->
 
 		<div class="user-double-column">
 			<div class="user-part">
@@ -139,7 +137,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 				</label> <input class="user-form-input" type="password" id="confirm-password"
 					name="confirm_password" maxlength="20"
 					pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
-					title="Must match the password above.">
+					title="Confirm your password. It must match the password you entered already.">
 			</div>
 		</div>
 
