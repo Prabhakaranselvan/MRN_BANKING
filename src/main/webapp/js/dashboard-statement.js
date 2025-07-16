@@ -68,6 +68,8 @@ function initStatementScript() {
                     accountSelect.appendChild(option);
                 });
             }
+			// ✅ After loading dropdown, fetch all statements
+	        fetchStatement();
         });
     }
 
@@ -166,7 +168,7 @@ function initStatementScript() {
 		        prevBtn.disabled = currentPage === 1;
 		        nextBtn.disabled = data.Transactions.length < limit;
 		    } else {
-		        resultBox.innerHTML = "No Records Found";
+		        resultBox.innerHTML = `<p class="no-record">No Record Found</p>`;
 		        if (currentPage === 1) {
 		            paginationWrapper.style.display = "none";
 		        } else {

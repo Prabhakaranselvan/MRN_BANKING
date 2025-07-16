@@ -188,3 +188,14 @@ input:focus, select:focus {
 	cursor: not-allowed;
 	box-shadow: none;
 }
+
+.no-record {
+	text-align: center;
+    font-weight: 600;
+    margin-top: 40px;
+}
+
+.note-text {
+    font-size: 13px;
+    color: #888;
+}

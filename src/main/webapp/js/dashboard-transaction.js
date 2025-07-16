@@ -29,36 +29,38 @@ function initTransactionScript() {
   }
 
   txnType.addEventListener("change", () => {
+	
     const val = txnType.value;
+	form.reset();
+	txnType.value = val;
     peerGroupInside.style.display = val === "3" ? "flex" : "none";
     peerGroupOutside.style.display = val === "4" ? "flex" : "none";
     extraFields.style.display = val === "4" ? "flex" : "none";
+	
     peerAccNoInside.required = val === "3";
     peerAccNoOutside.required = val === "4";
+	peerName.required = val === "4";
+    peerBankName.required = val === "4";
+    peerIFSCCode.required = val === "4";
+	
+	
   });
 
   if (peerAccNoInside) {
     peerAccNoInside.addEventListener("input", () => {
-      peerAccNoInside.value = peerAccNoInside.value.replace(/\D/g, '').slice(0, 11);
+      peerAccNoInside.value = peerAccNoInside.value.replace(/\D/g, '').replace(/^0+/, '');
     });
   }
 
   if (peerAccNoOutside) {
     peerAccNoOutside.addEventListener("input", () => {
-      let cleaned = peerAccNoOutside.value.replace(/\D/g, '').replace(/^0+/, '');
-      peerAccNoOutside.value = cleaned.slice(0, 15);
+      peerAccNoOutside.value = peerAccNoOutside.value.replace(/\D/g, '').replace(/^0+/, '');
     });
   }
-
+  
   amountInput.addEventListener("input", () => {
-    let value = amountInput.value.replace(/[^0-9.]/g, '').replace(/^(\d*\.\d{0,2}).*$/, '$1');
-    let floatVal = parseFloat(value);
-    if (!isNaN(floatVal)) {
-      if (floatVal > 100000) value = '100000';
-      else if (floatVal < 1) value = '1';
-    }
-    amountInput.value = value;
-  });
+      amountInput.value = amountInput.value.replace(/[^0-9.]/g, '').replace(/^0+/, '').replace(/^(\d*\.\d{0,2}).*$/, '$1');
+    });
 
   togglePasswordBtn.addEventListener("click", () => {
 	const isHidden = passwordInput.type === "password";
@@ -113,6 +115,12 @@ function initTransactionScript() {
     const accountNo = parseInt(document.getElementById("fromAccount").value);
     if (isNaN(accountNo)) return handleResponse({ error: "Invalid From Account number." });
 
+	const amountVal = amountInput.value.trim();
+	const amountNum = parseFloat(amountVal);
+	if (isNaN(amountNum) || amountNum < 1 || amountNum > 100000) {
+	  return handleResponse({ error: "Please enter a valid Amount between ₹1 and ₹1,00,000 (one lakh), with up to 2 decimal places" });
+	}
+
     const body = {
       accountNo: accountNo,
       amount: parseFloat(amountInput.value),
@@ -131,6 +139,16 @@ function initTransactionScript() {
     if (txn === 4) {
       const peer = parseInt(peerAccNoOutside.value);
       if (isNaN(peer)) return handleResponse({ error: "Please enter a valid outside bank recipient account number." });
+	  
+	  const bankName = peerBankName.value.trim().toLowerCase();
+      const ifsc = peerIFSCCode.value.trim().toUpperCase();
+
+      if (bankName === "mrn bank" || ifsc.startsWith("MRNB")) {
+        handleResponse({
+           error: "The provided Bank Name or IFSC Code belongs to MRN Bank. Please use internal transfer instead."
+        });
+        return;
+      }
 
       const extra = {
         peerBankName: peerBankName.value.trim(),

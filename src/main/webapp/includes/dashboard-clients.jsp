@@ -7,7 +7,7 @@
 			<h2 class="form-header">CLIENTS</h2>			
 				<div class="pagination">
 					<button id="addClientBtn" class="add-user-btn" onclick="openAddUserModal(0)">
-						<span class="material-icons">person_add</span>
+						<span class="material-icons" title="Add Client">person_add</span>
 					</button>
 					<div  id="paginationWrapper" class="pagination-bar">
 						<button id="prevPage" class="page-btn" title="Previous">

@@ -26,6 +26,32 @@ function initProfileScript() {
         this.value = this.value.replace(/[0-9]/g, ''); // Remove any digits
     });
 	
+	// Custom DOB validation: Show clear age-related error
+	   const dob = document.getElementById("dob");
+	   dob.addEventListener("invalid", function () {
+	       const validity = dob.validity;
+		   const minDateStr = dob.dataset.minBirthdateStr;
+		   const maxDateStr = dob.dataset.maxBirthdateStr;
+	
+	       if (validity.rangeOverflow) {
+	    	    // Too young: DOB after max (e.g., after 07/13/2007)
+	    	    dob.setCustomValidity(`You must be at least 18 years old.\nAllowed DOB: on or before ${maxDateStr}`);
+	    	    dob.reportValidity();
+	    	} 
+	    	else if (validity.rangeUnderflow) {
+	    	    // Too old: DOB before min (e.g., before 07/13/1874)
+	    	    dob.setCustomValidity(`You must be no older than 150 years.\nAllowed DOB: on or after ${minDateStr}`);
+	    	    dob.reportValidity();
+	    	}
+	       else {
+	           dob.setCustomValidity(""); // For other errors, use default
+	       }
+	   });
+
+	   dob.addEventListener("input", function () {
+	       dob.setCustomValidity(""); // Always clear previous message on input
+	   });
+   
 	//Toggle password
 	const toggleIcon = document.querySelector(".password-toggle-icon");
 	const passwordInput = document.getElementById("password");
@@ -70,6 +96,8 @@ function initProfileScript() {
 	}
 
     let isEditMode = false;
+	let profileOutsideClickListener = null;
+	enableProfileModalOutsideClickClose();
 
     if (!form || !editBtn || !saveBtn || !passwordField) {
         console.warn("Missing required DOM elements.");
@@ -84,6 +112,7 @@ function initProfileScript() {
     }
 
     editBtn.addEventListener("click", () => {
+		disableProfileModalOutsideClickClose();
         isEditMode = true;
 
         // Enable editable fields
@@ -221,3 +250,28 @@ function fetchProfileData(form, userId, isEditingClient) {
         handleResponse(err);
     });
 }
+
+function enableProfileModalOutsideClickClose() {
+	const overlay = document.getElementById("profile-modal");
+	const modalBox = overlay.querySelector(".profile-modal-box");
+
+	profileOutsideClickListener = function (event) {
+		if (!modalBox.contains(event.target)) {
+			closeProfileModal();
+			document.removeEventListener("click", profileOutsideClickListener);
+			profileOutsideClickListener = null;
+		}
+	};
+
+	setTimeout(() => {
+		document.addEventListener("click", profileOutsideClickListener);
+	}, 0);
+}
+
+function disableProfileModalOutsideClickClose() {
+	if (profileOutsideClickListener) {
+		document.removeEventListener("click", profileOutsideClickListener);
+		profileOutsideClickListener = null;
+	}
+}
+

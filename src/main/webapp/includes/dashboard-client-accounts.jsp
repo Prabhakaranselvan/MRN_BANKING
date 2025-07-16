@@ -17,7 +17,7 @@
 
   <!-- Account Selection + Info -->
   <div class="account-details">
-    <label for="accountSelect" class="select-label">Select Account for Details:</label>
+    <label for="accountSelect" class="select-label" id="selectLabel">Select Account for Details:</label>
     <select id="accountSelect" class="select-dropdown">
       <option value="">-- Select Account --</option>
     </select>

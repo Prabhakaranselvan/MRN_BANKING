@@ -29,7 +29,7 @@
                 <label class="profile-form-label" for="dob">Date of Birth</label>
                 <input class="profile-form-input" type="date" id="dob" name="dob" min="<%=minBirthDate%>" max="<%=maxBirthDate%>"  
                 title="You must be between 18 and 150 years old. Allowed DOB: <%= minBirthDateStr %> to <%= maxBirthDateStr %>" 
-                	disabled required>
+                data-min-birthdate-str="<%=minBirthDateStr%>" data-max-birthdate-str="<%=maxBirthDateStr%>"	disabled required>
             </div>
         </div>
         

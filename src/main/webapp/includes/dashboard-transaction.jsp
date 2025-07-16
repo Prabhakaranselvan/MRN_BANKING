@@ -43,18 +43,26 @@
                 </div>
                 <div class="form-group">
                     <label for="peerName">Receiver Name</label>
-                    <input type="text" id="peerName" name="peerName" maxlength="50" placeholder="Eg: Rahul Sharma" />
+                    <input type="text" id="peerName" name="peerName" name="name" maxlength="70"
+							pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" placeholder="Eg: Rahul Sharma"
+							oninput="this.value = this.value.replace(/[0-9]/g, '')"
+							title="Name should contain only letters, spaces, hyphens, and apostrophes (1–70 characters)." />
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="peerBankName">Receiver Bank Name</label>
-                    <input type="text" id="peerBankName" name="peerBankName" maxlength="25" placeholder="Eg: HDFC Bank" />
+                    <input type="text" id="peerBankName" name="peerBankName" maxlength="70"
+							pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" placeholder="Eg: HDFC Bank" 
+							oninput="this.value = this.value.replace(/[0-9]/g, '')"
+							title="Bank Name should contain only letters, spaces, hyphens, and apostrophes (1–70 characters)."/>
                 </div>
                 <div class="form-group">
                     <label for="peerIFSCCode">Receiver IFSC Code</label>
-                    <input type="text" id="peerIFSCCode" name="peerIFSCCode" maxlength="15" placeholder="Eg: HDFC0001234" />
+                    <input type="text" id="peerIFSCCode" name="peerIFSCCode" maxlength="11" pattern="^[A-Z]{4}0[A-Z0-9]{6}$"
+                    	oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')"
+       					title="Enter a valid IFSC code (e.g., HDFC0001234)" placeholder="Eg: HDFC0001234" />
                 </div>
             </div>
         </div>
@@ -63,13 +71,16 @@
         <div class="form-row">
             <div class="form-group">
                 <label for="amount">Amount</label>
-                <input type="text" id="amount" name="amount" required
-                       placeholder=" ₹1–100K (max 2 decimals) | Eg: 500.00" />
+               <input type="text" id="amount" name="amount" required  maxlength="6" title="Amount must be between ₹1 and ₹1,00,000 (one lakh), with up to 2 decimal places"
+       				placeholder="₹1–₹1,00,000 (max 2 decimal places)" />
+
             </div>
             <div class="form-group password-toggle-group">
                 <label for="txnPassword">Transaction Password</label>
                 <div class="password-wrapper">
-                    <input type="password" id="txnPassword" name="txnPassword" required placeholder="Enter your password" />
+                    <input type="password" id="txnPassword" name="txnPassword" maxlength="20"
+							pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required  placeholder="Enter your password" 
+							title="Password must be 8-20 characters, include uppercase, lowercase, number, and a special character."/>
                     <span id="togglePassword" class="material-icons toggle-password" title="Show Password">visibility</span>
                 </div>
             </div>
@@ -78,7 +89,7 @@
         <!-- Row 6: Description -->
         <div class="form-row">
             <div class="form-group full-width">
-                <label for="description">Description</label>
+                <label for="description">Description (Optional)</label>
                 <input type="text" id="description" name="description" maxlength="50" placeholder="Eg: Rent, Deposit" />
             </div>
         </div>

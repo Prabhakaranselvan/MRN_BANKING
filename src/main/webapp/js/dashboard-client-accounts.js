@@ -1,6 +1,7 @@
 function initClientAccountsScript() {
     const userId = document.body.getAttribute("data-user-id");
     const cardsContainer = document.getElementById("accountCardsContainer");
+	const selectLabel = document.getElementById("selectLabel");
     const accountSelect = document.getElementById("accountSelect");
     const accountInfo = document.getElementById("accountInfo");
 
@@ -21,6 +22,19 @@ function initClientAccountsScript() {
     .then(res => res.json())
     .then(data => {
         const accounts = data.Accounts || [];
+		if (accounts.length === 0) {
+		            cardsContainer.innerHTML = `
+		              <div class="no-data-box">
+		                <span class="material-icons no-data-icon">account_balance</span>
+		                <p class="no-data-text">You do not have any accounts yet.</p>
+		                <p class="no-data-text">Click the 'Request Account' button to create a new account.</p>
+		              </div>
+		            `;
+					selectLabel.style.display = "none";
+					accountSelect.style.display = "none";
+					accountInfo.style.display = "none";
+		            return;
+		        }
         accounts.forEach(account => {
 			// Card
 			const card = document.createElement("div");

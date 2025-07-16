@@ -36,9 +36,8 @@ LocalDate sixMonthsAgo = today.minusMonths(6);
 					</div>
 
 					<div class="form-group">
-						<label for="fromDate">From Date</label> <input type="date"
-							id="fromDate" name="fromDate" min="<%=sixMonthsAgo%>"
-							max="<%=today%>">
+						<label for="fromDate">From Date<span class="note-text">  (Past 6 months only)</span></label> 
+						<input type="date" id="fromDate" name="fromDate" min="<%=sixMonthsAgo%>" max="<%=today%>">
 					</div>
 
 					<div class="form-group">

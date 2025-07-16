@@ -37,42 +37,51 @@ public class Validator
 	private static final BranchDAO branchDAO = new BranchDAO();
 	private static final ClientDAO clientDAO = new ClientDAO();
 	private static final AccountsDAO accountsDAO = new AccountsDAO();
-	
-	static {
-	    validationPatterns.put("Name", "^(?=.{1,70}$)[A-Za-z]+(?:[-' ][A-Za-z]+)*$");
-	    validationMessages.put("Name", "Name should contain only letters, spaces, hyphens, and apostrophes (1–70 characters).");
 
-	    validationPatterns.put("Gender", "^(Male|Female|Other)$");
-	    validationMessages.put("Gender", "Gender must be Male, Female, or Other.");
+	static
+	{
+		validationPatterns.put("Name", "^(?=.{1,70}$)[A-Za-z]+(?:[-' ][A-Za-z]+)*$");
+		validationMessages.put("Name", "Name should contain only letters, spaces, hyphens, and apostrophes (1–70 characters).");
 
-	    validationPatterns.put("Email Address", "^(?=.{6,250}$)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-	    validationMessages.put("Email Address", "Please enter a valid email (e.g., user@example.com) with 6–250 characters.");
+		validationPatterns.put("Gender", "^(Male|Female|Other)$");
+		validationMessages.put("Gender", "Gender must be Male, Female, or Other.");
 
-	    validationPatterns.put("Phone Number", "^\\d{10}$");
-	    validationMessages.put("Phone Number", "Phone number must be exactly 10 digits.");
+		validationPatterns.put("Email Address", "^(?=.{6,250}$)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+		validationMessages.put("Email Address", "Please enter a valid email (e.g., user@example.com) with 6–250 characters.");
 
-	    validationPatterns.put("Password", "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,20}$");
-	    validationMessages.put("Password", "Password must be 8–20 characters, with uppercase, lowercase, number, and special character.");
+		validationPatterns.put("Phone Number", "^\\d{10}$");
+		validationMessages.put("Phone Number", "Phone number must be exactly 10 digits.");
 
-	    validationPatterns.put("Aadhar Number", "^\\d{12}$");
-	    validationMessages.put("Aadhar Number", "Aadhar number must be exactly 12 digits.");
+		validationPatterns.put("Password", "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,20}$");
+		validationMessages.put("Password", "Password must be 8–20 characters, with uppercase, lowercase, number, and special character.");
 
-	    validationPatterns.put("PAN", "^[A-Z]{5}\\d{4}[A-Z]$");
-	    validationMessages.put("PAN", "PAN must be in format: 5 uppercase letters, 4 digits, 1 uppercase letter.");
+		validationPatterns.put("Aadhar Number", "^\\d{12}$");
+		validationMessages.put("Aadhar Number", "Aadhar number must be exactly 12 digits.");
 
-	    validationPatterns.put("Branch Name", "^[A-Za-z0-9 .'-]{3,50}$");
-	    validationMessages.put("Branch Name", "Branch name must be 3–50 characters long and may include letters, numbers, and symbols.");
+		validationPatterns.put("PAN", "^[A-Z]{5}\\d{4}[A-Z]$");
+		validationMessages.put("PAN", "PAN must be in format: 5 uppercase letters, 4 digits, 1 uppercase letter.");
 
-	    validationPatterns.put("Branch Location", "^[A-Za-z .'-]{3,50}$");
-	    validationMessages.put("Branch Location", "Branch location must be 3–50 letters and may include spaces and punctuation.");
+		validationPatterns.put("Branch Name", "^[A-Za-z0-9 .'-]{3,50}$");
+		validationMessages.put("Branch Name", "Branch name must be 3–50 characters long and may include letters, numbers, and symbols.");
 
-	    validationPatterns.put("Account No", "^\\d{11}$");
-	    validationMessages.put("Account No", "Account number must be exactly 11 digits.");
+		validationPatterns.put("Branch Location", "^[A-Za-z .'-]{3,50}$");
+		validationMessages.put("Branch Location", "Branch location must be 3–50 letters and may include spaces and punctuation.");
 
-	    validationPatterns.put("Address", "^(?=.{5,100}$)[A-Za-z0-9 ,.'/-]+$");
-	    validationMessages.put("Address", "Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / -");
+		validationPatterns.put("Account No", "^\\d{11}$");
+		validationMessages.put("Account No", "Account number must be exactly 11 digits.");
+
+		validationPatterns.put("Address", "^(?=.{5,100}$)[A-Za-z0-9 ,.'/-]+$");
+		validationMessages.put("Address", "Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / -");
+
+		validationPatterns.put("Receiver Name", "^(?=.{1,70}$)[A-Za-z]+(?:[-' ][A-Za-z]+)*$");
+		validationMessages.put("Receiver Name",	"Receiver Name should contain only letters, spaces, hyphens, and apostrophes (1–70 characters).");
+
+		validationPatterns.put("Receiver Bank Name", "^(?=.{1,70}$)[A-Za-z]+(?:[-' ][A-Za-z]+)*$");
+		validationMessages.put("Receiver Bank Name", "Receiver Bank Name should contain only letters, spaces, hyphens, and apostrophes (1–70 characters).");
+
+		validationPatterns.put("IFSC Code", "^[A-Z]{4}0[A-Z0-9]{6}$");
+		validationMessages.put("IFSC Code", "Enter a valid IFSC code (e.g., HDFC0001234).");
 	}
-
 
 	public static StringBuilder checkLoginCredentials(Login credentials)
 	{
@@ -392,7 +401,8 @@ public class Validator
 			BigDecimal balance = accountsDAO.getAccountBalance(accNo);
 			if (balance.compareTo(BigDecimal.ZERO) != 0)
 			{
-				throw new InvalidException("Account cannot be closed. Balance must be zero, current balance: ₹" + balance);
+				throw new InvalidException(
+						"Account cannot be closed. Balance must be zero, current balance: ₹" + balance);
 			}
 		}
 
@@ -451,49 +461,79 @@ public class Validator
 		checkField(txn.getPassword(), "Password");
 		validateEnum(() -> TxnType.fromValue(txn.getTxnType()));
 
-		if (errorMsg.length() > 0) return errorMsg; // Stop here if invalid enum
+		if (errorMsg.length() > 0)
+			return errorMsg; // Stop here if invalid enum
 
 		TxnType txnType = TxnType.fromValue(txn.getTxnType());
 		if (txnType == TxnType.DEBIT || txnType == TxnType.CREDIT)
 		{
 			checkLongField(txn.getPeerAccNo(), "Peer Acc No");
 		}
-		
-		if (txnType == TxnType.DEBIT) {
-		    Long peerAccNo = txn.getPeerAccNo();
-		    boolean isInternal = txn.isInternalTransfer();
-		    System.out.println(isInternal);
 
-		    if (isInternal) {
-		        // Internal transfer must have a valid peer account number
-		        if (peerAccNo == null || !accountsDAO.doesAccountExist(peerAccNo)) {
-		            errorMsg.append("For internal bank transfer, provide a valid internal account number.<br/>");
-		        }
-		    } else {
-		        // External transfer
-		    	if (peerAccNo != null && accountsDAO.doesAccountExist(peerAccNo)) {
-		    		throw new InvalidException("External transfers cannot be made to MRN Bank accounts.<br/>");
-		        }
-	            String extraInfo = txn.getExtraInfo();
-	            if (extraInfo == null || extraInfo.isEmpty()) {
-	                errorMsg.append("Extra info is required for outside bank transfer.<br/>");
-	            } else {
-	                try {
-	                    JSONObject extra = new JSONObject(extraInfo);
-	                    if (!extra.has("peerBankName") || extra.getString("peerBankName").isBlank()) {
-	                        errorMsg.append("Peer Bank Name is required in extra info.<br/>");
-	                    }
-	                    if (!extra.has("peerIFSCCode") || extra.getString("peerIFSCCode").isBlank()) {
-	                        errorMsg.append("Peer IFSC Code is required in extra info.<br/>");
-	                    }
-	                    if (!extra.has("peerName") || extra.getString("peerName").isBlank()) {
-	                        errorMsg.append("Peer Name is required in extra info.<br/>");
-	                    }
-	                } catch (Exception e) {
-	                    errorMsg.append("Invalid extraInfo JSON format for outside bank transfer.<br/>");
+		if (txnType == TxnType.DEBIT)
+		{
+			Long peerAccNo = txn.getPeerAccNo();
+			boolean isInternal = txn.isInternalTransfer();
+			System.out.println(isInternal);
+
+			if (isInternal)
+			{
+				// Internal transfer must have a valid peer account number
+				if (peerAccNo == null || !accountsDAO.doesAccountExist(peerAccNo))
+				{
+					errorMsg.append("For internal bank transfer, provide a valid internal account number.<br/>");
+				}
+			}
+			else
+			{
+				// External transfer
+				if (peerAccNo != null && accountsDAO.doesAccountExist(peerAccNo))
+				{
+					throw new InvalidException("External transfers cannot be made to MRN Bank accounts.<br/>");
+				}
+				String extraInfo = txn.getExtraInfo();
+				if (checkEmpty(extraInfo, "Extra Info"))
+				{
+					return errorMsg;
+				}
+				try {
+	                JSONObject extra = new JSONObject(extraInfo);
+
+	                // Peer Name
+	                String peerName = extra.optString("peerName", "").trim();
+	                if (peerName.isBlank()) {
+	                    errorMsg.append("Peer Name is required in extra info.<br/>");
+	                } else {
+	                    checkField(peerName, "Receiver Name");
 	                }
+
+	                // Peer Bank Name
+	        	    String peerBankName = extra.optString("peerBankName", "").trim();
+	        	    if (peerBankName.isBlank()) {
+	        	        errorMsg.append("Peer Bank Name is required in extra info.<br/>");
+	        	    } else {
+	        	        checkField(peerBankName, "Receiver Bank Name");
+	        	        if (peerBankName.equalsIgnoreCase("MRN Bank")) {
+	        	            errorMsg.append("Receiver Bank Name indicates MRN Bank. Please use 'Transfer - Within Bank' for internal transfers.<br/>");
+	        	        }
+	        	    }
+
+	        	    // Peer IFSC Code
+	        	    String peerIFSC = extra.optString("peerIFSCCode", "").trim();
+	        	    if (peerIFSC.isBlank()) {
+	        	        errorMsg.append("Peer IFSC Code is required in extra info.<br/>");
+	        	    } else {
+	        	        checkField(peerIFSC, "IFSC Code");
+	        	        if (peerIFSC.toUpperCase().startsWith("MRNB")) {
+	        	            errorMsg.append("IFSC Code indicates MRN Bank. Please use 'Transfer - Within Bank' for internal transfers.<br/>");
+	        	        }
+	        	    }
+
+
+	            } catch (Exception e) {
+	                errorMsg.append("Invalid extraInfo JSON format for outside bank transfer.<br/>");
 	            }
-		    }
+			}
 		}
 		return errorMsg;
 	}
@@ -605,35 +645,36 @@ public class Validator
 			if (!matcher.matches())
 			{
 				String message = validationMessages.getOrDefault(fieldName,
-		                fieldName + " is invalid. Please follow the correct format.");
-		            errorMsg.append(message).append("<br/>");
+						fieldName + " is invalid. Please follow the correct format.");
+				errorMsg.append(message).append("<br/>");
 			}
 		}
 	}
-	
-	private static void checkValidDate(String field, String fieldName) {
-	    if (!checkEmpty(field, fieldName)) {
-	        try {
-	            LocalDate dob = LocalDate.parse(field);
-	            LocalDate today = LocalDate.now();
-	            LocalDate minDate = today.minusYears(150);
-	            LocalDate maxDate = today.minusYears(18);
 
-	            if (dob.isBefore(minDate) || dob.isAfter(maxDate)) {
-	                errorMsg.append(fieldName)
-	                        .append(" must be between ")
-	                        .append(minDate)
-	                        .append(" and ")
-	                        .append(maxDate)
-	                        .append(" (Age should be between 18 and 150 years).<br/>");
-	            }
+	private static void checkValidDate(String field, String fieldName)
+	{
+		if (!checkEmpty(field, fieldName))
+		{
+			try
+			{
+				LocalDate dob = LocalDate.parse(field);
+				LocalDate today = LocalDate.now();
+				LocalDate minDate = today.minusYears(150);
+				LocalDate maxDate = today.minusYears(18);
 
-	        } catch (DateTimeParseException e) {
-	            errorMsg.append(fieldName).append(" must be a valid date in yyyy-MM-dd format.<br/>");
-	        }
-	    }
+				if (dob.isBefore(minDate) || dob.isAfter(maxDate))
+				{
+					errorMsg.append(fieldName).append(" must be between ").append(minDate).append(" and ")
+							.append(maxDate).append(" (Age should be between 18 and 150 years).<br/>");
+				}
+
+			}
+			catch (DateTimeParseException e)
+			{
+				errorMsg.append(fieldName).append(" must be a valid date in yyyy-MM-dd format.<br/>");
+			}
+		}
 	}
-
 
 	private static void checkLongField(Long value, String fieldName)
 	{

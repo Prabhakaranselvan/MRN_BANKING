@@ -145,6 +145,22 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 16px;
+	height: 310px;
+	overflow-y: auto;
+	padding-right: 8px; 
+}
+
+.card-container::-webkit-scrollbar {
+	width: 6px;
+}
+
+.card-container::-webkit-scrollbar-thumb {
+	background: #ccc;
+	border-radius: 3px;
+}
+
+.card-container::-webkit-scrollbar-thumb:hover {
+	background: #aaa;
 }
 
 .account-card {

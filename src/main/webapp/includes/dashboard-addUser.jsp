@@ -40,7 +40,9 @@
 				<label class="user-form-label" for="dob">Date of Birth <span
 					class="user-required">*</span></label> <input class="user-form-input" type="date"
 					id="dob" name="dob" min="<%=minBirthDate%>"	max="<%=maxBirthDate%>"  
-					title="You must be between 18 and 150 years old. Allowed DOB: <%= minBirthDateStr %> to <%= maxBirthDateStr %>" required>
+					title="You must be between 18 and 150 years old. Allowed DOB: <%= minBirthDateStr %> to <%= maxBirthDateStr %>" 
+					 data-min-birthdate-str="<%=minBirthDateStr%>" data-max-birthdate-str="<%=maxBirthDateStr%>" required>
+					
 			</div>
 		</div>
 
@@ -75,7 +77,7 @@
 				<label class="user-form-label" for="phone">Phone Number <span
 					class="user-required">*</span></label> <input class="user-form-input" type="text"
 					id="phone" name="phoneNo" maxlength="10" pattern="\d{10}"
-					ttitle="Phone number must be exactly 10 digits." required>
+					title="Phone number must be exactly 10 digits." required>
 			</div>
 		</div>
 		
@@ -104,7 +106,7 @@
 			<div class="user-part">
 				<label class="user-form-label" for="aadhar">Aadhar Number <span
 					class="user-required">*</span></label> <input class="user-form-input" type="text"
-					id="aadhar" name="aadhar" maxlength="12" pattern="\d{12}"
+					id="aadhar" name="aadhar" maxlength="12" pattern="\d{12}" required
 					title="Aadhar number must be exactly 12 digits.">
 			</div>
 			<div class="user-part">

@@ -21,7 +21,25 @@ function initMainScript() {
 
   // === Render Account Cards ===
   function renderAccounts(accounts) {
-    cardsContainer.innerHTML = '';
+	cardsContainer.innerHTML = '';
+
+	if (!accounts.length) {
+	  cardsContainer.innerHTML = `<p>No accounts available for this user.</p>`;
+	  accountSelect.innerHTML = `<option value="">-- No Accounts --</option>`;
+	  
+	  // Destroy any previous chart
+	    if (doughnutChart) doughnutChart.destroy();
+
+	    // Display "No Data Available" inside chart container
+	    const ctx = pieCtx.getContext('2d');
+	    ctx.clearRect(0, 0, pieCtx.width, pieCtx.height);
+	    ctx.font = '12px Poppins';
+	    ctx.fillStyle = '#2C3E50';
+	    ctx.textAlign = 'center';
+	    ctx.fillText('No Data Available', pieCtx.width / 2, pieCtx.height / 2);
+	  return;
+	}
+
     let totalBalance = 0;
     const labels = [];
     const balances = [];
