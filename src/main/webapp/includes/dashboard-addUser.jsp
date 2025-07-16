@@ -99,7 +99,9 @@
 		
 		<div class="user-part client-only">
 			<label class="user-form-label" for="balance">Opening Balance <span class="user-required">*</span></label>
-			<input class="user-form-input" type="text" id="balance" name="balance" required>
+			<input class="user-form-input" type="text" id="balance" name="balance" maxlength="8" 
+			title="Amount must be between ₹1 and ₹1,00,000 (one lakh), with up to 2 decimal places"
+       				placeholder="₹1–₹1,00,000 (max 2 decimal places)" required>
 		</div>
 
 		<div class="user-double-column client-only">
@@ -121,8 +123,8 @@
 		<div class="user-address client-only">
 			<label class="user-form-label" for="address">Address <span class="user-required">*</span></label> 
 			<input class="user-form-input" type="text" name="address" minlength="5" maxlength="60" 
-					pattern="[A-Za-z0-9 ,-\\.]+" required
-					title="Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / -" >
+					pattern="[A-Za-z0-9\\\.\/ ,\-']+" required
+					title="Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / \ -" >
 		</div>
 
 		<div class="user-double-column">

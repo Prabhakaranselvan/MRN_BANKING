@@ -28,7 +28,7 @@ function initStatementScript() {
 
         // Only digits and max 11
 		accountInput.addEventListener("input", () => {
-           accountInput.value = accountInput.value.replace(/\D/g, "").slice(0, 11);
+           accountInput.value = accountInput.value.replace(/\D/g, "").replace(/^0+/, '').slice(0, 11);
        });
        accountInput.addEventListener("keydown", (e) => {
            if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
@@ -39,7 +39,7 @@ function initStatementScript() {
 			clientInput.style.display = "block";
 			
 			clientInput.addEventListener("input", () => {
-	           clientInput.value = clientInput.value.replace(/\D/g, "").slice(0, 6);
+	           clientInput.value = clientInput.value.replace(/\D/g, "").replace(/^0+/, '').slice(0, 6);
 	       });
             clientInput.addEventListener("keydown", (e) => {
                 if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
@@ -58,7 +58,7 @@ function initStatementScript() {
 							"Method": "GET" },
             body: JSON.stringify({ clientId: parseInt(userId) })
         })
-        .then(res => res.json())
+        .then(handleFetchResponse)
         .then(data => {
             if (Array.isArray(data.Accounts)) {
                 data.Accounts.forEach(acc => {
@@ -70,7 +70,12 @@ function initStatementScript() {
             }
 			// ✅ After loading dropdown, fetch all statements
 	        fetchStatement();
-        });
+        })
+		.catch(err => {
+		  if (err !== "handled") {
+		    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+		  }
+		});
     }
 
     form.addEventListener("submit", e => {
@@ -160,7 +165,7 @@ function initStatementScript() {
 			 },
             body: JSON.stringify(requestBody)
         })
-        .then(res => res.json())
+         .then(handleFetchResponse)
 		.then(data => {
 		    if (data.Transactions && data.Transactions.length > 0) {
 		        displayStatement(data.Transactions);
@@ -178,10 +183,11 @@ function initStatementScript() {
 		        }
 		    }
 		})
-        .catch(err => {
-            console.error("Error:", err);
-            handleResponse({ error: "Failed to load statement. Please try again." });
-        });
+		.catch(err => {
+		  if (err !== "handled") {
+		    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+		  }
+		});
     }
 }
 

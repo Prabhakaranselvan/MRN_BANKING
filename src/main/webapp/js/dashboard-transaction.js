@@ -86,7 +86,7 @@ function initTransactionScript() {
       },
       body: JSON.stringify({ clientId: parseInt(userId) })
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         if (Array.isArray(data.Accounts)) {
           data.Accounts.forEach(acc => {
@@ -97,7 +97,11 @@ function initTransactionScript() {
           });
         }
       })
-      .catch(err => console.error("Error loading client accounts:", err));
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   } else {
     fromAccount.addEventListener("input", () => {
       fromAccount.value = fromAccount.value.replace(/\D/g, '').slice(0, 11);
@@ -172,7 +176,7 @@ function initTransactionScript() {
       },
       body: JSON.stringify(body)
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         handleResponse(data);
         if (!data.error) {
@@ -180,10 +184,11 @@ function initTransactionScript() {
           txnType.dispatchEvent(new Event("change"));
         }
       })
-      .catch(err => {
-        console.error("Transaction error:", err);
-        handleResponse({ error: "Transaction failed. Please try again." });
-      });
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   });
 
   txnType.dispatchEvent(new Event("change"));

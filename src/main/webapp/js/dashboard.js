@@ -144,8 +144,8 @@ function loadContent(page) {
       	}
     })
 	.catch((err) => {
-	  if (err !== "handled") {  // Avoid duplicate error toast if already shown by handleFetchResponse
-	    handleResponse({ error: "Something went wrong. Please try again." });
+	  if (err !== "handled") {
+	    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
 	  }
 	});
 }
@@ -206,7 +206,7 @@ function openProfileModal(targetId = null, targetRole = null) {
     })
 	.catch((err) => {
 	  if (err !== "handled") {
-	    handleResponse({ error: "Something went wrong. Please try again." });
+	    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
 	  }
 	});
 }
@@ -236,7 +236,7 @@ function openAddUserModal(targetRole = null) {
     })
 	.catch((err) => {
 	  if (err !== "handled") {
-	    handleResponse({ error: "Something went wrong. Please try again." });
+	    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
 	  }
 	});
 }

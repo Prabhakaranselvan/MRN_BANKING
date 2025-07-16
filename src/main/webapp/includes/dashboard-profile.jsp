@@ -81,8 +81,8 @@
 
         <label class="profile-form-label" for="address">Address</label>
         <input class="profile-form-input" type="text" id="address" name="address" minlength="5" maxlength="60" 
-					pattern="[A-Za-z0-9 ,-\\.]+" disabled required
-					title="Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / -">
+					pattern="[A-Za-z0-9\\\.\/ ,\-']+" disabled required
+					title="Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / \ -" >
         </div>
         <div class="profile-double-column">
         	<div class="profile-part">

@@ -16,9 +16,8 @@ function initClientsScript() {
             "Method": "GET"
         }
     })
-        .then(res => res.json())
+        .then(handleFetchResponse)
         .then(data => {
-            console.log("Clients list:", data);
             if (data.clients && data.clients.length > 0) {
                 renderClients(data.clients);
 				paginationWrapper.style.display = "flex";
@@ -33,14 +32,13 @@ function initClientsScript() {
 		            prevBtn.disabled = false;
 		            nextBtn.disabled = true;
 		        }
-		    }
-                
+		    }  
         })
-        .catch(err => {
-            console.error("Error loading clients:", err);
-            container.innerHTML = `<p class="error">Failed to load clients.</p>`;
-            handleResponse({ error: "Failed to fetch clients." });
-        });
+		.catch(err => {
+		  if (err !== "handled") {
+		    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+		  }
+		});
 		}
 
 		function renderClients(clients) {
@@ -96,7 +94,10 @@ function initClientsScript() {
 
 	   // Initial Load
 	   loadClients(currentPage);
-
+	   
+	   window.refreshClients = function () {
+	       loadClients(currentPage);
+	   };
 }
 
 function viewClient(targetId, targetRole) {

@@ -127,8 +127,8 @@
 
 				<label class="form-label">Address <span class="required">*</span></label>
 				<input class="form-input" type="text" name="address" minlength="5" maxlength="60" 
-					pattern="[A-Za-z0-9 ,-\\.]+" required
-					title="Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / -" > 
+					pattern="[A-Za-z0-9\\\.\/ ,\-']+" required
+					title="Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / \ -" > 
 				
 				<div class="double-column">
 					<div class="part">
@@ -230,7 +230,7 @@
 	            }
 	        })
 	        .catch(err => {
-	            console.error("Failed to load branches:", err);
+	        	handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
 	        });
 	
 
@@ -303,7 +303,15 @@
 	                });
 	
 	                const data = await response.json();
-	                handleResponse(data, `${pageContext.request.contextPath}/login.jsp`);
+	                if (data.message)
+                	{
+                		handleResponse(data, `${pageContext.request.contextPath}/login.jsp`);
+                	}
+	                else
+                	{
+	                	handleResponse(data);
+                	}
+	                
 	            } 
 	            catch (error) {
 	                handleResponse({ error: "An error occurred while submitting the form." });

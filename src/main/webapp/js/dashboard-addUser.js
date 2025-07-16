@@ -18,14 +18,8 @@ function initAddUserScript() {
 	
 	const balanceInput = document.getElementById("balance");
 	balanceInput.addEventListener("input", () => {
-	    let value = balanceInput.value.replace(/[^0-9.]/g, '').replace(/^(\d*\.\d{0,2}).*$/, '$1');
-	    let floatVal = parseFloat(value);
-	    if (!isNaN(floatVal)) {
-	      if (floatVal > 100000) value = '100000';
-	      else if (floatVal < 1) value = '1';
-	    }
-	    balanceInput.value = value;
-	  });
+		balanceInput.value = balanceInput.value.replace(/[^0-9.]/g, '').replace(/^0+/, '').replace(/^(\d*\.\d{0,2}).*$/, '$1');
+     });
 	
 	// Prevent numbers in the name field
     const nameInput = document.querySelector("input[name='name']");
@@ -83,7 +77,7 @@ function initAddUserScript() {
 	            "Method": "GET"
 	        }
 	    })
-	    .then(res => res.json())
+	    .then(handleFetchResponse)
 	    .then(data => {
 	        branchSelect.innerHTML = '<option value="">-- Select --</option>';
 	        data.Branches.forEach(branch => {
@@ -93,8 +87,12 @@ function initAddUserScript() {
             branchSelect.appendChild(option);
 	        });
 	    })
-		    .catch(err => console.error("[loadAllBranches] Error:", err));
-		}
+		.catch(err => {
+		  if (err !== "handled") {
+		    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+		  }
+		});
+	}
 
 	function setFixedBranch(branchId) {
 	 
@@ -106,13 +104,8 @@ function initAddUserScript() {
 	    },
 	    body: JSON.stringify({ branchId })
 	  })
-	    .then(res => res.json())
-	    .then(data => {
-	      if (!data.branch) {
-	        console.warn("[setFixedBranch] No branch data returned", data);
-	        return;
-	      }
-
+      .then(handleFetchResponse)
+	  .then(data => {
 		const label = `${data.branch.branchName} (${data.branch.branchLocation})`;
         const value = String(data.branch.branchId);
         const option = new Option(label, value);
@@ -122,15 +115,19 @@ function initAddUserScript() {
         opt.selected = true;
         branchSelect.appendChild(opt);
         branchSelect.value = value;
-  	  
-         console.log(`[setFixedBranch] value : ${branchSelect.value}`);
       })
-	    .catch(err => console.error("[setFixedBranch] Error:", err));
+	  .catch(err => {
+  		if (err !== "handled") {
+  		  handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+  		}
+  	  });
 	}
 
 	// Role-based visibility
 	userCategorySelect.addEventListener("change", () => {
-	    const value = parseInt(userCategorySelect.value);
+		const value = parseInt(userCategorySelect.value);
+		form.reset();
+		userCategorySelect.value = value;
 
 	    document.querySelectorAll(".client-only").forEach(el => {
 	        const inputs = el.querySelectorAll("input, select");
@@ -211,11 +208,17 @@ function initAddUserScript() {
 		       user.aadhar = formData.get("aadhar");
 		       user.pan = formData.get("pan");
 		       user.address = formData.get("address");
+			   
+			   const balanceVal = formData.get("balance").trim();
+			   const balanceNum = parseFloat(balanceVal);
+	   		  	if (isNaN(balanceNum) || balanceNum < 1 || balanceNum > 100000) {
+	   		  	  return handleResponse({ error: "Please enter a valid Opening Balance between ₹1 and ₹1,00,000 (one lakh), with up to 2 decimal places" });
+	   		  	}
 
 		       const account = {
 		           branchId: parseInt(formData.get("branchId")),
 		           accountType: parseInt(formData.get("accountTypeSelect")),
-				   balance: parseInt(formData.get("balance"))
+				   balance: balanceNum
 		       };
 
 		       body.client = user;
@@ -239,7 +242,7 @@ function initAddUserScript() {
 	        },
 	        body: JSON.stringify(body)
 	    })
-	    .then(res => res.json())
+	    .then(handleFetchResponse)
 	    .then(data => {
 	        handleResponse(data);
 			if (data.message) {
@@ -247,10 +250,11 @@ function initAddUserScript() {
 	            closeAddUserModal(); // ✅ close modal on success
 	        };
 	    })
-	    .catch(err => {
-	        console.error("Registration failed:", err);
-	        handleResponse({ error: "Failed to submit form." });
-	    });
+		.catch(err => {
+		  if (err !== "handled") {
+		    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+		  }
+		});
 	});
 
     // Optional: Show early mismatch if both fields are filled and focus leaves confirm

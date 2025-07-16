@@ -28,7 +28,7 @@ function initRequestScript() {
       },
       body: JSON.stringify({ branchId: userBranchId })
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         const b = data.branch;
         branchFilter.innerHTML = "";
@@ -38,9 +38,11 @@ function initRequestScript() {
         branchFilter.appendChild(option);
         branchFilter.disabled = true;
       })
-      .catch(err => {
-        console.error("Failed to fetch branch info for current user:", err);
-      });
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   }
 
   function fetchBranches() {
@@ -51,7 +53,7 @@ function initRequestScript() {
         "Method": "GET"
       }
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         branchFilter.innerHTML = '<option value="">All Branches</option>';
         data.Branches.forEach(branch => {
@@ -61,9 +63,11 @@ function initRequestScript() {
           branchFilter.appendChild(option);
         });
       })
-      .catch(err => {
-        console.error("Failed to load branches:", err);
-      });
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   }
 
   function loadRequests(page) {
@@ -100,10 +104,11 @@ function initRequestScript() {
 	        }
 	    }
       })
-      .catch(err => {
-        console.error("Error loading account requests:", err);
-        container.innerHTML = `<p class="error">Failed to load requests.</p>`;
-      });
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   }
 
   function renderRequests(requests) {
@@ -169,14 +174,16 @@ function initRequestScript() {
       },
       body: JSON.stringify({ requestId, status })
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         handleResponse(data);
         loadRequests(currentPage);
       })
-      .catch(err => {
-        console.error("Approval error:", err);
-      });
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   };
 
   if (statusFilter) statusFilter.addEventListener("change", () => {

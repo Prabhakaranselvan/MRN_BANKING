@@ -99,11 +99,6 @@ function initProfileScript() {
 	let profileOutsideClickListener = null;
 	enableProfileModalOutsideClickClose();
 
-    if (!form || !editBtn || !saveBtn || !passwordField) {
-        console.warn("Missing required DOM elements.");
-        return;
-    }
-
     // Show edit button if it's a self edit or privileged edit
     if (isSelfEdit || isPrivilegedEditing) {
         editBtn.style.display = "inline-block";
@@ -157,11 +152,6 @@ function initProfileScript() {
     form.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        if (!isEditMode) {
-            console.warn("Edit mode not active. Submission blocked.");
-            return;
-        }
-
         const formData = new FormData(form);
         const jsonBody = {
             userId: userId,
@@ -194,21 +184,30 @@ function initProfileScript() {
             },
             body: JSON.stringify(jsonBody)
         })
-        .then(res => res.json())
+        .then(handleFetchResponse)
         .then(data => {
             handleResponse(data);
             isEditMode = false;
-
+			if (isPrivilegedEditing && targetRole === 0) {
+			    if (document.getElementById("clientsList")) {
+			        refreshClients();
+			    }
+			} else if (isPrivilegedEditing && targetRole !== 0) {
+			    if (document.getElementById("employeesList")) {
+			        refreshEmployees();
+			    }
+			}	
 			if (isPrivilegedEditing) {
 				openProfileModal(targetId, targetRole);
 	        } else {
 				openProfileModal();
 	        }
         })
-        .catch(err => {
-            console.error("Error updating profile:", err);
-            handleResponse({ error: "Failed to update profile. Try again." });
-        });
+		.catch(err => {
+		  if (err !== "handled") {
+		    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+		  }
+		});
     });
 
     fetchProfileData(form, userId, isEditingClient);
@@ -225,10 +224,7 @@ function fetchProfileData(form, userId, isEditingClient) {
         },
         body: JSON.stringify({ userId })
     })
-    .then(response => response.json().then(data => {
-        if (!response.ok) throw data;
-        return data;
-    }))
+    .then(handleFetchResponse)
     .then(data => {
         const user = data.clients || data.Employee;
 
@@ -245,10 +241,11 @@ function fetchProfileData(form, userId, isEditingClient) {
             form.status.value = user.status;
         }
     })
-    .catch(err => {
-        console.error("Network or JSON error in fetchProfileData:", err);
-        handleResponse(err);
-    });
+	.catch(err => {
+	  if (err !== "handled") {
+	    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	  }
+	});
 }
 
 function enableProfileModalOutsideClickClose() {

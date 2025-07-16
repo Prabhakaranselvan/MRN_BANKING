@@ -5,11 +5,6 @@ function initClientAccountsScript() {
     const accountSelect = document.getElementById("accountSelect");
     const accountInfo = document.getElementById("accountInfo");
 
-    if (!userId) {
-        console.warn("No userId found.");
-        return;
-    }
-
     // Load accounts
     fetch("/MRN_BANKING/MRNBank/accounts", {
         method: "POST",
@@ -19,7 +14,7 @@ function initClientAccountsScript() {
         },
         body: JSON.stringify({ clientId: userId })
     })
-    .then(res => res.json())
+    .then(handleFetchResponse)
     .then(data => {
         const accounts = data.Accounts || [];
 		if (accounts.length === 0) {
@@ -60,10 +55,11 @@ function initClientAccountsScript() {
             accountSelect.appendChild(option);
         });
     })
-    .catch(err => {
-        console.error("Failed to fetch accounts:", err);
-        handleResponse({ error: "Unable to fetch account list." });
-    });
+	.catch(err => {
+	  if (err !== "handled") {
+	    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	  }
+	});
 
     accountSelect.addEventListener("change", () => {
         const selectedAccountNo = accountSelect.value;
@@ -82,7 +78,7 @@ function initClientAccountsScript() {
             },
             body: JSON.stringify({ accountNo: parseInt(selectedAccountNo) })
         })
-        .then(res => res.json())
+        .then(handleFetchResponse)
         .then(data => {
             const acc = data.Account.account;
             const branchName = data.Account.branchName;
@@ -99,10 +95,11 @@ function initClientAccountsScript() {
 			    <div class="detail-row"><span>Created Time:</span><strong>${new Date(acc.createdTime * 1000).toLocaleString()}</strong></div>
 			`;
         })
-        .catch(err => {
-            console.error("Failed to fetch account details:", err);
-            handleResponse({ error: "Unable to fetch account details." });
-        });
+		.catch(err => {
+		  if (err !== "handled") {
+		    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+		  }
+		});
     });
 
     initAccountRequestFeature();
@@ -142,7 +139,7 @@ function initAccountRequestFeature() {
                 "Method": "GET"
             }
         })
-        .then(res => res.json())
+        .then(handleFetchResponse)
         .then(data => {
             branchSelect.innerHTML = '<option value="">-- Select Branch --</option>';
             data.Branches.forEach(branch => {
@@ -152,9 +149,11 @@ function initAccountRequestFeature() {
                 branchSelect.appendChild(option);
             });
         })
-        .catch(err => {
-            console.error("Failed to load branches:", err);
-        });
+		.catch(err => {
+		  if (err !== "handled") {
+		    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+		  }
+		});
     }
 
     requestForm.addEventListener("submit", (e) => {
@@ -176,14 +175,16 @@ function initAccountRequestFeature() {
             },
             body: JSON.stringify({ branchId, accountType })
         })
-        .then(res => res.json())
+        .then(handleFetchResponse)
         .then(data => {
              handleResponse(data);
             modal.style.display = "none";
             requestForm.reset();
         })
-        .catch(err => {
-            console.error("Request failed:", err);
-        });
+		.catch(err => {
+		  if (err !== "handled") {
+		    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+		  }
+		});
     });
 }

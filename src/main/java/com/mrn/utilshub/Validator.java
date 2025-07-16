@@ -61,16 +61,16 @@ public class Validator
 		validationPatterns.put("PAN", "^[A-Z]{5}\\d{4}[A-Z]$");
 		validationMessages.put("PAN", "PAN must be in format: 5 uppercase letters, 4 digits, 1 uppercase letter.");
 
-		validationPatterns.put("Branch Name", "^[A-Za-z0-9 .'-]{3,50}$");
-		validationMessages.put("Branch Name", "Branch name must be 3–50 characters long and may include letters, numbers, and symbols.");
+		validationPatterns.put("Branch Name", "^[A-Za-z0-9 '-]{3,50}$");
+		validationMessages.put("Branch Name", "Branch name must be 3–50 characters long and may include letters, digits, space, apostrophe, hyphen only");
 
-		validationPatterns.put("Branch Location", "^[A-Za-z .'-]{3,50}$");
-		validationMessages.put("Branch Location", "Branch location must be 3–50 letters and may include spaces and punctuation.");
+		validationPatterns.put("Branch Location", "^[A-Za-z '-]{3,50}$");
+		validationMessages.put("Branch Location", "Branch location must be 3–50 letters and may include letters, space, apostrophe, hyphen only");
 
 		validationPatterns.put("Account No", "^\\d{11}$");
 		validationMessages.put("Account No", "Account number must be exactly 11 digits.");
 
-		validationPatterns.put("Address", "^(?=.{5,100}$)[A-Za-z0-9 ,.'/-]+$");
+		validationPatterns.put("Address", "^(?=.{5,100}$)[A-Za-z0-9 /,.'\\\\/-]+$");
 		validationMessages.put("Address", "Address should be 5–100 characters long with only letters, digits, and symbols like , . ' / -");
 
 		validationPatterns.put("Receiver Name", "^(?=.{1,70}$)[A-Za-z]+(?:[-' ][A-Za-z]+)*$");

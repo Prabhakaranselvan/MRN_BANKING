@@ -134,7 +134,6 @@ function initAccountsScript() {
       .catch(err => {
 		if (err !== "handled") {
 	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
-	      container.innerHTML = "<p class='error'>Error loading accounts.</p>";
 	    }
       });
   }
@@ -212,8 +211,14 @@ function initAccountsScript() {
     e.preventDefault();
     const formData = new FormData(addForm);
     const json = Object.fromEntries(formData.entries());
+	
+	const balanceVal = formData.get("balance").trim();
+   	const balanceNum = parseFloat(balanceVal);
+  	if (isNaN(balanceNum) || balanceNum < 1 || balanceNum > 100000) {
+  	  return handleResponse({ error: "Please enter a valid Opening Balance between ₹1 and ₹1,00,000 (one lakh), with up to 2 decimal places" });
+  	}
 
-    json.balance = parseFloat(json.balance);
+    json.balance = balanceNum;
     json.clientId = parseInt(json.clientId);
     json.accountType = parseInt(json.accountType);
     json.branchId = parseInt(json.branchId);

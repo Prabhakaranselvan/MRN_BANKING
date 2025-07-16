@@ -29,7 +29,7 @@ function renderAllCharts() {
     method: "GET",
     headers: { "Content-Type": "application/json", "Method": "GET" }
   })
-    .then(res => res.json())
+    .then(handleFetchResponse)
     .then(data => {
       const stats = data.Stats || [];
 
@@ -53,7 +53,9 @@ function renderAllCharts() {
       renderPieChart("branchAccountChart", branchData.map(s => "Branch " + s.subcategory), branchData.map(s => s.count), "Accounts per Branch");
     })
     .catch(err => {
-      console.error("Failed to load report data:", err);
+  	  if (err !== "handled") {
+  	    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+  	  }
     });
 }
 
@@ -136,7 +138,7 @@ function loadPendingRequestActions() {
     method: "GET",
     headers: { "Content-Type": "application/json", "Method": "GET" }
   })
-    .then(res => res.json())
+    .then(handleFetchResponse)
     .then(data => {
       const requests = data.AccountRequests || [];
 
@@ -170,8 +172,9 @@ function loadPendingRequestActions() {
       container.innerHTML = items;
     })
     .catch(err => {
-      console.error("Failed to load preview requests:", err);
-      container.innerHTML = `<p class="error">Unable to load account requests.</p>`;
+  	  if (err !== "handled") {
+  	    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+  	  }
     });
 }
 
@@ -181,14 +184,16 @@ function approveRequestFromAdmin(requestId, status) {
     headers: { "Content-Type": "application/json", "Method": "POST" },
     body: JSON.stringify({ requestId, status })
   })
-    .then(res => res.json())
+    .then(handleFetchResponse)
     .then(data => {
       handleResponse(data);
       loadPendingRequestActions(); // Refresh list
     })
-    .catch(err => {
-      console.error("Approval error:", err);
-    });
+	.catch(err => {
+	  if (err !== "handled") {
+	    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	  }
+	});
 }
 
 function formatAccountType(type) {
@@ -248,10 +253,12 @@ function fetchTransactions(page = 1, limit = 10, branchId = null) {
       'Method': 'GET'  // Custom header to signal internal handling if needed
     }
   })
-    .then(res => res.json())
+    .then(handleFetchResponse)
     .then(data => renderTransactions(data.Transactions || []))
-    .catch(err => {
-      console.error('Failed to load transactions:', err);
-    });
+	.catch(err => {
+	  if (err !== "handled") {
+	    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	  }
+	});
 }
 

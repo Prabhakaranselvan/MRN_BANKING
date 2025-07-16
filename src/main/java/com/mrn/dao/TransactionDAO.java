@@ -53,7 +53,7 @@ public class TransactionDAO
 			
 			String extraInfo = txn.getExtraInfo();
 			System.out.println(txn.isInternalTransfer());
-			if (txn.isInternalTransfer())
+			if (txn.isInternalTransfer() || txnType == TxnType.DEPOSIT.getValue() || txnType == TxnType.WITHDRAWAL.getValue())
 			{
 				pstmt.setNull(11, java.sql.Types.VARCHAR);
 			}

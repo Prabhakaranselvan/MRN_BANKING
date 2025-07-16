@@ -130,10 +130,11 @@ function initMainScript() {
         fetchTransactions(parseInt(selectedAccountNo)); // fetch transactions for this account
 		 fetchCreditDebitChart(parseInt(selectedAccountNo));
       })
-      .catch(err => {
-        console.error("Failed to fetch account details:", err);
-        accountInfo.innerHTML = `<p>Error loading account details.</p>`;
-      });
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
     });
 
   // === Render Doughnut Chart ===
@@ -250,7 +251,7 @@ function initMainScript() {
            limit: 100
          })
        })
-       .then(res => res.json())
+       .then(handleFetchResponse)
        .then(data => {
          const txns = data.Transactions || [];
          let credit = 0, debit = 0;
@@ -262,7 +263,11 @@ function initMainScript() {
 
          renderCreditDebitChart(credit, debit);
        })
-       .catch(err => console.error('Failed to load credit/debit stats:', err));
+	   .catch(err => {
+	     if (err !== "handled") {
+	       handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	     }
+	   });
      }
 
   // === Render Modern Transactions List ===
@@ -306,9 +311,13 @@ function initMainScript() {
       },
       body: JSON.stringify({ clientId: userId })
     })
-    .then(res => res.json())
+    .then(handleFetchResponse)
     .then(data => renderAccounts(data.Accounts || []))
-    .catch(err => console.error('Failed to load accounts:', err));
+	.catch(err => {
+	  if (err !== "handled") {
+	    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	  }
+	});
   }
 
   // === Fetch Transactions by Account or All ===
@@ -323,12 +332,13 @@ function initMainScript() {
         },
         body: JSON.stringify(payload)
       })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => renderTransactions(data.Transactions || []))
-      .catch(err => {
-        console.error('Failed to load transactions:', err);
-        txnListContainer.innerHTML = `<p>Error loading transactions.</p>`;
-      });
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
     }
 
     function getAccountTypeName(typeId) {

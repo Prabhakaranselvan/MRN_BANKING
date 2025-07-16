@@ -38,10 +38,12 @@
       <input type="hidden" id="branchId" />
 
       <label for="branchName">Branch Name</label>
-      <input type="text" id="branchName" maxlength="30" required />
+      <input type="text" id="branchName" pattern="^[A-Za-z0-9 '\-]+$" minlength="3" maxlength="50" required 
+      	title="Branch Name must be 3–50 characters long and may include letters, digits, spaces, apostrophes, hyphens only"/>
 
       <label for="branchLocation">Location</label>
-      <input type="text" id="branchLocation" maxlength="30" required />
+      <input type="text" id="branchLocation" pattern="^[A-Za-z '\-]+$" minlength="3" maxlength="50" required 
+      	title="Branch Location must be 3–50 characters long and may include letters, spaces, apostrophes, hyphenN only"/>
 
       <label for="contactNo">Contact Number</label>
       <input type="text" id="contactNo" maxlength="10" pattern="\d{10}" title="Phone number must be 10 digits" 

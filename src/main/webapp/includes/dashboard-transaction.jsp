@@ -71,7 +71,7 @@
         <div class="form-row">
             <div class="form-group">
                 <label for="amount">Amount</label>
-               <input type="text" id="amount" name="amount" required  maxlength="6" title="Amount must be between ₹1 and ₹1,00,000 (one lakh), with up to 2 decimal places"
+               <input type="text" id="amount" name="amount" required  maxlength="8" title="Amount must be between ₹1 and ₹1,00,000 (one lakh), with up to 2 decimal places"
        				placeholder="₹1–₹1,00,000 (max 2 decimal places)" />
 
             </div>

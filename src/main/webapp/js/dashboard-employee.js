@@ -32,7 +32,7 @@ function initEmployeesScript() {
 	    },
 	    body: JSON.stringify({ "branchId": userBranchId })
 	  })
-	  .then(res => res.json())
+	  .then(handleFetchResponse)
 	  .then(data => {
 	    const b = data.branch;
 	    branchFilter.innerHTML = "";
@@ -43,7 +43,9 @@ function initEmployeesScript() {
 	    branchFilter.disabled = true; // Lock it to their branch
 	  })
 	  .catch(err => {
-	    console.error("Failed to fetch branch info for current user:", err);
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
 	  });
 		   
 	} 
@@ -56,7 +58,7 @@ function initEmployeesScript() {
         "Method": "GET"
       }
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         branchFilter.innerHTML = '<option value="">All Branches</option>';
         data.Branches.forEach(branch => {
@@ -66,9 +68,11 @@ function initEmployeesScript() {
           branchFilter.appendChild(option);
         });
       })
-      .catch(err => {
-        console.error("Failed to load branches:", err);
-      });
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   }
 
   function loadEmployees(page) {
@@ -88,9 +92,8 @@ function initEmployeesScript() {
         "Method": "GET"
       }
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
-        console.log("Employee list:", data);
         if (data.employees && data.employees.length > 0) {
           renderEmployees(data.employees);
 		  paginationWrapper.style.display = "flex";
@@ -107,10 +110,11 @@ function initEmployeesScript() {
 	        }
         }
       })
-      .catch(err => {
-        console.error("Error loading employees:", err);
-        container.innerHTML = `<p class="error">Failed to load employees.</p>`;
-      });
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   }
 
   function renderEmployees(employees) {
@@ -175,6 +179,10 @@ function initEmployeesScript() {
 
   
   loadEmployees(currentPage);
+  
+  window.refreshEmployees = function () {
+  	       loadEmployees(currentPage);
+  	   };
 }
 
 function viewEmployee(targetId, targetRole) {

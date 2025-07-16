@@ -50,7 +50,8 @@
       <select id="addBranch" class="branch-input" name="branchId" required></select>
 
       <label for="addClientId">Client ID</label>
-      <input type="number" id="addClientId" name="clientId" required min="1" step="1" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+      <input type="text" id="addClientId" name="clientId" required maxlength="10" 
+      		oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/^0+/, '')" />
 
       <label for="addAccountType">Account Type</label>
       <select id="addAccountType" name="accountType" required>
@@ -61,7 +62,9 @@
       </select>
 
       <label for="addBalance">Opening Balance</label>
-      <input type="number" id="addBalance" name="balance" required min="0" step="0.01" oninput="this.value=this.value.replace(/[^0-9.]/g,'')" />
+      <input type="text" id="addBalance" name="balance" required maxlength="8" placeholder="₹1–₹1,00,000 (max 2 decimal places)" 
+      		title="Opening Balance must be between ₹1 and ₹1,00,000 (one lakh), with up to 2 decimal places"
+      		oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^0+/, '')" />
 
       <div class="modal-actions">
         <button type="submit" class="btn-submit">Create</button>

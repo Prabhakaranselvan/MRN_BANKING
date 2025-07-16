@@ -87,7 +87,15 @@
 	            });
 	
 	            const data = await response.json();
-	            handleResponse(data, "${pageContext.request.contextPath}/dashboard.jsp"); // Display response in dialog
+	            if (data.message)
+            	{
+	            	handleResponse(data, "${pageContext.request.contextPath}/dashboard.jsp"); // Display response in dialog
+            	}
+                else
+            	{
+                	handleResponse(data);
+            	}
+	            
 	        } 
 	        catch (error) {
 	            handleResponse({ error: "An error occurred while connecting to the server." });

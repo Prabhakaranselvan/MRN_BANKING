@@ -20,7 +20,7 @@ function initBranchScript() {
         "Method": "GET"
       }
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         const branches = data.Branches || [];
         branchCardsContainer.innerHTML = "";
@@ -44,10 +44,11 @@ function initBranchScript() {
           branchCardsContainer.appendChild(card);
         });
       })
-      .catch(err => {
-        console.error("Failed to fetch branches:", err);
-        branchCardsContainer.innerHTML = "<p>Error loading branches.</p>";
-      });
+	  .catch(err => {
+  	    if (err !== "handled") {
+  	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+  	    }
+  	  });
   }
 
   function loadBranchDetails(branchId) {
@@ -59,7 +60,7 @@ function initBranchScript() {
       },
       body: JSON.stringify({ branchId })
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         const b = data.branch;
         branchInfo.innerHTML = `
@@ -73,10 +74,11 @@ function initBranchScript() {
           <div class="detail-row"><span>Modified:</span><strong>${new Date(b.modifiedTime * 1000).toLocaleString()}</strong></div>
         `;
       })
-      .catch(err => {
-        console.error("Error loading branch details:", err);
-        branchInfo.innerHTML = "<p>Unable to load branch details.</p>";
-      });
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   }
 
   function initBranchModal() {
@@ -84,11 +86,6 @@ function initBranchScript() {
     const modal = document.getElementById("branchModal");
     const closeBtn = document.getElementById("closeBranchModal");
     const form = document.getElementById("branchForm");
-
-    if (!openBtn || !modal || !closeBtn || !form) {
-      console.warn("Branch modal elements not found. Skipping modal init.");
-      return;
-    }
 
     openBtn.addEventListener("click", () => openBranchModal());
 
@@ -121,16 +118,18 @@ function initBranchScript() {
         },
         body: JSON.stringify(payload)
       })
-        .then(res => res.json())
+        .then(handleFetchResponse)
         .then(data => {
           handleResponse(data);
           modal.style.display = "none";
           form.reset();
           fetchBranches();
         })
-        .catch(err => {
-          console.error("Save branch failed:", err);
-        });
+		.catch(err => {
+		  if (err !== "handled") {
+		    handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+		  }
+		});
     });
   }
 
@@ -138,11 +137,6 @@ function initBranchScript() {
     const modal = document.getElementById("branchModal");
     const title = document.getElementById("branchModalTitle");
     const form = document.getElementById("branchForm");
-
-    if (!modal || !title || !form) {
-      console.warn("Cannot open branch modal: DOM elements missing.");
-      return;
-    }
 
     if (!branchId) {
       title.textContent = "New Branch";
@@ -161,7 +155,7 @@ function initBranchScript() {
       },
       body: JSON.stringify({ branchId })
     })
-      .then(res => res.json())
+      .then(handleFetchResponse)
       .then(data => {
         const b = data.branch;
         title.textContent = "Edit Branch";
@@ -171,8 +165,10 @@ function initBranchScript() {
         document.getElementById("contactNo").value = b.contactNo;
         modal.style.display = "flex";
       })
-      .catch(err => {
-        console.error("Failed to load branch for edit:", err);
-      });
+	  .catch(err => {
+	    if (err !== "handled") {
+	      handleResponse({ error: "Something went wrong.<br/>Please check your network or try refreshing." });
+	    }
+	  });
   }
 }
