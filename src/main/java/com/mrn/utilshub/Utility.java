@@ -66,7 +66,7 @@ public class Utility {
 //Method To Check Whether the Input is Empty
 	public static void checkEmpty(CharSequence input) throws InvalidException {
 		checkNull(input);
-		if (input.isEmpty()) {
+		if (((String) input).isEmpty()) {
 			throw new InvalidException("Input is Empty");
 		}
 	}
